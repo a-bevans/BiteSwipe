@@ -102,12 +102,12 @@ resource "azurerm_network_interface_security_group_association" "nic_nsg_associa
   network_security_group_id = azurerm_network_security_group.nsg.id
 }
 
-# Create a virtual machine
+# Create a virtual machine (using smallest size that can run Docker)
 resource "azurerm_linux_virtual_machine" "vm" {
   name                = "${var.owner_tag}-biteswipe-vm"
   resource_group_name = azurerm_resource_group.rg.name
   location            = var.location
-  size                = var.vm_size
+  size                = var.vm_size  # Standard_B1s: 1vCPU, 1GB RAM, burstable performance
   admin_username      = var.admin_username
 
   network_interface_ids = [

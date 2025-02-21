@@ -25,7 +25,7 @@ variable "location" {
 variable "vm_size" {
   description = "Size of the VM"
   type        = string
-  default     = "Standard_B1s"
+  default     = "Standard_B1ls"  # Smallest VM size that can run Docker effectively
 }
 
 variable "allowed_ip_address" {

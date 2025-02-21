@@ -1,6 +1,7 @@
 import e from 'express';
 import express from 'express';
 import os from 'os';
+import mongoose from 'mongoose'; // Import mongoose
 import { connectDB } from './config/database';
 
 const app = express();
@@ -17,6 +18,26 @@ connectDB().then(() => {
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Health check endpoint for Docker
+app.get('/health', (req, res) => {
+  // Check MongoDB connection
+  if (mongoose.connection.readyState === 1) {
+    res.status(200).json({ 
+      status: 'healthy',
+      database: 'connected',
+      container: {
+        memory: process.memoryUsage(),
+        uptime: process.uptime()
+      }
+    });
+  } else {
+    res.status(503).json({ 
+      status: 'unhealthy',
+      database: 'disconnected'
+    });
+  }
+});
 
 app.get('/', (req, res) => {
   res.send('Hello World!+');
@@ -83,4 +104,5 @@ app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}/api/ip`);
   console.log(`Server is running at http://localhost:${port}/api/server-time`);
   console.log(`Server is running at http://localhost:${port}/api/first-last-name`);
+  console.log(`Server is running at http://localhost:${port}/health`);
 });

@@ -1,16 +1,43 @@
 ARG PORT
 
-#FROM node:20.06.0-alpine
+# Use a specific alpine version for smaller image
 FROM node:20.6.0-alpine
 
+# Add curl for healthcheck
+RUN apk add --no-cache curl
+
+# Set working directory
 WORKDIR /app
 
-COPY package.json ./
+# Copy package files and install dependencies
+COPY package*.json ./
+COPY tsconfig.json ./
 
-RUN npm install && npm ci
+# Install dependencies including TypeScript
+RUN npm ci --only=production && \
+    npm install typescript @types/node --save-dev && \
+    npm cache clean --force
 
+# Copy source
 COPY . .
 
+# Build TypeScript
+RUN npm run build
+
+# Set environment variables
+ENV NODE_ENV=production \
+    NPM_CONFIG_LOGLEVEL=warn \
+    PORT=$PORT
+
+# Expose port
 EXPOSE $PORT
 
+# Use non-root user for security
+USER node
+
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:$PORT/health || exit 1
+
+# Start the compiled app
 CMD ["npm", "start"]
