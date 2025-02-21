@@ -1,0 +1,44 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "typescript",
+			"tsconfig": "tsconfig.json",
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"label": "build_typescript"
+
+		},
+        {
+            "label": "Logs: Mongo",
+            "type": "shell",
+            "command": "docker-compose logs -f mongo",
+            "group": {
+                "kind": "none",
+                "isDefault": false
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            }
+        },
+        {
+            "label": "Logs: App",
+            "type": "shell",
+            "command": "docker-compose logs -f app",
+            "group": {
+                "kind": "none",
+                "isDefault": false
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            }
+        }
+	]
+}

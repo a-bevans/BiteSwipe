@@ -1,0 +1,9 @@
+*/node_modules/*
+backend/BiteSwipe.code-workspace
+
+# Terraform
+**/*.tfvars
+**/*.tfstate
+**/*.tfstate.*
+**/.terraform/
+**/.terraform.lock.hcl

@@ -1,0 +1,16 @@
+{
+  "name": "biteswipe-frontend",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "REACT_APP_ENV=development react-scripts start",
+    "start:staging": "REACT_APP_ENV=staging REACT_APP_API_URL=http://${AZURE_VM_IP} react-scripts start",
+    "build": "REACT_APP_ENV=production react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1"
+  }
+}
