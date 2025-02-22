@@ -45,10 +45,11 @@ resource "azurerm_subnet" "subnet" {
 # Create a public IP
 resource "azurerm_public_ip" "public_ip" {
   name                = "${var.owner_tag}-biteswipe-public-ip"
+  location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  location            = var.location
   allocation_method   = "Static"
-  sku                = "Standard"
+  sku                 = "Standard"
+  domain_name_label   = "${var.owner_tag}-biteswipe"
   
   tags = {
     owner = var.owner_tag
@@ -104,10 +105,10 @@ resource "azurerm_network_interface_security_group_association" "nic_nsg_associa
 
 # Create a virtual machine (using smallest size that can run Docker)
 resource "azurerm_linux_virtual_machine" "vm" {
-  name                = "${var.owner_tag}-biteswipe-vm"
+  name                = "${var.owner_tag}-biteswipe"
   resource_group_name = azurerm_resource_group.rg.name
   location            = var.location
-  size                = var.vm_size  # Standard_B1s: 1vCPU, 1GB RAM, burstable performance
+  size                = "Standard_B2s"  # 2 vCPUs, 4GB RAM
   admin_username      = var.admin_username
 
   network_interface_ids = [
@@ -117,12 +118,46 @@ resource "azurerm_linux_virtual_machine" "vm" {
   custom_data = base64encode(<<-EOF
     #!/bin/bash
     
-    # Create app directory
-    mkdir -p /app/backend
+    echo "[Setup] Starting VM configuration..."
     
-    # Make sure docker is running
+    echo "[Setup] Updating package lists..."
+    apt-get update
+    
+    echo "[Setup] Installing prerequisites..."
+    apt-get install -y \
+      apt-transport-https \
+      ca-certificates \
+      curl \
+      software-properties-common
+
+    echo "[Setup] Adding Docker repository..."
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+    add-apt-repository \
+      "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+      $(lsb_release -cs) \
+      stable"
+
+    echo "[Setup] Installing Docker..."
+    apt-get update
+    apt-get install -y docker-ce docker-ce-cli containerd.io
+
+    echo "[Setup] Installing Docker Compose..."
+    curl -L "https://github.com/docker/compose/releases/download/v2.24.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    chmod +x /usr/local/bin/docker-compose
+
+    echo "[Setup] Configuring Docker permissions..."
+    usermod -aG docker adminuser
+
+    echo "[Setup] Starting Docker service..."
     systemctl start docker
     systemctl enable docker
+
+    echo "[Setup] Creating application directories..."
+    mkdir -p /app/backend
+    chown -R adminuser:adminuser /app
+
+    echo "[Setup] Configuration complete!"
+    touch /tmp/setup_complete
   EOF
   )
 
@@ -137,8 +172,8 @@ resource "azurerm_linux_virtual_machine" "vm" {
   }
 
   source_image_reference {
-    publisher = "canonical"
-    offer     = "0001-com-ubuntu-server-docker-certified"
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-focal"
     sku       = "20_04-lts-gen2"
     version   = "latest"
   }
@@ -150,25 +185,88 @@ resource "azurerm_linux_virtual_machine" "vm" {
 
 # Separate deployment resource that can be triggered independently
 resource "null_resource" "deploy_backend" {
-  # This will trigger a new deployment when any file in the backend directory changes
   triggers = {
-    backend_hash = sha256(join("", [for f in fileset(path.root, "../../backend/**/*"): filesha256(f)]))
+    always_run = "${timestamp()}"
   }
-
-  # Wait for VM to be ready
-  depends_on = [azurerm_linux_virtual_machine.vm]
 
   provisioner "local-exec" {
     command = <<-EOT
-      # Copy backend folder to VM
-      scp -o StrictHostKeyChecking=no -i ${var.ssh_private_key_path} -r ${path.root}/../../backend/* ${var.admin_username}@${azurerm_public_ip.public_ip.ip_address}:/app/backend/
+      #!/bin/bash
+      set -x  # Enable debug output
+      set -e  # Exit on error
       
-      # SSH into VM and start docker services
-      ssh -o StrictHostKeyChecking=no -i ${var.ssh_private_key_path} ${var.admin_username}@${azurerm_public_ip.public_ip.ip_address} '
+      SSH_KEY="/Users/vm/.ssh/to_azure/CPEN321.pem"
+      VM_IP="${azurerm_public_ip.public_ip.ip_address}"
+      SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=10"
+
+      echo "[Deploy] Using VM IP: $VM_IP"
+      echo "[Deploy] Using SSH key: $SSH_KEY"
+      
+      # Verify SSH key exists and has correct permissions
+      ls -l $SSH_KEY
+      chmod 600 $SSH_KEY
+      
+      # Wait for SSH to be available
+      echo "[Deploy] Waiting for SSH to become available..."
+      for i in {1..30}; do
+        if ssh $SSH_OPTS -i $SSH_KEY adminuser@$VM_IP "echo 'SSH connection successful'" 2>/dev/null; then
+          echo "[Deploy] SSH is now available"
+          break
+        fi
+        echo "[Deploy] Attempt $i: Waiting for SSH... (VM_IP=$VM_IP)"
+        sleep 10
+      done
+
+      # Wait for setup to complete
+      echo "[Deploy] Waiting for setup script to complete..."
+      for i in {1..30}; do
+        if ssh $SSH_OPTS -i $SSH_KEY adminuser@$VM_IP "test -f /tmp/setup_complete && echo 'Setup complete file found'"; then
+          echo "[Deploy] Setup script completed successfully"
+          break
+        fi
+        echo "[Deploy] Attempt $i: Setup still in progress..."
+        # Check if we can see the cloud-init log
+        ssh $SSH_OPTS -i $SSH_KEY adminuser@$VM_IP "sudo tail -n 5 /var/log/cloud-init-output.log" || echo "Could not read cloud-init log"
+        sleep 10
+      done
+
+      # Copy files
+      echo "[Deploy] Copying backend files..."
+      BACKEND_PATH="$(pwd)/../../backend"
+      echo "[Deploy] Backend path: $BACKEND_PATH"
+      ls -la $BACKEND_PATH
+      
+      # Make sure .env file exists and has the right content
+      echo "[Deploy] Verifying .env file..."
+      ssh $SSH_OPTS -i $SSH_KEY adminuser@$VM_IP "
+        echo 'PORT=3000' > /app/backend/.env
+        echo 'DB_URI=mongodb://mongo:27017' >> /app/backend/.env
+        cat /app/backend/.env
+      "
+      
+      echo "[Deploy] Copying backend files..."
+      scp $SSH_OPTS -i $SSH_KEY -r $BACKEND_PATH/* adminuser@$VM_IP:/app/backend/
+
+      # Start services
+      echo "[Deploy] Starting Docker services..."
+      ssh $SSH_OPTS -i $SSH_KEY adminuser@$VM_IP "
+        set -x
         cd /app/backend
-        docker-compose down --remove-orphans
+        pwd
+        ls -la
+        echo '[Deploy] Verifying environment variables:'
+        cat .env
+        echo '[Deploy] Stopping existing containers...'
+        docker-compose down --remove-orphans || true
+        echo '[Deploy] Building and starting containers...'
         docker-compose up -d --build
-      '
+        echo '[Deploy] Containers started successfully!'
+        docker ps
+      "
     EOT
   }
+
+  depends_on = [
+    azurerm_linux_virtual_machine.vm
+  ]
 }

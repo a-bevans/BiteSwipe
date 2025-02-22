@@ -1,4 +1,5 @@
 import { Restaurant, IRestaurant } from '../models/Restaurant';
+import { FilterQuery } from 'mongoose';
 
 export class RestaurantService {
     // Create a new restaurant
@@ -12,7 +13,7 @@ export class RestaurantService {
     }
 
     // Get all restaurants with optional filters
-    static async findAll(filters: Partial<IRestaurant> = {}): Promise<IRestaurant[]> {
+    static async findAll(filters: FilterQuery<IRestaurant> = {}): Promise<IRestaurant[]> {
         try {
             return await Restaurant.find(filters);
         } catch (error) {
@@ -35,7 +36,7 @@ export class RestaurantService {
             return await Restaurant.findByIdAndUpdate(
                 id,
                 { $set: data },
-                { new: true, runValidators: true }
+                { new: true }
             );
         } catch (error) {
             throw new Error(`Error updating restaurant: ${error}`);
@@ -43,10 +44,9 @@ export class RestaurantService {
     }
 
     // Delete a restaurant
-    static async delete(id: string): Promise<boolean> {
+    static async delete(id: string): Promise<IRestaurant | null> {
         try {
-            const result = await Restaurant.findByIdAndDelete(id);
-            return result !== null;
+            return await Restaurant.findByIdAndDelete(id);
         } catch (error) {
             throw new Error(`Error deleting restaurant: ${error}`);
         }
@@ -83,7 +83,7 @@ export class RestaurantService {
             return await Restaurant.findByIdAndUpdate(
                 restaurantId,
                 { $push: { menu: menuItem } },
-                { new: true, runValidators: true }
+                { new: true }
             );
         } catch (error) {
             throw new Error(`Error adding menu item: ${error}`);
