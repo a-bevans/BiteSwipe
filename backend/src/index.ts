@@ -2,18 +2,13 @@ import e from 'express';
 import express from 'express';
 import os from 'os';
 import mongoose from 'mongoose'; // Import mongoose
-import { connectDB } from './config/database';
+import { Database} from './config/database';
 
 const app = express();
 const port = process.env.PORT;
 
 // Connect to MongoDB
-connectDB().then(() => {
-    console.log('Database connected successfully');
-}).catch((err) => {
-    console.error('Database connection error:', err);
-    process.exit(1);
-});
+const db = new Database(process.env.DB_URI || 'mongodb://localhost:27017', 'cpen321-app-db');
 
 // Middleware
 app.use(express.json());
