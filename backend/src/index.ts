@@ -3,6 +3,12 @@ import express from 'express';
 import os from 'os';
 import mongoose from 'mongoose'; // Import mongoose
 import { Database} from './config/database';
+import { sessionRoutes } from './routes/sessionRoutes';
+import { SessionManager } from './services/sessionManager';
+import { validationResult } from 'express-validator'; 
+import { Request, Response, NextFunction } from 'express';
+import { UserService } from './services/userService';
+
 
 const app = express();
 const port = process.env.PORT;
@@ -13,6 +19,47 @@ const db = new Database(process.env.DB_URI || 'mongodb://localhost:27017', 'cpen
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+
+// SessionManager
+
+const sessionManager = new SessionManager();
+const userSerivce = new UserService();
+
+//Testing purpose 
+
+// userSerivce.createUser('Lakshya@jiniiii.com', 'Lakshya')
+//   .then((user) => {
+//     console.log(user._id.toString());
+//     sessionManager.createSession(user._id, {location: {latitude: 49.2827, longitude: 123.1207, radius: 1000}}).then((session) => {
+//       console.log(session);
+//     });
+//   })
+//   .catch((error) => {
+//     console.log(error);
+//   })
+
+
+sessionRoutes(sessionManager).forEach((route) => {
+  (app as any)[route.method](
+    route.route,
+    route.validation,
+    async (req: Request, res: Response) => {
+      const errors = validationResult(req);
+      if(!errors.isEmpty()){
+        return res.status(400).json({ errors: errors.array() });
+      } else {
+        try {
+          await route.action(req, res);
+        } catch (error) {
+          console.log(error + 'line 38');
+          res.sendStatus(500);
+        }
+      }
+    }
+  )
+})
+
 
 // Health check endpoint for Docker
 app.get('/health', (req, res) => {
