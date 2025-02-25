@@ -4,6 +4,7 @@ import os from 'os';
 import mongoose from 'mongoose'; // Import mongoose
 import { Database} from './config/database';
 import { sessionRoutes } from './routes/sessionRoutes';
+import { userRoutes } from './routes/userRoutes';
 import { SessionManager } from './services/sessionManager';
 import { validationResult } from 'express-validator'; 
 import { Request, Response, NextFunction } from 'express';
@@ -26,25 +27,14 @@ app.use(express.urlencoded({ extended: true }));
 const sessionManager = new SessionManager();
 const userSerivce = new UserService();
 
-//Testing purpose 
-
-// userSerivce.createUser('Lakshya@jiniiii.com', 'Lakshya')
-//   .then((user) => {
-//     console.log(user._id.toString());
-//     sessionManager.createSession(user._id, {location: {latitude: 49.2827, longitude: 123.1207, radius: 1000}}).then((session) => {
-//       console.log(session);
-//     });
-//   })
-//   .catch((error) => {
-//     console.log(error);
-//   })
-
+// Sessoin Routes
 
 sessionRoutes(sessionManager).forEach((route) => {
   (app as any)[route.method](
     route.route,
     route.validation,
     async (req: Request, res: Response) => {
+      console.log(`Route: ${route.route}  ${route.method}`);
       const errors = validationResult(req);
       if(!errors.isEmpty()){
         return res.status(400).json({ errors: errors.array() });
@@ -58,7 +48,31 @@ sessionRoutes(sessionManager).forEach((route) => {
       }
     }
   )
-})
+});
+
+
+// User Routes
+
+userRoutes(userSerivce).forEach((route) => {
+  (app as any)[route.method](
+    route.route,
+    route.validation,
+    async (req: Request, res: Response) => {
+      console.log(`Route: ${route.route}  ${route.method}`);
+      const errors = validationResult(req);
+      if(!errors.isEmpty()){
+        return res.status(400).json({ errors: errors.array() });
+      } else {
+        try {
+          await route.action(req, res);
+        } catch (error) {
+          console.log(error + 'line 80');
+          res.sendStatus(500);
+        }
+      }
+    }
+  )
+});
 
 
 // Health check endpoint for Docker
