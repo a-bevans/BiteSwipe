@@ -2,22 +2,78 @@ import e from 'express';
 import express from 'express';
 import os from 'os';
 import mongoose from 'mongoose'; // Import mongoose
-import { connectDB } from './config/database';
+import { Database} from './config/database';
+import { sessionRoutes } from './routes/sessionRoutes';
+import { userRoutes } from './routes/userRoutes';
+import { SessionManager } from './services/sessionManager';
+import { validationResult } from 'express-validator'; 
+import { Request, Response, NextFunction } from 'express';
+import { UserService } from './services/userService';
+
 
 const app = express();
 const port = process.env.PORT;
 
 // Connect to MongoDB
-connectDB().then(() => {
-    console.log('Database connected successfully');
-}).catch((err) => {
-    console.error('Database connection error:', err);
-    process.exit(1);
-});
+const db = new Database(process.env.DB_URI || 'mongodb://localhost:27017', 'cpen321-app-db');
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+
+// SessionManager
+
+const sessionManager = new SessionManager();
+const userSerivce = new UserService();
+
+// Sessoin Routes
+
+sessionRoutes(sessionManager).forEach((route) => {
+  (app as any)[route.method](
+    route.route,
+    route.validation,
+    async (req: Request, res: Response) => {
+      console.log(`Route: ${route.route}  ${route.method}`);
+      const errors = validationResult(req);
+      if(!errors.isEmpty()){
+        return res.status(400).json({ errors: errors.array() });
+      } else {
+        try {
+          await route.action(req, res);
+        } catch (error) {
+          console.log(error + 'line 38');
+          res.sendStatus(500);
+        }
+      }
+    }
+  )
+});
+
+
+// User Routes
+
+userRoutes(userSerivce).forEach((route) => {
+  (app as any)[route.method](
+    route.route,
+    route.validation,
+    async (req: Request, res: Response) => {
+      console.log(`Route: ${route.route}  ${route.method}`);
+      const errors = validationResult(req);
+      if(!errors.isEmpty()){
+        return res.status(400).json({ errors: errors.array() });
+      } else {
+        try {
+          await route.action(req, res);
+        } catch (error) {
+          console.log(error + 'line 80');
+          res.sendStatus(500);
+        }
+      }
+    }
+  )
+});
+
 
 // Health check endpoint for Docker
 app.get('/health', (req, res) => {
