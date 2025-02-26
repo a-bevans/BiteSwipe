@@ -1,6 +1,7 @@
 import { Session } from '../models/session';
 import mongoose, { ObjectId } from 'mongoose';
 import { Types } from 'mongoose';
+
 import { RestaurantService } from './RestaurantService';
 
 export class SessionManager {
@@ -41,6 +42,7 @@ export class SessionManager {
             throw new Error('Session not found or already completed');
         }
 
+
         if(session.participants.length === 0) {
             session.participants.push({
                 userId: new mongoose.Types.ObjectId(userId),
@@ -60,32 +62,6 @@ export class SessionManager {
                 throw new Error('User already in session'); 
             }
         }
+
     }
-
-    // async handleSwipe(sessionId: string, userId: string, restaurantId: string, liked: boolean) {
-    //     const session = await Session.findById(sessionId);
-    //     if (!session || session.status.valueOf() === 'COMPLETED') {
-    //         throw new Error('Session not found or already completed');
-    //     }
-
-    //     const participant = session.participants.find(p => p.userId.valueOf() === userId);
-    //     if (!participant) {
-    //         throw new Error('Participant not found');
-    //     }
-
-    //     const preference = participant.preferences.find(p => p.restaurantId === restaurantId);
-    //     if (!preference) {
-    //         participant.preferences.push({
-    //             restaurantId: restaurantId,
-    //             liked: liked,
-    //             timestamp: new Date()
-    //         });
-    //     } else {
-    //         preference.liked = liked;
-    //         preference.timestamp = new Date();
-    //     }
-
-    //     await session.save();
-    //     return session;
-    // }
 }

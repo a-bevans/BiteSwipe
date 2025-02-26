@@ -10,14 +10,17 @@ WORKDIR /app
 COPY package*.json ./
 COPY tsconfig.json ./
 
-# Install all dependencies (including dev dependencies)
+# Install dependencies
 RUN npm install
 
 # Copy source
-COPY . .
+COPY src/ ./src/
 
 # Build TypeScript
 RUN npm run build
+
+# Verify the build output exists
+RUN ls -la dist/ && cat dist/index.js
 
 # Environment variables
 ENV NODE_ENV=production \
@@ -28,5 +31,5 @@ ARG PORT
 ENV PORT=$PORT
 EXPOSE $PORT
 
-# Start the application
-CMD ["node", "dist/index.js"]
+# Start the application with memory optimizations
+CMD ["node", "--max-old-space-size=150", "--optimize-for-size", "--gc-interval=100", "dist/index.js"]

@@ -16,22 +16,36 @@ services:
           cpus: '0.5'
         reservations:
           memory: 256M
-    command: ["mongod", "--wiredTigerCacheSizeGB", "0.25"]
+    command: >
+      mongod 
+      --wiredTigerCacheSizeGB 0.25
+      --tlsMode disabled
+      --setParameter internalQueryCacheMaxEntriesPerCollection=5000
+      --setParameter collectionSamplingLogIntervalSeconds=300
+      --setParameter storageEngineConcurrentReadTransactions=128
+      --setParameter storageEngineConcurrentWriteTransactions=128
+      --quiet
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        mode: "non-blocking"
 
   app:
     build:
       context: .
       dockerfile: dockerfile
       args:
-        - PORT=${PORT}
+        - PORT=3000
     container_name: cpen321_app
     restart: unless-stopped
     environment:
-      - PORT=${PORT}
-      - DB_URI=${DB_URI}
+      - PORT=3000
+      - DB_URI=mongodb://mongo:27017/biteswipe
       - NODE_ENV=production
     ports:
-      - "${PORT}:${PORT}"
+      - "3000:3000"
     depends_on:
       - mongo
     deploy:
@@ -42,15 +56,16 @@ services:
         reservations:
           memory: 128M
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:${PORT}/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-    command: >
-      sh -c "node --max-old-space-size=150
-      --optimize-for-size
-      --gc-interval=100
-      dist/index.js"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        mode: "non-blocking"
 
 volumes:
   mongo_data:

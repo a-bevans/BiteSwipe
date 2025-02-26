@@ -1,10 +1,13 @@
 import mongoose from 'mongoose';
+
 import { ObjectId, Types } from 'mongoose';
+
 
 export interface sessionSchema {
     creator: ObjectId,
     participants: {
         userId: Types.ObjectId,
+
         preferences: {
             restaurantId: string,
             liked: Boolean,
@@ -26,12 +29,15 @@ export interface sessionSchema {
     },
     restaurants: {
         restaurantId: Types.ObjectId,
+
         score: Number,
         totalVotes: Number,
         positiveVotes: Number
     }[],
     finalSelection: {
+
         restaurantId: Types.ObjectId,
+
         selectedAt: Date
     }
     createdAt: Date,
@@ -46,7 +52,9 @@ const SessionSchema = new mongoose.Schema<sessionSchema>({
     },
     participants: [{
         userId: {
+
             type: mongoose.Types.ObjectId,
+
             ref: 'User'
         },
         preferences: [{
@@ -68,13 +76,17 @@ const SessionSchema = new mongoose.Schema<sessionSchema>({
         }
     },
     restaurants: [{
+
         restaurantId: { type: mongoose.Types.ObjectId, ref: 'Restaurant' },
+
         score: Number,
         totalVotes: Number,
         positiveVotes: Number
     }],
     finalSelection: {
+
         restaurantId: { type: mongoose.Types.ObjectId, ref: 'Restaurant' },
+
         selectedAt: Date
     },
     createdAt: Date,
