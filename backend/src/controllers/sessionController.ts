@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { SessionManager } from "../services/sessionManager";
-import { Types } from "mongoose";
+import { mongo, Types } from "mongoose";
 
 export class SessionController {
     private sessionManager: SessionManager;
@@ -20,17 +20,19 @@ export class SessionController {
                 sessionId: session._id,
             });
         } catch (error) {
+            console.log(error);
             res.status(500).json({ error: error });
         }
     }
 
-    async joinSession(req, res: Response) {
+    async joinSession(req: Request, res: Response) {
         try {
             const { sessionId } = req.params;
-            const session = await this.sessionManager.joinSession(sessionId, req.user.id);
+            const session = await this.sessionManager.joinSession(new Types.ObjectId(sessionId), req.body.userId);
             
             res.json({ success: true, session: session._id });
         } catch (error) {
+            console.log(error);
             res.status(500).json({ error: error });
         }
     }

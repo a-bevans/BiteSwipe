@@ -22,7 +22,7 @@ export const sessionRoutes = (sessionManager: SessionManager) => {
             route: '/sessions/:sessionId/join',
             action: sessionController.joinSession,
             validation: [
-                param('sessionId').isString(),
+                param('sessionId').notEmpty(),
                 param('sessionId').notEmpty().withMessage('Session ID is required')
             ]
         }

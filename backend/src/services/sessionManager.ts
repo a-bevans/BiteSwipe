@@ -1,25 +1,38 @@
 import { Session } from '../models/session';
 import mongoose, { ObjectId } from 'mongoose';
 import { Types } from 'mongoose';
+import { RestaurantService } from './RestaurantService';
 
 export class SessionManager {
-    async createSession(creatorId: Types.ObjectId, settings: any) {
-        const session = new Session({
-            creator: creatorId,
-            settings: settings,
-            createdAt: new Date(),
-            expiresAt: new Date(Date.now() +  20 * 60 * 1000) // we can make it dynamic later 
-        });
 
-        const restaurants = []//await this.fetch // API call to fetch restaurants
-        session.restaurants = restaurants.map(r => ({
-            restaurantId: r.id,
-            score: 0,
-            totalVotes: 0,
-            positiveVotes: 0
-        }));
+    private restaurantService: RestaurantService;
+
+    constructor() {
+        this.restaurantService = new RestaurantService();
+    }
     
-        return await session.save();
+    async createSession(creatorId: Types.ObjectId, settings: any) {
+        try {
+            const restaurants = await this.restaurantService.addRestaurants(settings.location,'');
+        
+            const session = new Session({
+                creator: creatorId,
+                settings: settings,
+                createdAt: new Date(),
+                expiresAt: new Date(Date.now() +  20 * 60 * 1000), // we can make it dynamic later 
+                restaurants: restaurants.map(r => ({
+                    restaurantId: r._id,
+                    score: 0,
+                    totalVotes: 0,
+                    positiveVotes: 0
+                }))
+            });
+
+            return await session.save();
+        } catch (error) {
+            console.error(error);
+            throw new Error('Failed to create session');
+        }
     }
 
     async joinSession(sessionId: Types.ObjectId, userId: string) {
@@ -28,15 +41,25 @@ export class SessionManager {
             throw new Error('Session not found or already completed');
         }
 
-        if(!session.participants.find(p => p.userId.toString() === userId.toString())){
+        if(session.participants.length === 0) {
             session.participants.push({
-                userId: new mongoose.Schema.Types.ObjectId(userId),
+                userId: new mongoose.Types.ObjectId(userId),
                 preferences: []
-            });
-            await session.save();
+            })
+
+            return await session.save();
+        } else {
+            if(!session.participants.find(p => p.userId.toString() === userId)){
+                session.participants.push({
+                    userId: new mongoose.Types.ObjectId(userId),
+                    preferences: []
+                });
+
+                return await session.save();
+            } else {
+                throw new Error('User already in session'); 
+            }
         }
-        // ELSe statement for logic
-        return session;
     }
 
     // async handleSwipe(sessionId: string, userId: string, restaurantId: string, liked: boolean) {
