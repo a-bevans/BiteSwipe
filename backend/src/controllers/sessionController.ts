@@ -31,12 +31,12 @@ export class SessionController {
 
     async joinSession(req: Request, res: Response) {
         try {
-            const { sessionId } = req.params;
+            const sessionId = new Types.ObjectId(req.params.sessionId);
             const userId = new Types.ObjectId(req.body.userId);
             
             // Get the session creator's info
-            const session = await this.sessionManager.joinSession(new Types.ObjectId(sessionId), userId);
-            const creator = await UserModel.findById(session.createdBy);
+            const session = await this.sessionManager.joinSession(sessionId, userId);
+            const creator = await UserModel.findById(session.creator);
             
             // Send notification to the user being added
             if (creator) {

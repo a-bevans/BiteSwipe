@@ -36,32 +36,27 @@ export class SessionManager {
         }
     }
 
-    async joinSession(sessionId: Types.ObjectId, userId: string) {
+    async joinSession(sessionId: Types.ObjectId, userId: Types.ObjectId) {
         const session = await Session.findById(sessionId);
         if (!session || session.status.valueOf() === 'COMPLETED') {
             throw new Error('Session not found or already completed');
         }
 
-
         if(session.participants.length === 0) {
             session.participants.push({
-                userId: new mongoose.Types.ObjectId(userId),
+                userId: userId,
                 preferences: []
-            })
-
-            return await session.save();
+            });
         } else {
-            if(!session.participants.find(p => p.userId.toString() === userId)){
+            const existingParticipant = session.participants.find(p => p.userId.equals(userId));
+            if (!existingParticipant) {
                 session.participants.push({
-                    userId: new mongoose.Types.ObjectId(userId),
+                    userId: userId,
                     preferences: []
                 });
-
-                return await session.save();
-            } else {
-                throw new Error('User already in session'); 
             }
         }
 
+        return await session.save();
     }
 }

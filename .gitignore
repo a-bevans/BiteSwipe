@@ -8,3 +8,4 @@ backend/BiteSwipe.code-workspace
 **/.terraform/
 **/.terraform.lock.hcl
 backend/.env
+backend/biteswipe-132f1-firebase-adminsdk-fbsvc-76c5bb6fe5.json
