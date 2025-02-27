@@ -7,3 +7,4 @@ backend/BiteSwipe.code-workspace
 **/*.tfstate.*
 **/.terraform/
 **/.terraform.lock.hcl
+backend/.env
