@@ -33,7 +33,7 @@ sessionRoutes(sessionManager).forEach((route) => {
   (app as any)[route.method](
     route.route,
     route.validation,
-    async (req: Request, res: Response) => {
+    async (req: Request, res: Response, next: NextFunction) => {
       console.log(`Route: ${route.route}  ${route.method}`);
       const errors = validationResult(req);
       if(!errors.isEmpty()){
@@ -42,8 +42,7 @@ sessionRoutes(sessionManager).forEach((route) => {
         try {
           await route.action(req, res);
         } catch (error) {
-          console.log(error + 'line 38');
-          res.sendStatus(500);
+          next(error); // Pass error to error handler
         }
       }
     }
@@ -57,7 +56,7 @@ userRoutes(userSerivce).forEach((route) => {
   (app as any)[route.method](
     route.route,
     route.validation,
-    async (req: Request, res: Response) => {
+    async (req: Request, res: Response, next: NextFunction) => {
       console.log(`Route: ${route.route}  ${route.method}`);
       const errors = validationResult(req);
       if(!errors.isEmpty()){
@@ -66,8 +65,7 @@ userRoutes(userSerivce).forEach((route) => {
         try {
           await route.action(req, res);
         } catch (error) {
-          console.log(error + 'line 80');
-          res.sendStatus(500);
+          next(error); // Pass error to error handler
         }
       }
     }
@@ -153,6 +151,31 @@ app.get('/api/ip', (req, res) => {
 
   // res.send(hostIp);
   res.send('52.13.165.167');
+});
+
+// 404 Handler - Handle undefined routes
+app.use('*', (req: Request, res: Response) => {
+  res.status(404).json({
+    status: 'error',
+    error: 'Not Found',
+    message: `Cannot ${req.method} ${req.path}`,
+    path: req.originalUrl
+  });
+});
+
+// Global Error Handler
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error('Unhandled Error:', err);
+  
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  res.status(500).json({
+    status: 'error',
+    error: 'Internal Server Error',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'An unexpected error occurred'
+  });
 });
 
 app.listen(port, () => {

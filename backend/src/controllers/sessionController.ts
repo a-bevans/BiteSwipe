@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import { SessionManager } from "../services/sessionManager";
-
 import { mongo, Types } from "mongoose";
-
 
 export class SessionController {
     private sessionManager: SessionManager;
@@ -13,7 +11,7 @@ export class SessionController {
         this.joinSession = this.joinSession.bind(this);
     }
 
-    async createSession(req, res: Response) {
+    async createSession(req: Request, res: Response) {
         try {
             const settings  = {location: {latitude: req.body.latitude, longitude: req.body.longitude, radius: req.body.radius}};
             const session = await this.sessionManager.createSession(new Types.ObjectId(req.body.userId), settings);
@@ -22,13 +20,10 @@ export class SessionController {
                 sessionId: session._id,
             });
         } catch (error) {
-
             console.log(error);
-
             res.status(500).json({ error: error });
         }
     }
-
 
     async joinSession(req: Request, res: Response) {
         try {
@@ -38,7 +33,6 @@ export class SessionController {
             res.json({ success: true, session: session._id });
         } catch (error) {
             console.log(error);
-
             res.status(500).json({ error: error });
         }
     }
