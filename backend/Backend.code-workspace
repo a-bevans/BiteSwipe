@@ -1,13 +1,14 @@
 {
-	"folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": "../frontend"
-		},
-	],
-	"settings": {
-		
-	}
+  "folders": [
+    {
+      "path": "."
+    },
+    // {
+    //   "path": "../frontend"
+    // },
+    // {
+    //   "path": ".."
+    // }
+  ],
+  "settings": {}
 }

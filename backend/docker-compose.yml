@@ -39,6 +39,8 @@ services:
       args:
         - PORT=3000
     container_name: cpen321_app
+    volumes:
+      - .:/workspace
     restart: unless-stopped
     environment:
       - PORT=3000
@@ -51,10 +53,10 @@ services:
     deploy:
       resources:
         limits:
-          memory: 192M
-          cpus: '0.3'
+          cpus: 0.3
+          memory: 512M
         reservations:
-          memory: 128M
+          memory: 256M
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
       interval: 30s
