@@ -1,0 +1,114 @@
+[{
+  "_id": {
+    "$oid": "67c0146e50f81978e4f9f56d"
+  },
+  "creator": {
+    "$oid": "67c0106e9be4429eab3392b7"
+  },
+  "status": "CREATED",
+  "settings": {
+    "location": {
+      "latitude": 49.252646,
+      "longitude": -123.238658,
+      "radius": 400
+    }
+  },
+  "restaurants": [
+    {
+      "restaurantId": {
+        "$oid": "67c0146e50f81978e4f9f556"
+      },
+      "score": 0,
+      "totalVotes": 0,
+      "positiveVotes": 0,
+      "_id": {
+        "$oid": "67c0146e50f81978e4f9f56e"
+      }
+    },
+    {
+      "restaurantId": {
+        "$oid": "67c0146e50f81978e4f9f559"
+      },
+      "score": 0,
+      "totalVotes": 0,
+      "positiveVotes": 0,
+      "_id": {
+        "$oid": "67c0146e50f81978e4f9f56f"
+      }
+    },
+    {
+      "restaurantId": {
+        "$oid": "67c0146e50f81978e4f9f55c"
+      },
+      "score": 0,
+      "totalVotes": 0,
+      "positiveVotes": 0,
+      "_id": {
+        "$oid": "67c0146e50f81978e4f9f570"
+      }
+    },
+    {
+      "restaurantId": {
+        "$oid": "67c0146e50f81978e4f9f55f"
+      },
+      "score": 0,
+      "totalVotes": 0,
+      "positiveVotes": 0,
+      "_id": {
+        "$oid": "67c0146e50f81978e4f9f571"
+      }
+    },
+    {
+      "restaurantId": {
+        "$oid": "67c0146e50f81978e4f9f562"
+      },
+      "score": 0,
+      "totalVotes": 0,
+      "positiveVotes": 0,
+      "_id": {
+        "$oid": "67c0146e50f81978e4f9f572"
+      }
+    },
+    {
+      "restaurantId": {
+        "$oid": "67c0146e50f81978e4f9f565"
+      },
+      "score": 0,
+      "totalVotes": 0,
+      "positiveVotes": 0,
+      "_id": {
+        "$oid": "67c0146e50f81978e4f9f573"
+      }
+    },
+    {
+      "restaurantId": {
+        "$oid": "67c0146e50f81978e4f9f568"
+      },
+      "score": 0,
+      "totalVotes": 0,
+      "positiveVotes": 0,
+      "_id": {
+        "$oid": "67c0146e50f81978e4f9f574"
+      }
+    },
+    {
+      "restaurantId": {
+        "$oid": "67c0146e50f81978e4f9f56b"
+      },
+      "score": 0,
+      "totalVotes": 0,
+      "positiveVotes": 0,
+      "_id": {
+        "$oid": "67c0146e50f81978e4f9f575"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-02-27T07:29:50.975Z"
+  },
+  "expiresAt": {
+    "$date": "2025-02-27T07:49:50.975Z"
+  },
+  "participants": [],
+  "__v": 0
+}]
