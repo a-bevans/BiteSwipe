@@ -12,9 +12,10 @@ export const sessionRoutes = (sessionManager: SessionManager) => {
             route: '/sessions',
             action: sessionController.createSession,
             validation: [
-                body('latitude').isNumeric(),
-                body('longitude').isNumeric(),
-                body('radius').isNumeric(),
+                body('userId').notEmpty().withMessage('User ID is required'),
+                body('latitude').isNumeric().withMessage('Latitude must be a number'),
+                body('longitude').isNumeric().withMessage('Longitude must be a number'),
+                body('radius').isNumeric().withMessage('Radius must be a number')
             ]
         },
         {
@@ -22,8 +23,8 @@ export const sessionRoutes = (sessionManager: SessionManager) => {
             route: '/sessions/:sessionId/join',
             action: sessionController.joinSession,
             validation: [
-                param('sessionId').notEmpty(),
-                param('sessionId').notEmpty().withMessage('Session ID is required')
+                param('sessionId').notEmpty().withMessage('Session ID is required'),
+                body('userId').notEmpty().withMessage('User ID is required')
             ]
         }
     ];

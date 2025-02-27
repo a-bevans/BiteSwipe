@@ -8,11 +8,11 @@ export const userRoutes = (userService: UserService) => {
     return [
         {
             method: 'post',
-            route: '/users/create',
+            route: '/users/',
             action: userController.createUser,
             validation: [
-                body('email').isEmail(),
-                body('displayName').isString()
+                body('email').isEmail().withMessage('Valid email is required'),
+                body('displayName').isString().withMessage('Display name is required')
             ]
         },
         {
@@ -20,8 +20,8 @@ export const userRoutes = (userService: UserService) => {
             route: '/users/:userId/fcm-token',
             action: userController.updateFcmToken,
             validation: [
-                param('userId').notEmpty(),
-                body('fcmToken').notEmpty().isString()
+                param('userId').notEmpty().withMessage('User ID is required'),
+                body('fcmToken').notEmpty().isString().withMessage('FCM token is required')
             ]
         }
     ]

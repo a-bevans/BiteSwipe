@@ -34,7 +34,7 @@ sessionRoutes(sessionManager).forEach((route) => {
     route.route,
     route.validation,
     async (req: Request, res: Response, next: NextFunction) => {
-      console.log(`Route: ${route.route}  ${route.method}`);
+      console.log(`${route.method}`.toUpperCase() + ` ${route.route}  `);
       const errors = validationResult(req);
       if(!errors.isEmpty()){
         return res.status(400).json({ errors: errors.array() });
@@ -57,7 +57,7 @@ userRoutes(userSerivce).forEach((route) => {
     route.route,
     route.validation,
     async (req: Request, res: Response, next: NextFunction) => {
-      console.log(`Route: ${route.route}  ${route.method}`);
+      console.log(`${route.method}`.toUpperCase() + ` ${route.route}  `);
       const errors = validationResult(req);
       if(!errors.isEmpty()){
         return res.status(400).json({ errors: errors.array() });
