@@ -14,6 +14,15 @@ export const userRoutes = (userService: UserService) => {
                 body('email').isEmail(),
                 body('displayName').isString()
             ]
+        },
+        {
+            method: 'post',
+            route: '/users/:userId/fcm-token',
+            action: userController.updateFcmToken,
+            validation: [
+                param('userId').notEmpty(),
+                body('fcmToken').notEmpty().isString()
+            ]
         }
     ]
 }
