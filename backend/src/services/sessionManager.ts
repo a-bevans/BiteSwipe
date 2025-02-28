@@ -21,6 +21,9 @@ export class SessionManager {
                 settings: settings,
                 createdAt: new Date(),
                 expiresAt: new Date(Date.now() +  20 * 60 * 1000), // we can make it dynamic later 
+                participants: [{
+                    userId: creatorId
+                }],
                 restaurants: restaurants.map(r => ({
                     restaurantId: r._id,
                     score: 0,
