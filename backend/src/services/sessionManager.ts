@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { Session } from '../models/session';
+import { Session, ISession, SessionStatus } from '../models/session';
 import { RestaurantService } from './restaurantService';
 import mongoose, { ObjectId } from 'mongoose';
 import { UserModel } from '../models/user';
@@ -16,70 +16,123 @@ export class SessionManager {
         this.restaurantService = restaurantService;
     }
     
-    async createSession(creatorId: Types.ObjectId, settings: any) {
+    async createSession(
+        userId: Types.ObjectId,
+        settings: {
+            latitude: number;
+            longitude: number;
+            radius: number;
+        }
+    ): Promise<ISession> {
         try {
             // Check if user exists
-            const user = await UserModel.findById(creatorId);
+            const user = await UserModel.findById(userId);
             if (!user) {
                 const error = new Error() as CustomError;
                 error.code = 'USER_NOT_FOUND';
                 throw error;
             }
 
-            const restaurants = await this.restaurantService.addRestaurants(settings.location,'');
-        
+            // Set expiry to 24 hours from now
+            const expiresAt = new Date();
+            expiresAt.setHours(expiresAt.getHours() + 24);
+
+            const restaurants = await this.restaurantService.addRestaurants(settings, '');
+
             const session = new Session({
-                creator: creatorId,
-                settings: settings,
-                createdAt: new Date(),
-                expiresAt: new Date(Date.now() +  20 * 60 * 1000), // we can make it dynamic later 
+                creator: userId,
                 participants: [{
-                    userId: creatorId
+                    userId: userId,
+                    preferences: []
                 }],
+                pendingInvitations: [],
+                settings: {
+                    location: settings
+                },
                 restaurants: restaurants.map(r => ({
                     restaurantId: r._id,
                     score: 0,
                     totalVotes: 0,
                     positiveVotes: 0
-                }))
+                })),
+                status: 'CREATED' as SessionStatus,
+                expiresAt: expiresAt
             });
 
-            return await session.save();
+            await session.save();
+            return session;
         } catch (error) {
             console.error('Session creation error:', error);
             throw error;
         }
     }
 
-    async inviteParticipant(sessionId: Types.ObjectId, userId: Types.ObjectId) {
+    async addPendingInvitation(sessionId: Types.ObjectId, userId: Types.ObjectId): Promise<ISession> {
         const session = await Session.findById(sessionId);
-        if (!session || session.status.valueOf() === 'COMPLETED') {
-            throw new Error('Session not found or already completed');
+        if (!session) {
+            throw new Error('Session not found');
         }
 
-        if(session.participants.length === 0) {
-            session.participants.push({
-                userId: userId,
-                preferences: []
-            });
-        } else {
-            const existingParticipant = session.participants.find(p => p.userId.equals(userId));
-            if (!existingParticipant) {
-                session.participants.push({
-                    userId: userId,
-                    preferences: []
-                });
-            }
+        if (session.status === 'COMPLETED') {
+            throw new Error('Cannot invite users to a completed session');
         }
 
-        return await session.save();
+        // Check if user is already a participant
+        if (session.participants.some(p => p.userId.equals(userId))) {
+            throw new Error('User is already a participant');
+        }
+
+        // Check if user is already invited
+        if (session.pendingInvitations.some(id => id.equals(userId))) {
+            throw new Error('User has already been invited');
+        }
+
+        session.pendingInvitations.push(userId);
+        await session.save();
+        return session;
     }
 
-    async getUserSessions(userId: Types.ObjectId) {
+    async joinSession(sessionId: Types.ObjectId, userId: Types.ObjectId): Promise<ISession> {
+        const session = await Session.findById(sessionId);
+        if (!session) {
+            throw new Error('Session not found');
+        }
+
+        if (session.status === 'COMPLETED') {
+            throw new Error('Cannot join a completed session');
+        }
+
+        // Check if user is already a participant
+        if (session.participants.some(p => p.userId.equals(userId))) {
+            throw new Error('User is already a participant');
+        }
+
+        // Check if user has been invited
+        const inviteIndex = session.pendingInvitations.findIndex(id => id.equals(userId));
+        if (inviteIndex === -1) {
+            throw new Error('User has not been invited to this session');
+        }
+
+        // Remove from pending invitations and add to participants
+        session.pendingInvitations.splice(inviteIndex, 1);
+        session.participants.push({
+            userId: userId,
+            preferences: []
+        });
+
+        await session.save();
+        return session;
+    }
+
+    async getUserSessions(userId: Types.ObjectId): Promise<ISession[]> {
         try {
-            const sessions = await Session.find({ 
-                creator: userId,
-                status: { $ne: 'COMPLETED' } // Only return active sessions
+            const sessions = await Session.find({
+                $or: [
+                    { creator: userId },
+                    { 'participants.userId': userId },
+                    { pendingInvitations: userId }
+                ],
+                status: { $ne: 'COMPLETED' as SessionStatus }
             }).sort({ createdAt: -1 }); // Most recent first
             
             return sessions;
@@ -89,37 +142,72 @@ export class SessionManager {
         }
     }
 
-    async getSession(sessionId: Types.ObjectId) {
+    async getSession(sessionId: Types.ObjectId): Promise<ISession> {
         try {
-            const session = await Session.findById(sessionId)
-                .select('-__v')
-                .populate('creator', 'displayName')
-                .populate('participants.userId', 'displayName')
-                .lean();
-
+            const session = await Session.findById(sessionId);
             if (!session) {
-                const error = new Error('Session not found') as CustomError;
+                const error = new Error('Session not found') as Error & { code?: string };
                 error.code = 'SESSION_NOT_FOUND';
                 throw error;
             }
-
-            // Calculate session status
-            const now = new Date();
-            let status = 'ACTIVE';
-            
-            if (now > session.expiresAt) {
-                status = 'COMPLETED';
-            } else if (session.participants.length === 0) {
-                status = 'PENDING';
-            }
-
-            return {
-                ...session,
-                status
-            };
+            return session;
         } catch (error) {
             console.error('Error fetching session:', error);
             throw error;
         }
+    }
+
+    async rejectInvitation(sessionId: Types.ObjectId, userId: Types.ObjectId): Promise<ISession> {
+        const session = await Session.findById(sessionId);
+        if (!session) {
+            throw new Error('Session not found');
+        }
+
+        if (session.status === 'COMPLETED') {
+            throw new Error('Cannot reject invitation for a completed session');
+        }
+
+        // Check if user is already a participant
+        if (session.participants.some(p => p.userId.equals(userId))) {
+            throw new Error('User is already a participant');
+        }
+
+        // Check if user was invited
+        const inviteIndex = session.pendingInvitations.findIndex(id => id.equals(userId));
+        if (inviteIndex === -1) {
+            throw new Error('User has not been invited to this session');
+        }
+
+        // Remove from pending invitations
+        session.pendingInvitations.splice(inviteIndex, 1);
+        await session.save();
+        return session;
+    }
+
+    async leaveSession(sessionId: Types.ObjectId, userId: Types.ObjectId): Promise<ISession> {
+        const session = await Session.findById(sessionId);
+        if (!session) {
+            throw new Error('Session not found');
+        }
+
+        if (session.status === 'COMPLETED') {
+            throw new Error('Cannot leave a completed session');
+        }
+
+        // Check if user is the creator
+        if (session.creator.equals(userId)) {
+            throw new Error('Session creator cannot leave the session');
+        }
+
+        // Check if user is a participant
+        const participantIndex = session.participants.findIndex(p => p.userId.equals(userId));
+        if (participantIndex === -1) {
+            throw new Error('User is not a participant in this session');
+        }
+
+        // Remove from participants
+        session.participants.splice(participantIndex, 1);
+        await session.save();
+        return session;
     }
 }

@@ -1,4 +1,5 @@
 import admin from '../config/firebase';
+import { messaging } from '../config/firebase';
 import { Types } from 'mongoose';
 import { UserModel } from '../models/user';
 
@@ -29,6 +30,25 @@ export class NotificationService {
             const response = await admin.messaging().send(message);
             console.log('Successfully sent notification:', response);
             
+            return response;
+        } catch (error) {
+            console.error('Error sending notification:', error);
+            throw error;
+        }
+    }
+
+    async sendNotification(token: string, title: string, body: string) {
+        try {
+            const message = {
+                notification: {
+                    title,
+                    body,
+                },
+                token
+            };
+
+            const response = await messaging.send(message);
+            console.log('Successfully sent notification:', response);
             return response;
         } catch (error) {
             console.error('Error sending notification:', error);

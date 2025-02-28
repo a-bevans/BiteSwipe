@@ -245,10 +245,10 @@ POST /sessions
 **Request Body**
 ```json
 {
-  "userId": "string",
-  "latitude": "number",
-  "longitude": "number",
-  "radius": "number"
+  "userId": "string",    // MongoDB ObjectId
+  "latitude": number,
+  "longitude": number,
+  "radius": number
 }
 ```
 
@@ -256,21 +256,47 @@ POST /sessions
 - `201 Created`: Session created successfully
 ```json
 {
-  "sessionId": "string"
+  "_id": "string",
+  "creator": "string",
+  "participants": [
+    {
+      "userId": "string",
+      "preferences": []
+    }
+  ],
+  "pendingInvitations": [],
+  "status": "CREATED",
+  "settings": {
+    "location": {
+      "latitude": number,
+      "longitude": number,
+      "radius": number
+    }
+  },
+  "restaurants": [
+    {
+      "restaurantId": "string",
+      "score": number,
+      "totalVotes": number,
+      "positiveVotes": number
+    }
+  ],
+  "createdAt": "string",
+  "expiresAt": "string"
 }
 ```
-- `400 Bad Request`: Unable to create session
+- `400 Bad Request`: Invalid request parameters
 ```json
 {
-  "error": "Unable to create session"
+  "error": "Internal server error"
 }
 ```
 
-#### Add Participant
-Adds a participant to an existing dining session. The invited user will receive a notification.
+#### Create Session Invitation
+Invites a user to join a session. The invited user will receive a push notification.
 
 ```http
-POST /sessions/{sessionId}/participants
+POST /sessions/:sessionId/invitations
 ```
 
 **Parameters**
@@ -279,22 +305,252 @@ POST /sessions/{sessionId}/participants
 **Request Body**
 ```json
 {
-  "userId": "string"
+  "userId": "string"  // MongoDB ObjectId of the user to invite
 }
 ```
 
 **Response**
-- `201 Created`: Successfully added participant
+- `200 OK`: Successfully invited user
 ```json
 {
-  "success": true,
-  "session": "string"
+  "_id": "string",
+  "creator": "string",
+  "participants": [
+    {
+      "userId": "string",
+      "preferences": []
+    }
+  ],
+  "pendingInvitations": ["string"],  // List of invited user IDs
+  "status": "CREATED",
+  "settings": {
+    "location": {
+      "latitude": number,
+      "longitude": number,
+      "radius": number
+    }
+  },
+  "restaurants": [
+    {
+      "restaurantId": "string",
+      "score": number,
+      "totalVotes": number,
+      "positiveVotes": number
+    }
+  ],
+  "createdAt": "string",
+  "expiresAt": "string"
 }
 ```
-- `400 Bad Request`: Unable to add participant
+
+- `400 Bad Request`: Invalid session or user ID format, or user is already a participant
 ```json
 {
-  "error": "Unable to add participant"
+  "error": "User is already a participant"
+}
+```
+- `404 Not Found`: Session not found
+```json
+{
+  "error": "Session not found"
+}
+```
+
+#### Join Session
+Accept an invitation and join a session. User must have been invited first.
+
+```http
+POST /sessions/:sessionId/participants
+```
+
+**Parameters**
+- `sessionId`: Session ID (path parameter)
+
+**Request Body**
+```json
+{
+  "userId": "string"  // MongoDB ObjectId of the user joining
+}
+```
+
+**Response**
+- `200 OK`: Successfully joined session
+```json
+{
+  "_id": "string",
+  "creator": "string",
+  "participants": [
+    {
+      "userId": "string",
+      "preferences": []
+    }
+  ],
+  "pendingInvitations": ["string"],
+  "status": "CREATED",
+  "settings": {
+    "location": {
+      "latitude": number,
+      "longitude": number,
+      "radius": number
+    }
+  },
+  "restaurants": [
+    {
+      "restaurantId": "string",
+      "score": number,
+      "totalVotes": number,
+      "positiveVotes": number
+    }
+  ],
+  "createdAt": "string",
+  "expiresAt": "string"
+}
+```
+
+- `400 Bad Request`: Invalid session or user ID format, or user is already a participant
+```json
+{
+  "error": "User is already a participant"
+}
+```
+- `403 Forbidden`: User has not been invited to this session
+```json
+{
+  "error": "User has not been invited to this session"
+}
+```
+- `404 Not Found`: Session not found
+```json
+{
+  "error": "Session not found"
+}
+```
+
+#### Leave Session
+Leave a session as a participant. Note that the session creator cannot leave their own session.
+
+```http
+DELETE /sessions/:sessionId/participants/:userId
+```
+
+**Parameters**
+- `sessionId`: Session ID (path parameter)
+- `userId`: User ID (path parameter)
+
+**Response**
+- `200 OK`: Successfully left session
+```json
+{
+  "_id": "string",
+  "creator": "string",
+  "participants": [
+    {
+      "userId": "string",
+      "preferences": []
+    }
+  ],
+  "pendingInvitations": ["string"],
+  "status": "CREATED",
+  "settings": {
+    "location": {
+      "latitude": number,
+      "longitude": number,
+      "radius": number
+    }
+  },
+  "restaurants": [
+    {
+      "restaurantId": "string",
+      "score": number,
+      "totalVotes": number,
+      "positiveVotes": number
+    }
+  ],
+  "createdAt": "string",
+  "expiresAt": "string"
+}
+```
+
+- `400 Bad Request`: Invalid session or user ID format, or if creator tries to leave
+```json
+{
+  "error": "Session creator cannot leave the session"
+}
+```
+- `403 Forbidden`: User is not a participant in this session
+```json
+{
+  "error": "User is not a participant in this session"
+}
+```
+- `404 Not Found`: Session not found
+```json
+{
+  "error": "Session not found"
+}
+```
+
+#### Reject Session Invitation
+Reject or cancel a pending invitation to join a session.
+
+```http
+DELETE /sessions/:sessionId/invitations/:userId
+```
+
+**Parameters**
+- `sessionId`: Session ID (path parameter)
+- `userId`: User ID (path parameter)
+
+**Response**
+- `200 OK`: Successfully rejected invitation
+```json
+{
+  "_id": "string",
+  "creator": "string",
+  "participants": [
+    {
+      "userId": "string",
+      "preferences": []
+    }
+  ],
+  "pendingInvitations": ["string"],
+  "status": "CREATED",
+  "settings": {
+    "location": {
+      "latitude": number,
+      "longitude": number,
+      "radius": number
+    }
+  },
+  "restaurants": [
+    {
+      "restaurantId": "string",
+      "score": number,
+      "totalVotes": number,
+      "positiveVotes": number
+    }
+  ],
+  "createdAt": "string",
+  "expiresAt": "string"
+}
+```
+
+- `400 Bad Request`: Invalid session or user ID format
+```json
+{
+  "error": "Invalid session or user ID format"
+}
+```
+- `403 Forbidden`: User has not been invited to this session
+```json
+{
+  "error": "User has not been invited to this session"
+}
+```
+- `404 Not Found`: Session not found
+```json
+{
+  "error": "Session not found"
 }
 ```
 
@@ -316,28 +572,35 @@ POST /sessions/{sessionId}/participants
 {
   "_id": "string",
   "creator": "string",
+  "participants": [
+    {
+      "userId": "string",
+      "preferences": [
+        {
+          "restaurantId": "string",
+          "liked": boolean,
+          "timestamp": "date"
+        }
+      ]
+    }
+  ],
+  "pendingInvitations": ["string"],
+  "status": "CREATED" | "ACTIVE" | "MATCHING" | "COMPLETED",
   "settings": {
     "location": {
-      "latitude": "number",
-      "longitude": "number",
-      "radius": "number"
+      "latitude": number,
+      "longitude": number,
+      "radius": number
     }
   },
-  "participants": [{
-    "userId": "string",
-    "preferences": [{
+  "restaurants": [
+    {
       "restaurantId": "string",
-      "liked": "boolean",
-      "timestamp": "date"
-    }]
-  }],
-  "restaurants": [{
-    "restaurantId": "string",
-    "score": "number",
-    "totalVotes": "number",
-    "positiveVotes": "number"
-  }],
-  "status": "string", // One of: 'ACTIVE', 'COMPLETED', 'PENDING'
+      "score": number,
+      "totalVotes": number,
+      "positiveVotes": number
+    }
+  ],
   "createdAt": "date",
   "expiresAt": "date"
 }

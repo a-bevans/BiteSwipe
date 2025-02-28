@@ -1,61 +1,53 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Types } from 'mongoose';
 
-import { ObjectId, Types } from 'mongoose';
+type SessionStatus = 'CREATED' | 'ACTIVE' | 'MATCHING' | 'COMPLETED';
 
+interface IParticipant {
+    userId: Types.ObjectId;
+    preferences: {
+        restaurantId: string;
+        liked: boolean;
+        timestamp: Date;
+    }[];
+}
 
-export interface sessionSchema {
-    creator: ObjectId,
-    participants: {
-        userId: Types.ObjectId,
-
-        preferences: {
-            restaurantId: string,
-            liked: Boolean,
-            timestamp: Date
-        }[]
-    }[],
-    status: {
-        type: String,
-        enum: ['CREATED', 'ACTIVE', 'MATCHING', 'COMPLETED'],
-        default: 'CREATED'
-    },
+interface ISession extends Document {
+    creator: Types.ObjectId;
+    participants: IParticipant[];
+    pendingInvitations: Types.ObjectId[];
+    status: SessionStatus;
     settings: {
         location: {
-            latitude: Number,
-            longitude: Number,
-            radius: Number
-        }
-        // Possiblly add more stuff like cuisine, price range, etc.
-    },
-    restaurants: {
-        restaurantId: Types.ObjectId,
+            latitude: number;
+            longitude: number;
+            radius: number;
+        };
+    };
+    restaurants: Array<{
+        restaurantId: Types.ObjectId;
+        score: number;
+        totalVotes: number;
+        positiveVotes: number;
+    }>;
+    finalSelection?: {
+        restaurantId: Types.ObjectId;
+        selectedAt: Date;
+    };
+    createdAt: Date;
+    expiresAt: Date;
+}
 
-        score: Number,
-        totalVotes: Number,
-        positiveVotes: Number
-    }[],
-    finalSelection: {
-
-        restaurantId: Types.ObjectId,
-
-        selectedAt: Date
-    }
-    createdAt: Date,
-    expiresAt: Date
-};
-
-const SessionSchema = new mongoose.Schema<sessionSchema>({
+const SessionSchema = new mongoose.Schema<ISession>({
     creator: { 
-        type: mongoose.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        require: true
+        required: true 
     },
     participants: [{
-        userId: {
-
-            type: mongoose.Types.ObjectId,
-
-            ref: 'User'
+        userId: { 
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: 'User',
+            required: true 
         },
         preferences: [{
             restaurantId: String,
@@ -63,6 +55,10 @@ const SessionSchema = new mongoose.Schema<sessionSchema>({
             timestamp: Date
         }]
     }],
+    pendingInvitations: [{ 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'User' 
+    }],
     status: {
         type: String,
         enum: ['CREATED', 'ACTIVE', 'MATCHING', 'COMPLETED'],
@@ -70,27 +66,31 @@ const SessionSchema = new mongoose.Schema<sessionSchema>({
     },
     settings: {
         location: {
-            latitude: Number,
-            longitude: Number,
-            radius: Number
+            latitude: { type: Number, required: true },
+            longitude: { type: Number, required: true },
+            radius: { type: Number, required: true }
         }
     },
     restaurants: [{
-
-        restaurantId: { type: mongoose.Types.ObjectId, ref: 'Restaurant' },
-
-        score: Number,
-        totalVotes: Number,
-        positiveVotes: Number
+        restaurantId: { 
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Restaurant',
+            required: true 
+        },
+        score: { type: Number, default: 0 },
+        totalVotes: { type: Number, default: 0 },
+        positiveVotes: { type: Number, default: 0 }
     }],
     finalSelection: {
-
-        restaurantId: { type: mongoose.Types.ObjectId, ref: 'Restaurant' },
-
+        restaurantId: { 
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Restaurant'
+        },
         selectedAt: Date
     },
-    createdAt: Date,
-    expiresAt: Date
+    createdAt: { type: Date, default: Date.now },
+    expiresAt: { type: Date, required: true }
 });
 
-export const Session = mongoose.model<sessionSchema>('Session', SessionSchema);
+export const Session = mongoose.model<ISession>('Session', SessionSchema);
+export type { ISession, IParticipant, SessionStatus };
