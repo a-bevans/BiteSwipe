@@ -9,6 +9,7 @@ import { SessionManager } from './services/sessionManager';
 import { validationResult } from 'express-validator'; 
 import { Request, Response, NextFunction } from 'express';
 import { UserService } from './services/userService';
+import { RestaurantService } from './services/restaurantService'; // Import RestaurantService
 
 
 const app = express();
@@ -24,8 +25,10 @@ app.use(express.urlencoded({ extended: true }));
 
 // SessionManager
 
-const sessionManager = new SessionManager();
+const restaurantService = new RestaurantService(); // Create RestaurantService before SessionManager
 const userService = new UserService();
+const sessionManager = new SessionManager(restaurantService); // Pass RestaurantService to SessionManager
+
 
 // Sessoin Routes
 

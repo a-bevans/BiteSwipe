@@ -8,6 +8,14 @@ export const sessionRoutes = (sessionManager: SessionManager) => {
 
     return [
         {
+            method: 'get',
+            route: '/sessions/:sessionId',
+            action: sessionController.getSession,
+            validation: [
+                param('sessionId').notEmpty().withMessage('Session ID is required')
+            ]
+        },
+        {
             method: 'post',
             route: '/sessions',
             action: sessionController.createSession,

@@ -168,6 +168,73 @@ GET /users/{userId}/sessions
 }
 ```
 
+#### Get Session
+Retrieves detailed information about a specific session.
+
+```http
+GET /sessions/{sessionId}
+```
+
+**Parameters**
+- `sessionId`: Session ID (path parameter)
+
+**Response**
+- `200 OK`: Successfully retrieved session
+```json
+{
+  "_id": "string",
+  "creator": {
+    "_id": "string",
+    "displayName": "string"
+  },
+  "settings": {
+    "location": {
+      "latitude": "number",
+      "longitude": "number",
+      "radius": "number"
+    }
+  },
+  "participants": [{
+    "userId": {
+      "_id": "string",
+      "displayName": "string"
+    },
+    "preferences": [{
+      "restaurantId": "string",
+      "liked": "boolean",
+      "timestamp": "date"
+    }]
+  }],
+  "restaurants": [{
+    "restaurantId": "string",
+    "score": "number",
+    "totalVotes": "number",
+    "positiveVotes": "number"
+  }],
+  "status": "string", // One of: 'ACTIVE', 'COMPLETED', 'PENDING'
+  "createdAt": "date",
+  "expiresAt": "date"
+}
+```
+- `400 Bad Request`: Invalid session ID format
+```json
+{
+  "error": "Invalid session ID format"
+}
+```
+- `404 Not Found`: Session does not exist
+```json
+{
+  "error": "Session not found"
+}
+```
+- `500 Internal Server Error`: Server error occurred
+```json
+{
+  "error": "Internal server error"
+}
+```
+
 #### Create Session
 Creates a new dining session.
 
@@ -270,6 +337,7 @@ POST /sessions/{sessionId}/participants
     "totalVotes": "number",
     "positiveVotes": "number"
   }],
+  "status": "string", // One of: 'ACTIVE', 'COMPLETED', 'PENDING'
   "createdAt": "date",
   "expiresAt": "date"
 }

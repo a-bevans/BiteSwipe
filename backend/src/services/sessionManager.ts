@@ -1,15 +1,19 @@
-import { Session } from '../models/session';
-import mongoose, { ObjectId } from 'mongoose';
 import { Types } from 'mongoose';
+import { Session } from '../models/session';
+import { RestaurantService } from './restaurantService';
+import mongoose, { ObjectId } from 'mongoose';
 import { UserModel } from '../models/user';
-import { RestaurantService } from './RestaurantService';
+
+interface CustomError extends Error {
+    code?: string;
+}
 
 export class SessionManager {
 
     private restaurantService: RestaurantService;
 
-    constructor() {
-        this.restaurantService = new RestaurantService();
+    constructor(restaurantService: RestaurantService) {
+        this.restaurantService = restaurantService;
     }
     
     async createSession(creatorId: Types.ObjectId, settings: any) {
@@ -17,7 +21,7 @@ export class SessionManager {
             // Check if user exists
             const user = await UserModel.findById(creatorId);
             if (!user) {
-                const error = new Error() as Error & { code: string };
+                const error = new Error() as CustomError;
                 error.code = 'USER_NOT_FOUND';
                 throw error;
             }
@@ -81,6 +85,40 @@ export class SessionManager {
             return sessions;
         } catch (error) {
             console.error('Error fetching user sessions:', error);
+            throw error;
+        }
+    }
+
+    async getSession(sessionId: Types.ObjectId) {
+        try {
+            const session = await Session.findById(sessionId)
+                .select('-__v')
+                .populate('creator', 'displayName')
+                .populate('participants.userId', 'displayName')
+                .lean();
+
+            if (!session) {
+                const error = new Error('Session not found') as CustomError;
+                error.code = 'SESSION_NOT_FOUND';
+                throw error;
+            }
+
+            // Calculate session status
+            const now = new Date();
+            let status = 'ACTIVE';
+            
+            if (now > session.expiresAt) {
+                status = 'COMPLETED';
+            } else if (session.participants.length === 0) {
+                status = 'PENDING';
+            }
+
+            return {
+                ...session,
+                status
+            };
+        } catch (error) {
+            console.error('Error fetching session:', error);
             throw error;
         }
     }

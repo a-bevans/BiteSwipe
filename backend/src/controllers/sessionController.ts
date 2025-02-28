@@ -4,6 +4,10 @@ import { mongo, Types } from "mongoose";
 import { NotificationService } from "../services/notificationService";
 import { UserModel } from "../models/user";
 
+interface CustomError extends Error {
+    code?: string;
+}
+
 export class SessionController {
     private sessionManager: SessionManager;
     private notificationService: NotificationService;
@@ -13,6 +17,26 @@ export class SessionController {
         this.notificationService = new NotificationService();
         this.createSession = this.createSession.bind(this);
         this.inviteParticipant = this.inviteParticipant.bind(this);
+        this.getSession = this.getSession.bind(this);
+    }
+
+    async getSession(req: Request, res: Response) {
+        try {
+            const sessionId = req.params.sessionId;
+            
+            if (!Types.ObjectId.isValid(sessionId)) {
+                return res.status(400).json({ error: 'Invalid session ID format' });
+            }
+
+            const session = await this.sessionManager.getSession(new Types.ObjectId(sessionId));
+            res.json(session);
+        } catch (error) {
+            console.error('Error fetching session:', error);
+            if (error instanceof Error && (error as CustomError).code === 'SESSION_NOT_FOUND') {
+                return res.status(404).json({ error: 'Session not found' });
+            }
+            res.status(500).json({ error: 'Internal server error' });
+        }
     }
 
     async createSession(req: Request, res: Response) {
