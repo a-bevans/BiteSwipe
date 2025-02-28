@@ -70,4 +70,18 @@ export class SessionManager {
 
         return await session.save();
     }
+
+    async getUserSessions(userId: Types.ObjectId) {
+        try {
+            const sessions = await Session.find({ 
+                creator: userId,
+                status: { $ne: 'COMPLETED' } // Only return active sessions
+            }).sort({ createdAt: -1 }); // Most recent first
+            
+            return sessions;
+        } catch (error) {
+            console.error('Error fetching user sessions:', error);
+            throw error;
+        }
+    }
 }

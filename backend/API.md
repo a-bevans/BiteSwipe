@@ -78,6 +78,56 @@ POST /users/{userId}/fcm-token
 
 ### Sessions
 
+#### List User Sessions
+Returns all active sessions created by a user.
+
+```http
+GET /users/{userId}/sessions
+```
+
+**Parameters**
+- `userId`: User ID (path parameter)
+
+**Response**
+- `200 OK`: Successfully retrieved sessions
+```json
+{
+  "sessions": [{
+    "_id": "string",
+    "creator": "string",
+    "settings": {
+      "location": {
+        "latitude": "number",
+        "longitude": "number",
+        "radius": "number"
+      }
+    },
+    "participants": [{
+      "userId": "string",
+      "preferences": [{
+        "restaurantId": "string",
+        "liked": "boolean",
+        "timestamp": "date"
+      }]
+    }],
+    "restaurants": [{
+      "restaurantId": "string",
+      "score": "number",
+      "totalVotes": "number",
+      "positiveVotes": "number"
+    }],
+    "createdAt": "date",
+    "expiresAt": "date"
+  }]
+}
+```
+- `400 Bad Request`: Unable to fetch sessions
+```json
+{
+  "error": "Unable to fetch sessions"
+}
+```
+
 #### Create Session
 Creates a new dining session.
 

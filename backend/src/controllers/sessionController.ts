@@ -13,6 +13,7 @@ export class SessionController {
         this.notificationService = new NotificationService();
         this.createSession = this.createSession.bind(this);
         this.inviteParticipant = this.inviteParticipant.bind(this);
+        this.getUserSessions = this.getUserSessions.bind(this);
     }
 
     async createSession(req: Request, res: Response) {
@@ -52,6 +53,17 @@ export class SessionController {
         } catch (error) {
             console.log(error);
             res.status(400).json({ error: 'Unable to invite participant' });
+        }
+    }
+
+    async getUserSessions(req: Request, res: Response) {
+        try {
+            const userId = new Types.ObjectId(req.params.userId);
+            const sessions = await this.sessionManager.getUserSessions(userId);
+            res.json({ sessions });
+        } catch (error) {
+            console.log('Error fetching user sessions:', error);
+            res.status(400).json({ error: 'Unable to fetch sessions' });
         }
     }
 }
