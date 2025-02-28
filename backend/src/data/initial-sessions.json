@@ -1,10 +1,21 @@
 [{
   "_id": {
-    "$oid": "67c0146e50f81978e4f9f56d"
+    "$oid": "67c19de1087610838ead0e73"
   },
   "creator": {
     "$oid": "67c0106e9be4429eab3392b7"
   },
+  "participants": [
+    {
+      "userId": {
+        "$oid": "67c0106e9be4429eab3392b7"
+      },
+      "_id": {
+        "$oid": "67c19de1087610838ead0e74"
+      },
+      "preferences": []
+    }
+  ],
   "status": "CREATED",
   "settings": {
     "location": {
@@ -16,99 +27,98 @@
   "restaurants": [
     {
       "restaurantId": {
-        "$oid": "67c0146e50f81978e4f9f556"
+        "$oid": "67c19de0087610838ead0e5c"
       },
       "score": 0,
       "totalVotes": 0,
       "positiveVotes": 0,
       "_id": {
-        "$oid": "67c0146e50f81978e4f9f56e"
+        "$oid": "67c19de1087610838ead0e75"
       }
     },
     {
       "restaurantId": {
-        "$oid": "67c0146e50f81978e4f9f559"
+        "$oid": "67c19de1087610838ead0e5f"
       },
       "score": 0,
       "totalVotes": 0,
       "positiveVotes": 0,
       "_id": {
-        "$oid": "67c0146e50f81978e4f9f56f"
+        "$oid": "67c19de1087610838ead0e76"
       }
     },
     {
       "restaurantId": {
-        "$oid": "67c0146e50f81978e4f9f55c"
+        "$oid": "67c19de1087610838ead0e62"
       },
       "score": 0,
       "totalVotes": 0,
       "positiveVotes": 0,
       "_id": {
-        "$oid": "67c0146e50f81978e4f9f570"
+        "$oid": "67c19de1087610838ead0e77"
       }
     },
     {
       "restaurantId": {
-        "$oid": "67c0146e50f81978e4f9f55f"
+        "$oid": "67c19de1087610838ead0e65"
       },
       "score": 0,
       "totalVotes": 0,
       "positiveVotes": 0,
       "_id": {
-        "$oid": "67c0146e50f81978e4f9f571"
+        "$oid": "67c19de1087610838ead0e78"
       }
     },
     {
       "restaurantId": {
-        "$oid": "67c0146e50f81978e4f9f562"
+        "$oid": "67c19de1087610838ead0e68"
       },
       "score": 0,
       "totalVotes": 0,
       "positiveVotes": 0,
       "_id": {
-        "$oid": "67c0146e50f81978e4f9f572"
+        "$oid": "67c19de1087610838ead0e79"
       }
     },
     {
       "restaurantId": {
-        "$oid": "67c0146e50f81978e4f9f565"
+        "$oid": "67c19de1087610838ead0e6b"
       },
       "score": 0,
       "totalVotes": 0,
       "positiveVotes": 0,
       "_id": {
-        "$oid": "67c0146e50f81978e4f9f573"
+        "$oid": "67c19de1087610838ead0e7a"
       }
     },
     {
       "restaurantId": {
-        "$oid": "67c0146e50f81978e4f9f568"
+        "$oid": "67c19de1087610838ead0e6e"
       },
       "score": 0,
       "totalVotes": 0,
       "positiveVotes": 0,
       "_id": {
-        "$oid": "67c0146e50f81978e4f9f574"
+        "$oid": "67c19de1087610838ead0e7b"
       }
     },
     {
       "restaurantId": {
-        "$oid": "67c0146e50f81978e4f9f56b"
+        "$oid": "67c19de1087610838ead0e71"
       },
       "score": 0,
       "totalVotes": 0,
       "positiveVotes": 0,
       "_id": {
-        "$oid": "67c0146e50f81978e4f9f575"
+        "$oid": "67c19de1087610838ead0e7c"
       }
     }
   ],
   "createdAt": {
-    "$date": "2025-02-27T07:29:50.975Z"
+    "$date": "2025-02-28T11:28:33.803Z"
   },
   "expiresAt": {
-    "$date": "2025-02-27T07:49:50.975Z"
+    "$date": "2025-02-28T11:48:33.803Z"
   },
-  "participants": [],
   "__v": 0
 }]
