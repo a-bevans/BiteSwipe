@@ -14,6 +14,30 @@ export class UserController {
         this.createUser = this.createUser.bind(this);
         this.updateFCMToken = this.updateFCMToken.bind(this);
         this.getUserSessions = this.getUserSessions.bind(this);
+        this.getUser = this.getUser.bind(this);
+    }
+
+    async getUser(req: Request, res: Response) {
+        try {
+            const userId = req.params.userId;
+            
+            if (!Types.ObjectId.isValid(userId)) {
+                return res.status(400).json({ error: 'Invalid user ID format' });
+            }
+
+            const user = await UserModel.findById(new Types.ObjectId(userId))
+                .select('-__v') // Exclude version field
+                .lean(); // Convert to plain JavaScript object
+            
+            if (!user) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+
+            res.json(user);
+        } catch (error) {
+            console.error('Error fetching user:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
     }
 
     async createUser(req: Request, res: Response) {

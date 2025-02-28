@@ -12,6 +12,46 @@ http://localhost:3000
 
 ### Users
 
+#### Get User
+Retrieves user information.
+
+```http
+GET /users/{userId}
+```
+
+**Parameters**
+- `userId`: User ID (path parameter)
+
+**Response**
+- `200 OK`: Successfully retrieved user
+```json
+{
+  "_id": "string",
+  "email": "string",
+  "displayName": "string",
+  "fcmToken": "string",
+  "sessionHistory": []
+}
+```
+- `400 Bad Request`: Invalid user ID format
+```json
+{
+  "error": "Invalid user ID format"
+}
+```
+- `404 Not Found`: User does not exist
+```json
+{
+  "error": "User not found"
+}
+```
+- `500 Internal Server Error`: Server error occurred
+```json
+{
+  "error": "Internal server error"
+}
+```
+
 #### Create User
 Creates a new user account.
 
