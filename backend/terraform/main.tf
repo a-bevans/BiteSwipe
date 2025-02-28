@@ -240,7 +240,7 @@ resource "null_resource" "deploy_backend" {
       echo "[Deploy] Verifying .env file..."
       ssh $SSH_OPTS -i $SSH_KEY adminuser@$VM_IP "
         echo 'PORT=3000' > /app/backend/.env
-        echo 'DB_URI=mongodb://mongo:27017' >> /app/backend/.env
+        echo 'DB_URI=mongodb://mongo:27017/biteswipe' >> /app/backend/.env
         cat /app/backend/.env
       "
       

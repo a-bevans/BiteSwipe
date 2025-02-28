@@ -6,17 +6,15 @@ import * as fs from 'fs';
 import * as path from 'path';
 import dotenv from 'dotenv';
 
-// Load environment variables
-dotenv.config();
-
-// Set strictQuery to false to prepare for Mongoose 7
-mongoose.set('strictQuery', false);
+// Load environment variables from .env file
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 // Global configuration
+const DATA_DIR = path.join(__dirname, '../../data');
 const INITIAL_RESTAURANTS_FILE = 'initial-restaurants.json';
 const INITIAL_USERS_FILE = 'initial-users.json';
 const INITIAL_SESSIONS_FILE = 'initial-sessions.json';
-const DB_URI = 'mongodb://localhost:27017/cpen321-app-db';
+const DB_URI = process.env.DB_URI || 'mongodb://localhost:27017/biteswipe'
 
 interface MongoDocument {
     _id?: { $oid: string } | string;

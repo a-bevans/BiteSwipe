@@ -9,7 +9,7 @@ cp .env.example .env
 
 2. Update the `.env` file with your own values:
 - `PORT`: The port number for the server (default: 3000)
-- `DB_URI`: MongoDB connection string (default: mongodb://localhost:27017)
+- `DB_URI`: MongoDB connection string (default: mongodb://localhost:27017/biteswipe)
 - `GOOGLE_MAPS_API_KEY`: Your Google Maps API key
 - `YELP_API_KEY`: Your Yelp API key
 - `REDIS_URL`: Redis connection string (default: redis://localhost:6379)
