@@ -25,7 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 // SessionManager
 
 const sessionManager = new SessionManager();
-const userSerivce = new UserService();
+const userService = new UserService();
 
 // Sessoin Routes
 
@@ -52,7 +52,7 @@ sessionRoutes(sessionManager).forEach((route) => {
 
 // User Routes
 
-userRoutes(userSerivce).forEach((route) => {
+userRoutes(userService, sessionManager).forEach((route) => {
   (app as any)[route.method](
     route.route,
     route.validation,
