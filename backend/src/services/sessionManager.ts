@@ -47,7 +47,7 @@ export class SessionManager {
         }
     }
 
-    async joinSession(sessionId: Types.ObjectId, userId: Types.ObjectId) {
+    async inviteParticipant(sessionId: Types.ObjectId, userId: Types.ObjectId) {
         const session = await Session.findById(sessionId);
         if (!session || session.status.valueOf() === 'COMPLETED') {
             throw new Error('Session not found or already completed');

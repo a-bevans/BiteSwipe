@@ -12,7 +12,7 @@ export class SessionController {
         this.sessionManager = sessionManager;
         this.notificationService = new NotificationService();
         this.createSession = this.createSession.bind(this);
-        this.joinSession = this.joinSession.bind(this);
+        this.inviteParticipant = this.inviteParticipant.bind(this);
     }
 
     async createSession(req: Request, res: Response) {
@@ -30,13 +30,13 @@ export class SessionController {
         }
     }
 
-    async joinSession(req: Request, res: Response) {
+    async inviteParticipant(req: Request, res: Response) {
         try {
             const sessionId = new Types.ObjectId(req.params.sessionId);
             const userId = new Types.ObjectId(req.body.userId);
             
             // Get the session creator's info
-            const session = await this.sessionManager.joinSession(sessionId, userId);
+            const session = await this.sessionManager.inviteParticipant(sessionId, userId);
             const creator = await UserModel.findById(session.creator);
             
             // Send notification to the user being added
@@ -51,7 +51,7 @@ export class SessionController {
             res.json({ success: true, session: session._id });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: error });
+            res.status(400).json({ error: 'Unable to invite participant' });
         }
     }
 }

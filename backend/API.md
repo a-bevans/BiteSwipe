@@ -38,10 +38,10 @@ POST /users/
   "sessionHistory": []
 }
 ```
-- `500 Internal Server Error`: Server error
+- `400 Bad Request`: Unable to create user
 ```json
 {
-  "error": "Failed to create user"
+  "error": "Unable to create user"
 }
 ```
 
@@ -69,22 +69,10 @@ POST /users/{userId}/fcm-token
   "success": true
 }
 ```
-- `400 Bad Request`: Invalid user ID
+- `400 Bad Request`: Unable to update token
 ```json
 {
-  "error": "Invalid user ID"
-}
-```
-- `404 Not Found`: User not found
-```json
-{
-  "error": "User not found"
-}
-```
-- `500 Internal Server Error`: Server error
-```json
-{
-  "error": "Failed to update FCM token"
+  "error": "Unable to update FCM token"
 }
 ```
 
@@ -114,18 +102,18 @@ POST /sessions
   "sessionId": "string"
 }
 ```
-- `500 Internal Server Error`: Server error
+- `400 Bad Request`: Unable to create session
 ```json
 {
-  "error": "Error message"
+  "error": "Unable to create session"
 }
 ```
 
-#### Join Session
-Joins an existing dining session.
+#### Add Participant
+Adds a participant to an existing dining session. The invited user will receive a notification.
 
 ```http
-POST /sessions/{sessionId}/join
+POST /sessions/{sessionId}/participants
 ```
 
 **Parameters**
@@ -139,17 +127,17 @@ POST /sessions/{sessionId}/join
 ```
 
 **Response**
-- `200 OK`: Successfully joined session
+- `201 Created`: Successfully added participant
 ```json
 {
   "success": true,
   "session": "string"
 }
 ```
-- `500 Internal Server Error`: Server error
+- `400 Bad Request`: Unable to add participant
 ```json
 {
-  "error": "Error message"
+  "error": "Unable to add participant"
 }
 ```
 
@@ -178,24 +166,22 @@ POST /sessions/{sessionId}/join
       "radius": "number"
     }
   },
-  "participants": ["string"],
+  "participants": [{
+    "userId": "string",
+    "preferences": [{
+      "restaurantId": "string",
+      "liked": "boolean",
+      "timestamp": "date"
+    }]
+  }],
+  "restaurants": [{
+    "restaurantId": "string",
+    "score": "number",
+    "totalVotes": "number",
+    "positiveVotes": "number"
+  }],
   "createdAt": "date",
   "expiresAt": "date"
-}
-```
-
-## Error Handling
-
-All endpoints may return the following error responses:
-
-- `400 Bad Request`: Invalid input data
-- `404 Not Found`: Resource not found
-- `500 Internal Server Error`: Server error
-
-Error responses follow this format:
-```json
-{
-  "error": "Error message"
 }
 ```
 
@@ -205,4 +191,4 @@ Error responses follow this format:
 2. Date fields are in ISO 8601 format
 3. IDs are MongoDB ObjectIds represented as strings
 4. Session expiry is handled automatically by the server
-5. FCM tokens are used for push notifications when users join sessions
+5. FCM tokens are used for push notifications when users are invited to sessions
