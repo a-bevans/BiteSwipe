@@ -1,7 +1,7 @@
 import { Session } from '../models/session';
 import mongoose, { ObjectId } from 'mongoose';
 import { Types } from 'mongoose';
-
+import { UserModel } from '../models/user';
 import { RestaurantService } from './RestaurantService';
 
 export class SessionManager {
@@ -14,6 +14,14 @@ export class SessionManager {
     
     async createSession(creatorId: Types.ObjectId, settings: any) {
         try {
+            // Check if user exists
+            const user = await UserModel.findById(creatorId);
+            if (!user) {
+                const error = new Error() as Error & { code: string };
+                error.code = 'USER_NOT_FOUND';
+                throw error;
+            }
+
             const restaurants = await this.restaurantService.addRestaurants(settings.location,'');
         
             const session = new Session({
@@ -34,8 +42,8 @@ export class SessionManager {
 
             return await session.save();
         } catch (error) {
-            console.error(error);
-            throw new Error('Failed to create session');
+            console.error('Session creation error:', error);
+            throw error;
         }
     }
 

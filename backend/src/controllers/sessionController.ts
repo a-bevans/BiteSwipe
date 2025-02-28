@@ -24,8 +24,9 @@ export class SessionController {
                 sessionId: session._id,
             });
         } catch (error) {
-            console.log(error);
-            res.status(500).json({ error: error });
+            console.log('Controller error:', error);
+            // Log the actual error for debugging but return a generic message
+            res.status(400).json({ error: 'Unable to create session' });
         }
     }
 
