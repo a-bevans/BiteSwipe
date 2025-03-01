@@ -115,6 +115,23 @@ resource "azurerm_linux_virtual_machine" "vm" {
     azurerm_network_interface.nic.id,
   ]
 
+  admin_ssh_key {
+    username   = var.admin_username
+    public_key = file(var.ssh_public_key_path)
+  }
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "20_04-lts-gen2"
+    version   = "latest"
+  }
+
   custom_data = base64encode(<<-EOF
     #!/bin/bash
     
@@ -161,23 +178,6 @@ resource "azurerm_linux_virtual_machine" "vm" {
   EOF
   )
 
-  admin_ssh_key {
-    username   = var.admin_username
-    public_key = file(var.ssh_public_key_path)
-  }
-
-  os_disk {
-    caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
-  }
-
-  source_image_reference {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-focal"
-    sku       = "20_04-lts-gen2"
-    version   = "latest"
-  }
-  
   tags = {
     owner = var.owner_tag
   }
@@ -195,7 +195,7 @@ resource "null_resource" "deploy_backend" {
       set -x  # Enable debug output
       set -e  # Exit on error
       
-      SSH_KEY="/Users/vm/.ssh/to_azure/CPEN321.pem"
+      SSH_KEY="$HOME/.ssh/to_azure/CPEN321.pem"
       VM_IP="${azurerm_public_ip.public_ip.ip_address}"
       SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=10"
 
