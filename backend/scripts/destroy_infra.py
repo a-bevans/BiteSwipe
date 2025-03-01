@@ -175,6 +175,33 @@ def destroy_infrastructure():
     # Import all existing resources
     import_existing_resources(owner_tag)
 
+    # Check if resource group exists and try to delete it first
+    resource_group_name = f"{owner_tag}-biteswipe-resources"
+    print(f"\nChecking if resource group {resource_group_name} exists...")
+    try:
+        result = subprocess.run(
+            ["az", "group", "show", "--name", resource_group_name],
+            capture_output=True,
+            text=True,
+            check=False
+        )
+        if result.returncode == 0:
+            print(f"Resource group {resource_group_name} exists. Attempting direct deletion...")
+            try:
+                # Try to delete the resource group directly first
+                subprocess.run(
+                    ["az", "group", "delete",
+                     "--name", resource_group_name,
+                     "--yes", "--force"],
+                    check=True
+                )
+                print("✅ Successfully deleted resource group directly")
+                return True
+            except subprocess.CalledProcessError:
+                print("Direct resource group deletion failed, falling back to individual resource deletion...")
+    except Exception as e:
+        print(f"Error checking resource group: {e}")
+
     # Define resource deletion order
     resource_order = [
         # First delete the VM
