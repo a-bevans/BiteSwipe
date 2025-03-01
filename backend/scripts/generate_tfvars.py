@@ -6,8 +6,8 @@ from pathlib import Path
 
 def generate_tfvars():
     """Generate terraform.tfvars with system username."""
-    # Get the current username
-    username = getpass.getuser()
+    # Get the username from GitHub Actions or system
+    username = os.environ.get('GITHUB_ACTOR') or getpass.getuser()
     
     # Get the terraform directory
     script_dir = Path(__file__).parent.absolute()

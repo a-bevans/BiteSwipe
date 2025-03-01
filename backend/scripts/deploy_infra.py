@@ -23,6 +23,18 @@ def get_terraform_variable(var_name):
         return match.group(1)
     raise ValueError(f"Variable {var_name} not found in variables.tf")
 
+def get_owner_tag():
+    """Get the owner tag from terraform.tfvars."""
+    try:
+        with open(TERRAFORM_DIR / "terraform.tfvars", "r") as f:
+            content = f.read()
+            match = re.search(r'owner_tag\s*=\s*"([^"]+)"', content)
+            if match:
+                return match.group(1)
+    except (FileNotFoundError, IOError):
+        pass
+    return "runner"  # Default value
+
 # Get the private key path from Terraform variables
 AZURE_VM_PRIVATE_KEY_PATHNAME_STR = get_terraform_variable("ssh_private_key_path")
 
