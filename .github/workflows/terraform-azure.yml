@@ -43,11 +43,17 @@ jobs:
       with:
         terraform_version: '1.5.0'
 
-    - name: Deploy Infrastructure
+    - name: Destroy Existing Infrastructure
       run: |
         cd backend/scripts
         python3 destroy_infra.py || true  # Run destroy and continue even if it fails
-        sleep 30  # Wait for resources to be fully destroyed
+
+    - name: Wait for Resource Cleanup
+      run: sleep 30  # Wait for resources to be fully destroyed
+
+    - name: Deploy New Infrastructure
+      run: |
+        cd backend/scripts
         python3 deploy_infra.py
       env:
         ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}

@@ -192,7 +192,7 @@ def destroy_infrastructure():
                 subprocess.run(
                     ["az", "group", "delete",
                      "--name", resource_group_name,
-                     "--yes", "--force"],
+                     "--yes"],
                     check=True
                 )
                 print("✅ Successfully deleted resource group directly")
