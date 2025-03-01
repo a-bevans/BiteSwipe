@@ -205,43 +205,6 @@ def run_terraform_commands():
     # Initialize Terraform
     subprocess.run(["terraform", "init"], cwd=TERRAFORM_DIR, check=True)
 
-    # Get owner tag for resource imports
-    owner_tag = get_owner_tag()
-    
-    # Import all existing resources
-    import_existing_resources(owner_tag)
-
-    # First destroy any VMs
-    print("Destroying VMs if they exist...")
-    try:
-        subprocess.run(
-            ["az", "vm", "delete", "-g", f"{owner_tag}-biteswipe-resources", "-n", f"{owner_tag}-biteswipe", "--yes", "--force"],
-            check=True
-        )
-    except subprocess.CalledProcessError:
-        print("No VMs to delete or already deleted")
-
-    # Now try to delete the entire resource group
-    print("Destroying resource group...")
-    try:
-        subprocess.run(
-            ["az", "group", "delete", "-g", f"{owner_tag}-biteswipe-resources", "--yes", "--force"],
-            check=True
-        )
-        print("Successfully deleted resource group")
-    except subprocess.CalledProcessError:
-        print("Failed to delete resource group, trying Terraform destroy...")
-        try:
-            subprocess.run(["terraform", "destroy", "-auto-approve=true"], cwd=TERRAFORM_DIR, check=True)
-            print("Successfully destroyed infrastructure via Terraform")
-        except subprocess.CalledProcessError as e:
-            print(f"Warning: Failed to destroy infrastructure: {e}")
-            print("Proceeding with apply anyway...")
-
-    # Wait for resources to be cleaned up
-    print("Waiting for resources to be fully cleaned up...")
-    time.sleep(30)
-
     # Apply new infrastructure
     print("Applying new infrastructure...")
     subprocess.run(["terraform", "apply", "-auto-approve=true"], cwd=TERRAFORM_DIR, check=True)
