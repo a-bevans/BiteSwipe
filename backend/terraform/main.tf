@@ -204,7 +204,7 @@ resource "null_resource" "deploy_backend" {
       
       # Wait for SSH to be available
       echo "[Deploy] Waiting for SSH to become available..."
-      for i in {1..30}; do
+      for i in $(seq 1 30); do
         if ssh $SSH_OPTS -i $SSH_KEY adminuser@$VM_IP "echo 'SSH connection successful'" 2>/dev/null; then
           echo "[Deploy] SSH is now available"
           break
@@ -215,7 +215,7 @@ resource "null_resource" "deploy_backend" {
 
       # Wait for setup to complete
       echo "[Deploy] Waiting for setup script to complete..."
-      for i in {1..30}; do
+      for i in $(seq 1 30); do
         if ssh $SSH_OPTS -i $SSH_KEY adminuser@$VM_IP "test -f /tmp/setup_complete && echo 'Setup complete file found'"; then
           echo "[Deploy] Setup script completed successfully"
           break
@@ -232,7 +232,7 @@ resource "null_resource" "deploy_backend" {
       
       # Wait for Docker verification
       echo "[Deploy] Waiting for Docker verification..."
-      for i in {1..10}; do
+      for i in $(seq 1 10); do
         if ssh $SSH_OPTS -i $SSH_KEY adminuser@$VM_IP "test -f /tmp/docker_verified"; then
           echo "[Deploy] Docker verified successfully"
           break

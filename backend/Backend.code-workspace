@@ -5,7 +5,9 @@
     },
     {
       "path": ".."
-    }
+    },
   ],
-  "settings": {}
+  "settings": {
+    "python.languageServer": "None"
+  }
 }
