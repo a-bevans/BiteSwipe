@@ -103,8 +103,25 @@ def force_unlock_terraform():
 
 
 def run_terraform_commands():
-    # Run terraform commands with auto-approve
-    subprocess.run(["terraform", "init", "-input=false"], cwd=TERRAFORM_DIR, check=True)
+    """Run Terraform commands to deploy infrastructure."""
+    # Initialize Terraform
+    subprocess.run(["terraform", "init"], cwd=TERRAFORM_DIR, check=True)
+    
+    # Import existing resource group if it exists
+    resource_group_name = f"{get_owner_tag()}-biteswipe-resources"
+    try:
+        # Try to import the existing resource group
+        import_cmd = [
+            "terraform", "import",
+            "azurerm_resource_group.rg",
+            f"/subscriptions/{os.getenv('ARM_SUBSCRIPTION_ID')}/resourceGroups/{resource_group_name}"
+        ]
+        subprocess.run(import_cmd, cwd=TERRAFORM_DIR, check=True)
+        print(f"Successfully imported existing resource group: {resource_group_name}")
+    except subprocess.CalledProcessError:
+        print(f"Resource group {resource_group_name} doesn't exist or couldn't be imported")
+    
+    # Apply Terraform configuration
     subprocess.run(["terraform", "apply", "-auto-approve=true"], cwd=TERRAFORM_DIR, check=True)
 
 
