@@ -5,20 +5,31 @@ import pathlib
 import subprocess
 import time
 import re
+import getpass
 
 # Determine the path to the terraform directory relative to the script
 script_dir = pathlib.Path(__file__).resolve().parent
 TERRAFORM_DIR = script_dir / '../terraform'
 
 def get_owner_tag():
-    """Read owner_tag from terraform.tfvars file."""
+    """Get owner tag from environment or system username."""
+    # First try to get from GITHUB_ACTOR environment variable
+    owner = os.getenv('GITHUB_ACTOR')
+    if not owner:
+        # Fallback to system username
+        owner = getpass.getuser()
+    
+    return owner
+
+def generate_tfvars(owner_tag):
+    """Generate terraform.tfvars file."""
+    tfvars_content = f'owner_tag = "{owner_tag}"'
     tfvars_file = TERRAFORM_DIR / 'terraform.tfvars'
-    with open(tfvars_file, 'r') as f:
-        content = f.read()
-    match = re.search(r'owner_tag\s*=\s*"([^"]+)"', content)
-    if match:
-        return match.group(1)
-    raise ValueError("owner_tag not found in terraform.tfvars")
+    
+    print(f"📝 Generating terraform.tfvars...")
+    with open(tfvars_file, 'w') as f:
+        f.write(tfvars_content)
+    print(f"Generated terraform.tfvars with owner_tag = {owner_tag}")
 
 def get_azure_resources(owner_tag):
     """Get all Azure resources with the given prefix."""
@@ -120,8 +131,9 @@ def destroy_infrastructure():
     # Initialize Terraform
     subprocess.run(["terraform", "init"], cwd=TERRAFORM_DIR, check=True)
 
-    # Get owner tag
+    # Get owner tag and generate tfvars
     owner_tag = get_owner_tag()
+    generate_tfvars(owner_tag)
     
     # Import all existing resources
     import_existing_resources(owner_tag)
