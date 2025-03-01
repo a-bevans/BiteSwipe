@@ -162,9 +162,68 @@ def get_terraform_resource_name(resource_name, owner_tag):
     }
     return name_map.get(name, name)
 
+def get_azure_subscription_id():
+    """Get the Azure subscription ID from environment or from az CLI."""
+    subscription_id = os.getenv('ARM_SUBSCRIPTION_ID')
+    if not subscription_id:
+        try:
+            # Try to get the subscription ID using az CLI
+            result = subprocess.check_output(
+                ["az", "account", "show", "--query", "id", "-o", "tsv"],
+                text=True
+            ).strip()
+            if result:
+                return result
+        except subprocess.CalledProcessError:
+            print("Warning: Could not get subscription ID from Azure CLI")
+    return subscription_id
+
+def import_resource_group(owner_tag):
+    """Import the resource group into Terraform state."""
+    subscription_id = get_azure_subscription_id()
+    if not subscription_id:
+        print("Warning: Azure subscription ID not found. Skipping resource group import.")
+        return False
+        
+    resource_group_name = f"{owner_tag}-biteswipe-resources"
+    resource_id = f"/subscriptions/{subscription_id}/resourceGroups/{resource_group_name}"
+    
+    try:
+        # Check if the resource group exists
+        print(f"Checking if resource group {resource_group_name} exists...")
+        result = subprocess.run(
+            ["az", "group", "show", "--name", resource_group_name],
+            capture_output=True,
+            text=True,
+            check=False
+        )
+        
+        if result.returncode != 0:
+            print(f"Resource group {resource_group_name} does not exist.")
+            return False
+            
+        print(f"Resource group {resource_group_name} exists. Importing to Terraform state...")
+        subprocess.run(
+            ["terraform", "import", "azurerm_resource_group.rg", resource_id],
+            cwd=TERRAFORM_DIR,
+            check=True
+        )
+        print(f"Successfully imported resource group {resource_group_name}")
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"Warning: Failed to import resource group {resource_group_name}")
+        print(f"Error: {e}")
+        return False
+
 def import_existing_resources(owner_tag):
     """Import existing Azure resources into Terraform state."""
     print(f"Searching for existing resources with prefix '{owner_tag}-biteswipe'...")
+    
+    # Get the subscription ID
+    subscription_id = get_azure_subscription_id()
+    if not subscription_id:
+        print("Warning: Azure subscription ID not found. Skipping resource import.")
+        return
     
     # Get all resources in the resource group
     resources = get_azure_resources(owner_tag)
@@ -187,8 +246,8 @@ def import_existing_resources(owner_tag):
 
     # Try to import network interface associations after all resources are imported
     try:
-        nic_id = f"/subscriptions/{os.getenv('ARM_SUBSCRIPTION_ID')}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/networkInterfaces/{owner_tag}-biteswipe-nic"
-        nsg_id = f"/subscriptions/{os.getenv('ARM_SUBSCRIPTION_ID')}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/networkSecurityGroups/{owner_tag}-biteswipe-nsg"
+        nic_id = f"/subscriptions/{subscription_id}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/networkInterfaces/{owner_tag}-biteswipe-nic"
+        nsg_id = f"/subscriptions/{subscription_id}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/networkSecurityGroups/{owner_tag}-biteswipe-nsg"
         association_id = f"{nic_id}|{nsg_id}"
         
         subprocess.run(
@@ -201,11 +260,28 @@ def import_existing_resources(owner_tag):
         print("Warning: Failed to import network interface association")
 
 def run_terraform_commands():
-    """Run Terraform commands to deploy infrastructure."""
-    # Initialize Terraform
+    """Run terraform commands to deploy infrastructure."""
+    # Run terraform init
+    print("Initializing terraform...")
     subprocess.run(["terraform", "init"], cwd=TERRAFORM_DIR, check=True)
+    
+    # Get the owner tag from terraform variables
+    owner_tag = get_owner_tag()
 
-    # Apply new infrastructure
+    # First attempt to import the resource group if it exists
+    # This helps avoid errors when the resource group exists but isn't in Terraform state
+    try:
+        import_resource_group(owner_tag)
+    except Exception as e:
+        print(f"Warning: Error during resource group import: {e}")
+    
+    # Try to import existing resources
+    try:
+        import_existing_resources(owner_tag)
+    except Exception as e:
+        print(f"Warning: Error during resource import: {e}")
+        
+    # Run terraform apply
     print("Applying new infrastructure...")
     subprocess.run(["terraform", "apply", "-auto-approve=true"], cwd=TERRAFORM_DIR, check=True)
 
