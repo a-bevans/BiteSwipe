@@ -5,6 +5,7 @@ import subprocess
 import pathlib
 import re
 import sys
+import time
 
 # Determine the path to the terraform directory relative to the script
 script_dir = pathlib.Path(__file__).resolve().parent
@@ -114,26 +115,77 @@ def force_unlock_terraform():
         pass
 
 
+def import_existing_resources(owner_tag):
+    """Import existing Azure resources into Terraform state."""
+    resources_to_import = [
+        {
+            "type": "azurerm_virtual_network",
+            "name": "vnet",
+            "id": f"/subscriptions/{os.getenv('ARM_SUBSCRIPTION_ID')}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/virtualNetworks/{owner_tag}-biteswipe-network"
+        },
+        {
+            "type": "azurerm_public_ip",
+            "name": "public_ip",
+            "id": f"/subscriptions/{os.getenv('ARM_SUBSCRIPTION_ID')}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/publicIPAddresses/{owner_tag}-biteswipe-public-ip"
+        },
+        {
+            "type": "azurerm_network_security_group",
+            "name": "nsg",
+            "id": f"/subscriptions/{os.getenv('ARM_SUBSCRIPTION_ID')}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/networkSecurityGroups/{owner_tag}-biteswipe-nsg"
+        }
+    ]
+
+    for resource in resources_to_import:
+        try:
+            subprocess.run(
+                ["terraform", "import", f"{resource['type']}.{resource['name']}", resource['id']],
+                cwd=TERRAFORM_DIR,
+                check=True
+            )
+            print(f"Successfully imported {resource['type']}: {resource['name']}")
+        except subprocess.CalledProcessError as e:
+            print(f"Warning: Failed to import {resource['type']}: {resource['name']}")
+            print(f"Error: {e}")
+
+
 def run_terraform_commands():
     """Run Terraform commands to deploy infrastructure."""
     # Initialize Terraform
     subprocess.run(["terraform", "init"], cwd=TERRAFORM_DIR, check=True)
+
+    # Get owner tag for resource imports
+    owner_tag = get_owner_tag()
     
-    # Import existing resource group if it exists
-    resource_group_name = f"{get_owner_tag()}-biteswipe-resources"
     try:
-        # Try to import the existing resource group
-        import_cmd = [
-            "terraform", "import",
-            "azurerm_resource_group.rg",
-            f"/subscriptions/{os.getenv('ARM_SUBSCRIPTION_ID')}/resourceGroups/{resource_group_name}"
-        ]
-        subprocess.run(import_cmd, cwd=TERRAFORM_DIR, check=True)
-        print(f"Successfully imported existing resource group: {resource_group_name}")
-    except subprocess.CalledProcessError:
-        print(f"Resource group {resource_group_name} doesn't exist or couldn't be imported")
-    
-    # Apply Terraform configuration
+        # Try to import the resource group first
+        resource_group_id = f"/subscriptions/{os.getenv('ARM_SUBSCRIPTION_ID')}/resourceGroups/{owner_tag}-biteswipe-resources"
+        subprocess.run(
+            ["terraform", "import", "azurerm_resource_group.rg", resource_group_id],
+            cwd=TERRAFORM_DIR,
+            check=True
+        )
+        print(f"Successfully imported existing resource group: {owner_tag}-biteswipe-resources")
+    except subprocess.CalledProcessError as e:
+        print(f"Warning: Failed to import resource group, it might not exist yet: {e}")
+
+    # Import other existing resources
+    import_existing_resources(owner_tag)
+
+    # Destroy existing infrastructure
+    print("Destroying existing infrastructure...")
+    try:
+        subprocess.run(["terraform", "destroy", "-auto-approve=true"], cwd=TERRAFORM_DIR, check=True)
+        print("Successfully destroyed existing infrastructure")
+    except subprocess.CalledProcessError as e:
+        print(f"Warning: Failed to destroy existing infrastructure: {e}")
+        print("Proceeding with apply anyway...")
+
+    # Wait a bit to ensure Azure has fully cleaned up
+    print("Waiting for resources to be fully cleaned up...")
+    time.sleep(30)
+
+    # Apply new infrastructure
+    print("Applying new infrastructure...")
     subprocess.run(["terraform", "apply", "-auto-approve=true"], cwd=TERRAFORM_DIR, check=True)
 
 
@@ -150,7 +202,6 @@ def update_ssh_config():
     except subprocess.CalledProcessError:
         print("Warning: Could not get server IP from Terraform output. Waiting for IP to be available...")
         # Wait a bit and try again as sometimes it takes time for the IP to be assigned
-        import time
         time.sleep(30)
         server_ip = subprocess.check_output(
             ["terraform", "output", "-raw", "server_public_ip"],
