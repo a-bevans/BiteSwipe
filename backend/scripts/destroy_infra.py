@@ -72,41 +72,78 @@ def get_terraform_resource_name(resource_name, owner_tag):
     }
     return name_map.get(name, name)
 
-def import_existing_resources(owner_tag):
-    """Import existing Azure resources into Terraform state."""
-    print(f"Searching for existing resources with prefix '{owner_tag}-biteswipe'...")
-    resources = get_azure_resources(owner_tag)
-    
-    for resource in resources:
-        tf_type = get_terraform_resource_type(resource['type'])
-        if tf_type:
-            tf_name = get_terraform_resource_name(resource['name'], owner_tag)
-            try:
-                print(f"Importing {resource['name']} as {tf_type}.{tf_name}...")
-                subprocess.run(
-                    ["terraform", "import", f"{tf_type}.{tf_name}", resource['id']],
-                    cwd=TERRAFORM_DIR,
-                    check=True
-                )
-                print(f"Successfully imported {tf_type}: {tf_name}")
-            except subprocess.CalledProcessError as e:
-                print(f"Warning: Failed to import {tf_type}: {tf_name}")
-                print(f"Error: {e}")
-
-    # Try to import network interface associations
+def resource_exists(owner_tag, resource_type, resource_name):
+    """Check if an Azure resource exists."""
     try:
-        nic_id = f"/subscriptions/{os.getenv('ARM_SUBSCRIPTION_ID')}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/networkInterfaces/{owner_tag}-biteswipe-nic"
-        nsg_id = f"/subscriptions/{os.getenv('ARM_SUBSCRIPTION_ID')}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/networkSecurityGroups/{owner_tag}-biteswipe-nsg"
-        association_id = f"{nic_id}|{nsg_id}"
-        
         subprocess.run(
-            ["terraform", "import", "azurerm_network_interface_security_group_association.nic_nsg_association", association_id],
+            ["az", "resource", "show",
+             "--resource-group", f"{owner_tag}-biteswipe-resources",
+             "--resource-type", resource_type,
+             "--name", resource_name],
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
+def import_resource(owner_tag, azure_type, resource_name, tf_type, tf_name):
+    """Import a resource into Terraform state if it exists."""
+    if not resource_exists(owner_tag, azure_type, resource_name):
+        print(f"Resource {azure_type}/{resource_name} does not exist, skipping import")
+        return False
+
+    try:
+        resource_id = f"/subscriptions/{os.getenv('ARM_SUBSCRIPTION_ID')}/resourceGroups/{owner_tag}-biteswipe-resources/providers/{azure_type}/{resource_name}"
+        print(f"Importing {resource_name} as {tf_type}.{tf_name}...")
+        subprocess.run(
+            ["terraform", "import", f"{tf_type}.{tf_name}", resource_id],
             cwd=TERRAFORM_DIR,
             check=True
         )
-        print("Successfully imported network interface association")
-    except subprocess.CalledProcessError:
-        print("Warning: Failed to import network interface association")
+        print(f"Successfully imported {tf_type}: {tf_name}")
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to import {tf_type}: {tf_name}")
+        print(f"Error: {e}")
+        return False
+
+def import_existing_resources(owner_tag):
+    """Import existing Azure resources into Terraform state."""
+    print(f"Searching for existing resources with prefix '{owner_tag}-biteswipe'...")
+    
+    # Define resources to import
+    resources_to_import = [
+        ("Microsoft.Network/publicIPAddresses", f"{owner_tag}-biteswipe-public-ip", "azurerm_public_ip", "public_ip"),
+        ("Microsoft.Network/virtualNetworks", f"{owner_tag}-biteswipe-network", "azurerm_virtual_network", "vnet"),
+        ("Microsoft.Network/networkInterfaces", f"{owner_tag}-biteswipe-nic", "azurerm_network_interface", "nic"),
+        ("Microsoft.Compute/virtualMachines", f"{owner_tag}-biteswipe", "azurerm_linux_virtual_machine", "vm"),
+        ("Microsoft.Network/networkSecurityGroups", f"{owner_tag}-biteswipe-nsg", "azurerm_network_security_group", "nsg")
+    ]
+
+    imported_resources = []
+    for azure_type, resource_name, tf_type, tf_name in resources_to_import:
+        if import_resource(owner_tag, azure_type, resource_name, tf_type, tf_name):
+            imported_resources.append((azure_type, resource_name))
+
+    # Try to import network interface association only if both NIC and NSG exist
+    if any(r[0] == "Microsoft.Network/networkInterfaces" for r in imported_resources) and \
+       any(r[0] == "Microsoft.Network/networkSecurityGroups" for r in imported_resources):
+        try:
+            nic_id = f"/subscriptions/{os.getenv('ARM_SUBSCRIPTION_ID')}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/networkInterfaces/{owner_tag}-biteswipe-nic"
+            nsg_id = f"/subscriptions/{os.getenv('ARM_SUBSCRIPTION_ID')}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/networkSecurityGroups/{owner_tag}-biteswipe-nsg"
+            association_id = f"{nic_id}|{nsg_id}"
+            
+            print("Importing network interface association...")
+            subprocess.run(
+                ["terraform", "import", "azurerm_network_interface_security_group_association.nic_nsg_association", association_id],
+                cwd=TERRAFORM_DIR,
+                check=True
+            )
+            print("Successfully imported network interface association")
+        except subprocess.CalledProcessError:
+            print("Warning: Failed to import network interface association")
 
 def destroy_resource(owner_tag, resource_type, resource_name, force=False):
     """Try to destroy a specific Azure resource."""
