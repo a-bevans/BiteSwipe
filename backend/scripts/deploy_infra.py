@@ -6,6 +6,7 @@ import pathlib
 import re
 import sys
 import time
+import json
 
 # Determine the path to the terraform directory relative to the script
 script_dir = pathlib.Path(__file__).resolve().parent
@@ -115,38 +116,89 @@ def force_unlock_terraform():
         pass
 
 
+def get_azure_resources(owner_tag):
+    """Get all Azure resources with the given prefix."""
+    try:
+        # List all resources in the resource group
+        result = subprocess.check_output(
+            ["az", "resource", "list", 
+             "--resource-group", f"{owner_tag}-biteswipe-resources",
+             "--query", "[].{name: name, type: type, id: id}",
+             "--output", "json"],
+            text=True
+        )
+        return json.loads(result)
+    except subprocess.CalledProcessError:
+        print(f"Warning: Could not list resources in resource group {owner_tag}-biteswipe-resources")
+        return []
+
+def get_terraform_resource_type(azure_type):
+    """Convert Azure resource type to Terraform resource type."""
+    # Map of Azure resource types to Terraform resource types
+    type_map = {
+        'Microsoft.Network/virtualNetworks': 'azurerm_virtual_network',
+        'Microsoft.Network/publicIPAddresses': 'azurerm_public_ip',
+        'Microsoft.Network/networkSecurityGroups': 'azurerm_network_security_group',
+        'Microsoft.Network/networkInterfaces': 'azurerm_network_interface',
+        'Microsoft.Network/virtualNetworks/subnets': 'azurerm_subnet',
+        'Microsoft.Compute/virtualMachines': 'azurerm_linux_virtual_machine',
+        'Microsoft.Resources/resourceGroups': 'azurerm_resource_group'
+    }
+    return type_map.get(azure_type)
+
+def get_terraform_resource_name(resource_name, owner_tag):
+    """Generate Terraform resource name from Azure resource name."""
+    # Remove the owner prefix from resource name
+    name = resource_name.replace(f"{owner_tag}-biteswipe-", "")
+    
+    # Map of Azure resource names to Terraform resource names
+    name_map = {
+        'network': 'vnet',
+        'public-ip': 'public_ip',
+        'nsg': 'nsg',
+        'nic': 'nic',
+        'internal': 'subnet',
+        'resources': 'rg'
+    }
+    return name_map.get(name, name)
+
 def import_existing_resources(owner_tag):
     """Import existing Azure resources into Terraform state."""
-    resources_to_import = [
-        {
-            "type": "azurerm_virtual_network",
-            "name": "vnet",
-            "id": f"/subscriptions/{os.getenv('ARM_SUBSCRIPTION_ID')}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/virtualNetworks/{owner_tag}-biteswipe-network"
-        },
-        {
-            "type": "azurerm_public_ip",
-            "name": "public_ip",
-            "id": f"/subscriptions/{os.getenv('ARM_SUBSCRIPTION_ID')}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/publicIPAddresses/{owner_tag}-biteswipe-public-ip"
-        },
-        {
-            "type": "azurerm_network_security_group",
-            "name": "nsg",
-            "id": f"/subscriptions/{os.getenv('ARM_SUBSCRIPTION_ID')}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/networkSecurityGroups/{owner_tag}-biteswipe-nsg"
-        }
-    ]
+    print(f"Searching for existing resources with prefix '{owner_tag}-biteswipe'...")
+    
+    # Get all resources in the resource group
+    resources = get_azure_resources(owner_tag)
+    
+    for resource in resources:
+        tf_type = get_terraform_resource_type(resource['type'])
+        if tf_type:
+            tf_name = get_terraform_resource_name(resource['name'], owner_tag)
+            try:
+                print(f"Importing {resource['name']} as {tf_type}.{tf_name}...")
+                subprocess.run(
+                    ["terraform", "import", f"{tf_type}.{tf_name}", resource['id']],
+                    cwd=TERRAFORM_DIR,
+                    check=True
+                )
+                print(f"Successfully imported {tf_type}: {tf_name}")
+            except subprocess.CalledProcessError as e:
+                print(f"Warning: Failed to import {tf_type}: {tf_name}")
+                print(f"Error: {e}")
 
-    for resource in resources_to_import:
-        try:
-            subprocess.run(
-                ["terraform", "import", f"{resource['type']}.{resource['name']}", resource['id']],
-                cwd=TERRAFORM_DIR,
-                check=True
-            )
-            print(f"Successfully imported {resource['type']}: {resource['name']}")
-        except subprocess.CalledProcessError as e:
-            print(f"Warning: Failed to import {resource['type']}: {resource['name']}")
-            print(f"Error: {e}")
-
+    # Try to import network interface associations after all resources are imported
+    try:
+        nic_id = f"/subscriptions/{os.getenv('ARM_SUBSCRIPTION_ID')}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/networkInterfaces/{owner_tag}-biteswipe-nic"
+        nsg_id = f"/subscriptions/{os.getenv('ARM_SUBSCRIPTION_ID')}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/networkSecurityGroups/{owner_tag}-biteswipe-nsg"
+        association_id = f"{nic_id}|{nsg_id}"
+        
+        subprocess.run(
+            ["terraform", "import", "azurerm_network_interface_security_group_association.nic_nsg_association", association_id],
+            cwd=TERRAFORM_DIR,
+            check=True
+        )
+        print("Successfully imported network interface association")
+    except subprocess.CalledProcessError:
+        print("Warning: Failed to import network interface association")
 
 def run_terraform_commands():
     """Run Terraform commands to deploy infrastructure."""
@@ -156,31 +208,37 @@ def run_terraform_commands():
     # Get owner tag for resource imports
     owner_tag = get_owner_tag()
     
-    try:
-        # Try to import the resource group first
-        resource_group_id = f"/subscriptions/{os.getenv('ARM_SUBSCRIPTION_ID')}/resourceGroups/{owner_tag}-biteswipe-resources"
-        subprocess.run(
-            ["terraform", "import", "azurerm_resource_group.rg", resource_group_id],
-            cwd=TERRAFORM_DIR,
-            check=True
-        )
-        print(f"Successfully imported existing resource group: {owner_tag}-biteswipe-resources")
-    except subprocess.CalledProcessError as e:
-        print(f"Warning: Failed to import resource group, it might not exist yet: {e}")
-
-    # Import other existing resources
+    # Import all existing resources
     import_existing_resources(owner_tag)
 
-    # Destroy existing infrastructure
-    print("Destroying existing infrastructure...")
+    # First destroy any VMs
+    print("Destroying VMs if they exist...")
     try:
-        subprocess.run(["terraform", "destroy", "-auto-approve=true"], cwd=TERRAFORM_DIR, check=True)
-        print("Successfully destroyed existing infrastructure")
-    except subprocess.CalledProcessError as e:
-        print(f"Warning: Failed to destroy existing infrastructure: {e}")
-        print("Proceeding with apply anyway...")
+        subprocess.run(
+            ["az", "vm", "delete", "-g", f"{owner_tag}-biteswipe-resources", "-n", f"{owner_tag}-biteswipe", "--yes", "--force"],
+            check=True
+        )
+    except subprocess.CalledProcessError:
+        print("No VMs to delete or already deleted")
 
-    # Wait a bit to ensure Azure has fully cleaned up
+    # Now try to delete the entire resource group
+    print("Destroying resource group...")
+    try:
+        subprocess.run(
+            ["az", "group", "delete", "-g", f"{owner_tag}-biteswipe-resources", "--yes", "--force"],
+            check=True
+        )
+        print("Successfully deleted resource group")
+    except subprocess.CalledProcessError:
+        print("Failed to delete resource group, trying Terraform destroy...")
+        try:
+            subprocess.run(["terraform", "destroy", "-auto-approve=true"], cwd=TERRAFORM_DIR, check=True)
+            print("Successfully destroyed infrastructure via Terraform")
+        except subprocess.CalledProcessError as e:
+            print(f"Warning: Failed to destroy infrastructure: {e}")
+            print("Proceeding with apply anyway...")
+
+    # Wait for resources to be cleaned up
     print("Waiting for resources to be fully cleaned up...")
     time.sleep(30)
 
