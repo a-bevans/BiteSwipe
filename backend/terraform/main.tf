@@ -199,6 +199,17 @@ resource "azurerm_linux_virtual_machine" "vm" {
   }
 }
 
+# Add locals block near the top of your file
+locals {
+  # Read and extract Google Maps API key from .env
+  env_content = file("${path.module}/../.env")
+  google_maps_api_key = trim(replace(
+    regexall("GOOGLE_MAPS_API_KEY=[^\n]*", local.env_content)[0],
+    "GOOGLE_MAPS_API_KEY=", 
+    ""
+  ))
+}
+
 # Separate deployment resource that can be triggered independently
 resource "null_resource" "deploy_backend" {
   triggers = {
@@ -293,9 +304,10 @@ resource "null_resource" "deploy_backend" {
       # Create environment file
       create_env_file() {
         echo "[Deploy] Creating .env file..."
-        ssh $SSH_OPTS -i $SSH_KEY adminuser@$VM_IP "cat > /app/backend/.env" << 'ENVFILE'
+        ssh $SSH_OPTS -i $SSH_KEY adminuser@$VM_IP "cat > /app/backend/.env" << ENVFILE
 PORT=3000
 DB_URI=mongodb://mongo:27017/biteswipe
+GOOGLE_MAPS_API_KEY=${local.google_maps_api_key}
 ENVFILE
       }
       

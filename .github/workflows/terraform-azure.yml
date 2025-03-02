@@ -37,6 +37,12 @@ jobs:
         chmod 644 ~/.ssh/to_azure/CPEN321.pub
         ls -la ~/.ssh/
 
+    - name: Create .env File
+      run: |
+        echo "PORT=3000" > backend/.env
+        echo "DB_URI=mongodb://mongo:27017/biteswipe" >> backend/.env
+        echo "GOOGLE_MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY }}" >> backend/.env
+
     - name: Create Firebase Credentials File
       run: |
         echo "${{ secrets.FIREBASE_CREDENTIALS_JSON }}" > backend/biteswipe-132f1-firebase-adminsdk-fbsvc-76c5bb6fe5.json
