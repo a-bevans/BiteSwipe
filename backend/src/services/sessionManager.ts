@@ -135,6 +135,7 @@ export class SessionManager {
                 status: { $eq: 'MATCHING' },
                 'participants.userId': userObjId,
                 'participants': {
+                    // TODO: BUG AFTER MVP; user should be able to revote in case of tie
                     $not: {
                         $elemMatch: {
                             userId: userObjId,
