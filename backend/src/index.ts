@@ -104,19 +104,23 @@ mongoose.connect(dbUrl, {
                     console.log(`HTTPS server is running on port ${port}`);
                 });
             } else {
-                console.log('SSL certificates not found. Falling back to HTTP server.');
-                // Start HTTP server as fallback if no SSL certificates
-                app.listen(port, () => {
-                    console.log(`HTTP server is running on port ${port}`);
-                });
+                // Provide a detailed error message about missing certificates
+                if (!fs.existsSync(sslCertPath)) {
+                    console.error(`ERROR: SSL certificate file not found at: ${sslCertPath}`);
+                }
+                if (!fs.existsSync(sslKeyPath)) {
+                    console.error(`ERROR: SSL key file not found at: ${sslKeyPath}`);
+                }
+                
+                console.error('CRITICAL ERROR: SSL certificates required.');
+                console.error('Server startup aborted. Please provide valid SSL certificates.');
+                process.exit(1); // Exit with error code
             }
         } catch (error) {
             console.error('Error starting HTTPS server:', error);
-            console.log('Falling back to HTTP server.');
-            // Start HTTP server as fallback if HTTPS fails
-            app.listen(port, () => {
-                console.log(`HTTP server is running on port ${port}`);
-            });
+            console.error('CRITICAL ERROR: Unable to start HTTPS server.');
+            console.error('Server startup aborted.');
+            process.exit(1); // Exit with error code
         }
     })
     .catch(error => {
