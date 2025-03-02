@@ -167,7 +167,8 @@ resource "azurerm_linux_virtual_machine" "vm" {
     openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
       -keyout /app/backend/key.pem \
       -out /app/backend/cert.pem \
-      -subj "/C=US/ST=Washington/L=Seattle/O=BiteSwipe/OU=Development/CN=$SERVER_NAME"
+      -subj "/C=US/ST=Washington/L=Seattle/O=BiteSwipe/OU=Development/CN=$SERVER_NAME" \
+      -addext "subjectAltName=DNS:localhost,DNS:hamaney-biteswipe.westus2.cloudapp.azure.com"
     
     # Set proper permissions
     chmod 600 /app/backend/key.pem
