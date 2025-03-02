@@ -36,32 +36,160 @@ export class SessionManager {
         }
     }
 
+    // ATOMIC 
     async joinSession(sessionId: Types.ObjectId, userId: string) {
-        const session = await Session.findById(sessionId);
-        if (!session || session.status.valueOf() === 'COMPLETED') {
-            throw new Error('Session not found or already completed');
+        const session = await Session.findOne({
+            _id: sessionId,
+            status: { $ne: 'COMPLETED'}
+        });
+
+        if (!session) {
+            throw new Error('Session not found or already Completed');
         }
 
+        if ( session.creator.toString() === userId) {
+            throw new Error('User is the creator of the session');
+        }
 
-        if(session.participants.length === 0) {
-            session.participants.push({
-                userId: new mongoose.Types.ObjectId(userId),
-                preferences: []
-            })
+        const userObjId = new mongoose.Types.ObjectId(userId);  
 
-            return await session.save();
-        } else {
-            if(!session.participants.find(p => p.userId.toString() === userId)){
-                session.participants.push({
-                    userId: new mongoose.Types.ObjectId(userId),
-                    preferences: []
-                });
+        const updatedSession = await Session.findOneAndUpdate(
+            {
+                _id: sessionId,
+                status: { $ne: 'COMPLETED'},
+                'participants.userId': { $ne: userObjId }
+            },
+            {
+                $push: {
+                    participants: {
+                        userId: userObjId,
+                        preferences: []
+                    }
+                }
+            },
+            { new: true, runValidators: true}
+        );
 
-                return await session.save();
+        if (!updatedSession) {
+            const existingSession = await Session.findOne({
+                _id: sessionId,
+                'participants.userId': userObjId
+            });
+
+            if(existingSession) {
+                throw new Error('User already in session');
             } else {
-                throw new Error('User already in session'); 
+                throw new Error('Session not found or already Completed');
             }
         }
 
+        return updatedSession;
     }
+
+    // TODO add routes
+    async sessionSwiped(sessionId: Types.ObjectId, userId: string, restaurantId: string, swipe: boolean) {
+        const userObjId = new mongoose.Types.ObjectId(userId);
+
+        const session = await Session.findOneAndUpdate(
+            {
+                _id: sessionId,
+                status: { $eq: 'MATCHING' },
+                'participants.userId': userObjId,
+                'participants': {
+                    $not: {
+                        $elemMatch: {
+                            userId: userObjId,
+                            'preferences.restaurantId': restaurantId
+                        }
+                    }
+                }
+            },
+            {
+                $push: {
+                    'participants.$.preferences': {
+                        restaurantId: restaurantId,
+                        liked: swipe,
+                        timestamp: new Date()
+                    }
+                }
+            },
+            { new: true, runValidators: true }
+        );
+
+        if (!session){
+            const existingSession = await Session.findOne({
+                _id: sessionId,
+                'participants': {
+                    $elemMatch : {
+                        userId: userObjId,
+                        'preferences.restaurantId': restaurantId
+                    }
+                }
+            });
+
+            if (existingSession) {
+                throw new Error('User already swiped on this restaurant');
+            } else {
+                throw new Error('Session does not exist or already completed or user not in session');
+            }
+        }
+
+        return session;
+    }
+
+    async getRestaurantsInSession(sessionId: Types.ObjectId, userId: string) {
+        const userObjId = new mongoose.Types.ObjectId(userId)
+        
+        const session = await Session.findOne({
+            _id: sessionId,
+            $or: [
+                { 'participants.userId': userObjId},
+                { creator: userObjId }
+            ]
+        });
+
+        if (!session) {
+            throw new Error('Session not found or user is not in session');
+        } else {
+            const restaurantsIds = session.restaurants.map(r => r.restaurantId);
+            return this.restaurantService.getRestaurants(restaurantsIds);
+        }
+    }
+
+    async startSession(sessionId: Types.ObjectId, userId: string) {
+        const userObjId = new mongoose.Types.ObjectId(userId);
+
+        const session = await Session.findOneAndUpdate(
+            {
+                _id: sessionId,
+                creator: userObjId,
+                status: 'CREATED'
+            },
+            {
+                status: 'MATCHING'
+            },
+            { new: true, runValidators: true }
+        );
+
+        if (!session) {
+            throw new Error('Session does not exists or user is not the creator or session does not have created status');
+        }
+
+        //Schedule the session to be marked as completed after 10 minutes
+        setTimeout(async () => {
+            try {
+                await Session.findByIdAndUpdate(
+                    sessionId,
+                    { status: 'COMPLETED' },
+                    { runValidators: true }
+                );
+                console.log(`Session: ${sessionId} Completed !!`);
+            } catch (error) {
+                console.log(`Failed to complete session: ${sessionId}`);
+            }
+        }, 1 * 60 * 1000);
+
+        return session;
+    }
+
 }

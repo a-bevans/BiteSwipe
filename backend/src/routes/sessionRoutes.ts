@@ -25,6 +25,32 @@ export const sessionRoutes = (sessionManager: SessionManager) => {
                 param('sessionId').notEmpty(),
                 param('sessionId').notEmpty().withMessage('Session ID is required')
             ]
+        },
+        {
+            method: 'get',
+            route: '/sessions/:sessionId/restaurants',
+            action: sessionController.getRestaurantsInSession,
+            validation: [
+                param('sessionId').notEmpty()
+            ]
+        },
+        {
+            method: 'post',
+            route: '/sessions/:sessionId/votes',
+            action: sessionController.sessionSwiped,
+            validation: [
+                param('sessionId').notEmpty(),
+                body('restaurantId').notEmpty(),
+                body('liked').isBoolean()
+            ]
+        },
+        {
+            method: 'post',
+            route: '/sessions/:sessionId/start',
+            action: sessionController.startSession,
+            validation: [
+                param('sessionId').notEmpty()
+            ]
         }
     ];
 };

@@ -14,6 +14,14 @@ export const userRoutes = (userService: UserService) => {
                 body('email').isEmail(),
                 body('displayName').isString()
             ]
+        },
+        {
+            method: 'get',
+            route: '/users/emails/:email',
+            action: userController.getUserByEmail,
+            validation: [
+                param('email').isEmail()
+            ]
         }
     ]
 }

@@ -24,7 +24,7 @@ export class GooglePlacesService {
                     location: `${latitude},${longitude}`,
                     radius: radius,
                     type: 'restaurant',
-                    keyword: keyword,
+                    keyword: keyword || 'food',
                     key: this.apiKey
                 }
             });
@@ -34,7 +34,25 @@ export class GooglePlacesService {
                 throw new Error('Failed to fetch nearby places');
             }
 
-            return response.data.results;
+            const restaurantsOnly = response.data.results.filter((place: any) => {
+                // Check if the place has restaurant-related types
+                const types = place.types || [];
+                const restaurantTypes = [
+                    'restaurant', 
+                    'food', 
+                    'cafe', 
+                    'bakery', 
+                    'meal_takeaway', 
+                    'meal_delivery'
+                ];
+                
+                // Make sure at least one restaurant-related type is present
+                // AND ensure 'lodging' is not the primary type (to exclude hotels)
+                return restaurantTypes.some(type => types.includes(type)) && 
+                       (!types.includes('lodging') || types.indexOf('restaurant') < types.indexOf('lodging'));
+            });
+            
+            return restaurantsOnly;
 
         } catch (error) {
             console.error(error);
