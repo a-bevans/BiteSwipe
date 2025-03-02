@@ -24,11 +24,16 @@ output "app_url" {
 }
 
 output "app_ip_url" {
-  value = "http://${azurerm_public_ip.public_ip.ip_address}:3000"
+  value = "https://${azurerm_public_ip.public_ip.ip_address}:3000"
   description = "The IP-based URL to access the application"
 }
 
 output "mongodb_url" {
   value = "mongodb://${azurerm_public_ip.public_ip.fqdn}:27017"
   description = "The MongoDB connection URL"
+}
+
+output "ssh_command" {
+  value       = "ssh -o StrictHostKeyChecking=no -i ~/.ssh/to_azure/CPEN321.pem adminuser@${azurerm_public_ip.public_ip.ip_address}"
+  description = "SSH command to connect to the VM"
 }

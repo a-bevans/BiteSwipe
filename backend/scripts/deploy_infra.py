@@ -7,6 +7,7 @@ import re
 import sys
 import time
 import json
+import argparse
 
 # Determine the path to the terraform directory relative to the script
 script_dir = pathlib.Path(__file__).resolve().parent
@@ -25,8 +26,19 @@ def get_terraform_variable(var_name):
         return match.group(1)
     raise ValueError(f"Variable {var_name} not found in variables.tf")
 
-def get_owner_tag():
-    """Get the owner tag from terraform.tfvars."""
+def get_owner_tag(prefix=None):
+    """Get the owner tag from command-line argument, environment or terraform.tfvars."""
+    # First check if a prefix was provided as a command-line argument
+    if prefix:
+        return prefix
+        
+    # Check if we're running on GitHub Actions main branch
+    github_ref = os.getenv('GITHUB_REF')
+    if github_ref and github_ref == 'refs/heads/main':
+        # Use a fixed production tag for main branch
+        return "master"
+    
+    # For any other case, try to read from terraform.tfvars
     try:
         with open(TERRAFORM_DIR / "terraform.tfvars", "r") as f:
             content = f.read()
@@ -35,7 +47,15 @@ def get_owner_tag():
                 return match.group(1)
     except (FileNotFoundError, IOError):
         pass
-    return "runner"  # Default value
+        
+    # If no terraform.tfvars, check if we're in GitHub Actions
+    owner = os.getenv('GITHUB_ACTOR')
+    if owner:
+        return owner
+        
+    # Fallback to system username for local runs
+    import getpass
+    return getpass.getuser()
 
 # Get the private key path from Terraform variables
 AZURE_VM_PRIVATE_KEY_PATHNAME_STR = get_terraform_variable("ssh_private_key_path")
@@ -173,9 +193,17 @@ def get_azure_subscription_id():
                 text=True
             ).strip()
             if result:
-                return result
+                subscription_id = result
+                print(f"Using Azure Subscription ID from CLI: {subscription_id}")
+                return subscription_id
         except subprocess.CalledProcessError:
             print("Warning: Could not get subscription ID from Azure CLI")
+    
+    if not subscription_id:
+        print("Error: Azure subscription ID not found. Make sure you're logged in to Azure CLI or ARM_SUBSCRIPTION_ID is set.")
+    else:
+        print(f"Using Azure Subscription ID from env: {subscription_id}")
+        
     return subscription_id
 
 def import_resource_group(owner_tag):
@@ -215,75 +243,136 @@ def import_resource_group(owner_tag):
         print(f"Error: {e}")
         return False
 
+def is_in_terraform_state(resource_address):
+    """Check if a resource is already in the Terraform state."""
+    try:
+        result = subprocess.run(
+            ["terraform", "state", "list", resource_address],
+            cwd=TERRAFORM_DIR,
+            capture_output=True,
+            text=True,
+            check=False
+        )
+        # If the command returns the resource address, it's in the state
+        return resource_address in result.stdout
+    except Exception:
+        # If there's an error, assume it's not in the state
+        return False
+
 def import_existing_resources(owner_tag):
-    """Import existing Azure resources into Terraform state."""
+    """Import existing resources into Terraform state."""
     print(f"Searching for existing resources with prefix '{owner_tag}-biteswipe'...")
     
-    # Get the subscription ID
+    # Get subscription ID (and validate it's not None)
     subscription_id = get_azure_subscription_id()
     if not subscription_id:
-        print("Warning: Azure subscription ID not found. Skipping resource import.")
-        return
+        print("Cannot import resources: No valid subscription ID")
+        return []
+        
+    # Define resources to import
+    resources_to_import = [
+        ("Microsoft.Network/publicIPAddresses", f"{owner_tag}-biteswipe-public-ip", "azurerm_public_ip", "public_ip"),
+        ("Microsoft.Network/virtualNetworks", f"{owner_tag}-biteswipe-network", "azurerm_virtual_network", "vnet"),
+        ("Microsoft.Network/networkInterfaces", f"{owner_tag}-biteswipe-nic", "azurerm_network_interface", "nic"),
+        ("Microsoft.Compute/virtualMachines", f"{owner_tag}-biteswipe", "azurerm_linux_virtual_machine", "vm"),
+        ("Microsoft.Network/networkSecurityGroups", f"{owner_tag}-biteswipe-nsg", "azurerm_network_security_group", "nsg")
+    ]
     
-    # Get all resources in the resource group
-    resources = get_azure_resources(owner_tag)
+    imported_resources = []
     
-    for resource in resources:
-        tf_type = get_terraform_resource_type(resource['type'])
-        if tf_type:
-            tf_name = get_terraform_resource_name(resource['name'], owner_tag)
+    for resource_type, resource_name, tf_type, tf_name in resources_to_import:
+        try:
+            # Check if the resource exists first
             try:
-                print(f"Importing {resource['name']} as {tf_type}.{tf_name}...")
                 subprocess.run(
-                    ["terraform", "import", f"{tf_type}.{tf_name}", resource['id']],
-                    cwd=TERRAFORM_DIR,
-                    check=True
+                    ["az", "resource", "show",
+                     "--resource-group", f"{owner_tag}-biteswipe-resources",
+                     "--resource-type", resource_type,
+                     "--name", resource_name],
+                    check=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE
                 )
-                print(f"Successfully imported {tf_type}: {tf_name}")
-            except subprocess.CalledProcessError as e:
-                print(f"Warning: Failed to import {tf_type}: {tf_name}")
-                print(f"Error: {e}")
-
+            except subprocess.CalledProcessError:
+                print(f"Resource {resource_type}/{resource_name} does not exist, skipping import")
+                continue
+                
+            # Check if resource is already in the Terraform state
+            resource_address = f"{tf_type}.{tf_name}"
+            if is_in_terraform_state(resource_address):
+                print(f"Resource {resource_name} is already in Terraform state as {resource_address}, skipping import")
+                imported_resources.append((resource_type, resource_name))
+                continue
+                
+            resource_id = f"/subscriptions/{subscription_id}/resourceGroups/{owner_tag}-biteswipe-resources/providers/{resource_type}/{resource_name}"
+            print(f"Importing {resource_name} as {tf_type}.{tf_name}...")
+            subprocess.run(
+                ["terraform", "import", f"{tf_type}.{tf_name}", resource_id],
+                cwd=TERRAFORM_DIR,
+                check=True
+            )
+            print(f"Successfully imported {tf_type}: {tf_name}")
+            imported_resources.append((resource_type, resource_name))
+        except subprocess.CalledProcessError as e:
+            print(f"Warning: Failed to import {tf_type}: {tf_name}")
+            print(f"Error: {e}")
+    
     # Try to import network interface associations after all resources are imported
     try:
-        nic_id = f"/subscriptions/{subscription_id}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/networkInterfaces/{owner_tag}-biteswipe-nic"
-        nsg_id = f"/subscriptions/{subscription_id}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/networkSecurityGroups/{owner_tag}-biteswipe-nsg"
-        association_id = f"{nic_id}|{nsg_id}"
-        
-        subprocess.run(
-            ["terraform", "import", "azurerm_network_interface_security_group_association.nic_nsg_association", association_id],
-            cwd=TERRAFORM_DIR,
-            check=True
-        )
-        print("Successfully imported network interface association")
+        # Check if both the NIC and NSG were imported successfully
+        if any(r[0] == "Microsoft.Network/networkInterfaces" for r in imported_resources) and \
+           any(r[0] == "Microsoft.Network/networkSecurityGroups" for r in imported_resources):
+                
+            # Check if the association is already in the state
+            if is_in_terraform_state("azurerm_network_interface_security_group_association.nic_nsg_association"):
+                print("Network interface association already in state, skipping import")
+                return imported_resources
+                
+            print("Importing network interface association...")
+            nic_id = f"/subscriptions/{subscription_id}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/networkInterfaces/{owner_tag}-biteswipe-nic"
+            nsg_id = f"/subscriptions/{subscription_id}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/networkSecurityGroups/{owner_tag}-biteswipe-nsg"
+            association_id = f"{nic_id}|{nsg_id}"
+            
+            # Import the network interface association
+            subprocess.run(
+                ["terraform", "import", "azurerm_network_interface_security_group_association.nic_nsg_association", association_id],
+                cwd=TERRAFORM_DIR,
+                check=True
+            )
+            print("Successfully imported network interface association")
     except subprocess.CalledProcessError:
         print("Warning: Failed to import network interface association")
+        
+    return imported_resources
 
-def run_terraform_commands():
-    """Run terraform commands to deploy infrastructure."""
-    # Run terraform init
-    print("Initializing terraform...")
-    subprocess.run(["terraform", "init"], cwd=TERRAFORM_DIR, check=True)
-    
-    # Get the owner tag from terraform variables
-    owner_tag = get_owner_tag()
-
-    # First attempt to import the resource group if it exists
-    # This helps avoid errors when the resource group exists but isn't in Terraform state
-    try:
-        import_resource_group(owner_tag)
-    except Exception as e:
-        print(f"Warning: Error during resource group import: {e}")
-    
-    # Try to import existing resources
+def run_terraform_commands(owner_tag):
+    """Run Terraform plan and apply commands with prompt for approval."""
+    print("\n🔍 Running Terraform init...")
+    if not run_command("terraform init", cwd=TERRAFORM_DIR):
+        return False
+        
+    # Try to import existing resource group if it exists
+    print("\n🔍 Checking for existing resource group...")
+    import_resource_group_script = script_dir / "import_resource_group.sh"
+    if os.path.exists(import_resource_group_script):
+        # Pass owner_tag as an argument to the script
+        if not run_command(f"{import_resource_group_script} {owner_tag}", cwd=script_dir):
+            print("Warning: Resource group import failed, but continuing with deployment")
+            
+    # Try to import other existing resources
+    print("\n🔍 Checking for existing Azure resources...")
     try:
         import_existing_resources(owner_tag)
     except Exception as e:
-        print(f"Warning: Error during resource import: {e}")
+        print(f"Warning: Resource import failed: {e}")
+        print("Continuing with deployment...")
         
-    # Run terraform apply
-    print("Applying new infrastructure...")
-    subprocess.run(["terraform", "apply", "-auto-approve=true"], cwd=TERRAFORM_DIR, check=True)
+    print("\n📋 Running Terraform plan...")
+    if not run_command("terraform plan -out=tfplan", cwd=TERRAFORM_DIR):
+        return False
+        
+    print("\n🚀 Running Terraform apply...")
+    return run_command("terraform apply -auto-approve tfplan", cwd=TERRAFORM_DIR)
 
 
 def update_ssh_config():
@@ -317,23 +406,32 @@ def update_ssh_config():
     )
 
 
-def main():
+def main(prefix=None):
+    """Main function to deploy infrastructure."""
+    # Get owner tag and generate terraform.tfvars
+    owner_tag = get_owner_tag(prefix)
+    
     set_script_directory()
     set_terraform_directory()
     kill_terraform_processes()
-    clean_lock_files()
-    force_unlock_terraform()
     
-    # Generate tfvars first
+    # Generate tfvars
+    print(f"\nUsing owner tag: {owner_tag}")
     print("\n📝 Generating terraform.tfvars...")
     generate_tfvars_script = script_dir / "generate_tfvars.py"
-    if not run_command(f"{generate_tfvars_script}", cwd=script_dir):
+    if not run_command(f"{generate_tfvars_script} {owner_tag}", cwd=script_dir):
         sys.exit(1)
     
-    run_terraform_commands()
+    run_terraform_commands(owner_tag)
     update_ssh_config()
 
 
 
 if __name__ == "__main__":
-    main()
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(description='Deploy Azure infrastructure for BiteSwipe.')
+    parser.add_argument('--prefix', type=str, help='Prefix for resource names (overrides GITHUB_ACTOR/username)')
+    args = parser.parse_args()
+    
+    # Call the main function
+    main(args.prefix)

@@ -6,6 +6,10 @@ on:
       - main
       - terraform/*
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -32,6 +36,12 @@ jobs:
         chmod 600 ~/.ssh/to_azure/CPEN321.pem
         chmod 644 ~/.ssh/to_azure/CPEN321.pub
         ls -la ~/.ssh/
+
+    - name: Create Firebase Credentials File
+      run: |
+        echo "${{ secrets.FIREBASE_CREDENTIALS_JSON }}" > backend/biteswipe-132f1-firebase-adminsdk-fbsvc-76c5bb6fe5.json
+        chmod 600 backend/biteswipe-132f1-firebase-adminsdk-fbsvc-76c5bb6fe5.json
+        ls -la backend/biteswipe-132f1-firebase-adminsdk-fbsvc-76c5bb6fe5.json
 
     - name: Setup Azure CLI
       uses: azure/login@v1

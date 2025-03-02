@@ -1,5 +1,5 @@
 import admin from '../config/firebase';
-import { messaging } from '../config/firebase';
+import { getMessaging } from '../config/firebase';
 import { Types } from 'mongoose';
 import { UserModel } from '../models/user';
 
@@ -27,7 +27,7 @@ export class NotificationService {
             };
 
             // Send the notification
-            const response = await admin.messaging().send(message);
+            const response = await getMessaging().send(message);
             console.log('Successfully sent notification:', response);
             
             return response;
@@ -47,7 +47,7 @@ export class NotificationService {
                 token
             };
 
-            const response = await messaging.send(message);
+            const response = await getMessaging().send(message);
             console.log('Successfully sent notification:', response);
             return response;
         } catch (error) {

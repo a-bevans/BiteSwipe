@@ -4,8 +4,9 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        
         {
-            "name": "Attach to Process",
+            "name": "Attach to local Process",
             "type": "node",
             "request": "attach",
             "restart": true,

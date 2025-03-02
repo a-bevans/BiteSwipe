@@ -16,6 +16,9 @@ RUN npm install
 # Copy source
 COPY src/ ./src/
 
+# Copy Firebase credentials file to the backend root directory
+COPY biteswipe-132f1-firebase-adminsdk-fbsvc-76c5bb6fe5.json ./biteswipe-132f1-firebase-adminsdk-fbsvc-76c5bb6fe5.json
+
 # Build TypeScript
 RUN npm run build
 

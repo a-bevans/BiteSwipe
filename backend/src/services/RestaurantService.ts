@@ -1,5 +1,5 @@
-import { Restaurant } from '../models/Restaurant';
-import { Types } from 'mongoose';
+import { Restaurant } from '../models/restaurant';
+import { FilterQuery } from 'mongoose';
 import { GooglePlacesService } from './externalAPIs/googleMaps';
 
 export class RestaurantService {
