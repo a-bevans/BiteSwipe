@@ -199,16 +199,20 @@ resource "azurerm_linux_virtual_machine" "vm" {
   }
 }
 
-# Add locals block near the top of your file
+
+
+
+# Add locals block for environment variables
 locals {
   # Read and extract Google Maps API key from .env
   env_content = file("${path.module}/../.env")
-  google_maps_api_key = trim(replace(
+  google_maps_api_key = trimspace(replace(
     regexall("GOOGLE_MAPS_API_KEY=[^\n]*", local.env_content)[0],
     "GOOGLE_MAPS_API_KEY=", 
     ""
   ))
 }
+
 
 # Separate deployment resource that can be triggered independently
 resource "null_resource" "deploy_backend" {
