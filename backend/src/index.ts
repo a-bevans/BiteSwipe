@@ -64,13 +64,15 @@ const port = process.env.PORT || 3000;
 const dbUrl = process.env.DB_URI || 'mongodb://localhost:27017/biteswipe';
 
 // Define SSL certificate paths
-const sslCertPath = process.env.SSL_CERT_PATH || path.join(__dirname, '..', '..', 'cert.pem');
-const sslKeyPath = process.env.SSL_KEY_PATH || path.join(__dirname, '..', '..', 'key.pem');
+const sslCertPath = process.env.SSL_CERT_PATH || path.join(__dirname, 'cert.pem');
+const sslKeyPath = process.env.SSL_KEY_PATH || path.join(__dirname, 'key.pem');
 
 // Basic startup info
 console.log('\n=== Server Configuration ===');
 console.log(`HTTPS Port: ${port}`);
 console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+console.log(`SSL Cert Path: ${sslCertPath}`);
+console.log(`SSL Key Path: ${sslKeyPath}`);
 console.log('=========================\n');
 
 // Configure mongoose connection with all recommended options
@@ -91,36 +93,58 @@ mongoose.connect(dbUrl, {
         console.log(`Clickable URL: \x1b[34mhttp://${mongoose.connection.host}:${mongoose.connection.port}/${mongoose.connection.name}\x1b[0m`);
         console.log('============================\n');
 
-        // Start HTTPS server if SSL certificates exist
+        // Attempt to start HTTPS server if SSL certificates exist
         try {
+            console.log(`Checking for SSL certificates:`);
+            console.log(`- Certificate file exists: ${fs.existsSync(sslCertPath)}`);
+            console.log(`- Key file exists: ${fs.existsSync(sslKeyPath)}`);
+            
             if (fs.existsSync(sslCertPath) && fs.existsSync(sslKeyPath)) {
+                console.log(`Loading certificates from:`);
+                console.log(`- Cert: ${sslCertPath}`);
+                console.log(`- Key: ${sslKeyPath}`);
+                
                 const httpsOptions = {
                     key: fs.readFileSync(sslKeyPath),
                     cert: fs.readFileSync(sslCertPath)
                 };
+                
+                // Log certificate info
+                try {
+                    const keyData = fs.readFileSync(sslKeyPath, 'utf8');
+                    const certData = fs.readFileSync(sslCertPath, 'utf8');
+                    console.log(`Key file length: ${keyData.length} chars`);
+                    console.log(`Cert file length: ${certData.length} chars`);
+                    console.log(`Key file starts with: ${keyData.substring(0, 40)}...`);
+                    console.log(`Cert file starts with: ${certData.substring(0, 40)}...`);
+                } catch (e) {
+                    console.error('Error reading certificate files for logging:', e);
+                }
                 
                 const httpsServer = https.createServer(httpsOptions, app);
                 httpsServer.listen(port, () => {
                     console.log(`HTTPS server is running on port ${port}`);
                 });
             } else {
-                // Provide a detailed error message about missing certificates
+                // If certificates are not found, log warning and start HTTP server
                 if (!fs.existsSync(sslCertPath)) {
-                    console.error(`ERROR: SSL certificate file not found at: ${sslCertPath}`);
+                    console.warn(`Warning: SSL certificate file not found at: ${sslCertPath}`);
                 }
                 if (!fs.existsSync(sslKeyPath)) {
-                    console.error(`ERROR: SSL key file not found at: ${sslKeyPath}`);
+                    console.warn(`Warning: SSL key file not found at: ${sslKeyPath}`);
                 }
                 
-                console.error('CRITICAL ERROR: SSL certificates required.');
-                console.error('Server startup aborted. Please provide valid SSL certificates.');
-                process.exit(1); // Exit with error code
+                console.warn('Starting server in HTTP mode because SSL certificates were not found.');
+                app.listen(port, () => {
+                    console.log(`HTTP server is running on port ${port}`);
+                });
             }
         } catch (error) {
             console.error('Error starting HTTPS server:', error);
-            console.error('CRITICAL ERROR: Unable to start HTTPS server.');
-            console.error('Server startup aborted.');
-            process.exit(1); // Exit with error code
+            console.warn('Starting server in HTTP mode due to SSL configuration error.');
+            app.listen(port, () => {
+                console.log(`HTTP server is running on port ${port}`);
+            });
         }
     })
     .catch(error => {
