@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   mongo:
     image: mongo:latest
@@ -34,7 +36,7 @@ services:
       - PORT=3000
       - DB_URI=mongodb://mongo:27017/biteswipe
       - NODE_ENV=production
-      - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY:-your_api_key_here}
+      - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
     ports:
       - "3000:3000"
     depends_on:

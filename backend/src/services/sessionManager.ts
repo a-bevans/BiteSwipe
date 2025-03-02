@@ -171,6 +171,10 @@ export class SessionManager {
                 throw new Error('User already swiped on this restaurant');
             } else {
                 throw new Error('Session does not exist or already completed or user not in session');
+            }
+        }
+        return session;
+    }
 
     async addPendingInvitation(sessionId: Types.ObjectId, userId: Types.ObjectId): Promise<ISession> {
         const session = await Session.findById(sessionId);

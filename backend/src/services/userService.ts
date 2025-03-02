@@ -38,4 +38,13 @@ export class UserService {
             throw error;
         }
     }
+
+    async getUserByEmail(email: string) {
+        try {
+            return await UserModel.findOne({ email });
+        } catch (error) {
+            console.error('Error getting user by email:', error);
+            throw error;
+        }
+    }
 }

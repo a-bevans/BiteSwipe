@@ -1,4 +1,4 @@
-import { Restaurant } from '../models/restaurant';
+import { Restaurant } from '../models/rest';
 import { FilterQuery, Types } from 'mongoose';
 import { GooglePlacesService } from './externalAPIs/googleMaps';
 
