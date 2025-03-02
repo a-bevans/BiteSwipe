@@ -2,28 +2,64 @@ import { SessionController } from '../controllers/sessionController';
 import { SessionManager } from '../services/sessionManager';
 import { body, param } from 'express-validator'; 
 
-
 export const sessionRoutes = (sessionManager: SessionManager) => {
     const sessionController = new SessionController(sessionManager);
 
     return [
         {
-            method: 'post',
-            route: '/sessions',
-            action: sessionController.createSession,
+            method: 'get',
+            route: '/sessions/:sessionId',
+            action: sessionController.getSession,
             validation: [
-                body('latitude').isNumeric(),
-                body('longitude').isNumeric(),
-                body('radius').isNumeric(),
+                param('sessionId').exists().withMessage('Session ID is required')
+                    .notEmpty().withMessage('Session ID cannot be empty')
             ]
         },
         {
             method: 'post',
-            route: '/sessions/:sessionId/join',
+            route: '/sessions',
+            action: sessionController.createSession,
+            validation: [
+                body('userId').notEmpty().withMessage('User ID is required'),
+                body('latitude').isNumeric().withMessage('Latitude must be a number'),
+                body('longitude').isNumeric().withMessage('Longitude must be a number'),
+                body('radius').isNumeric().withMessage('Radius must be a number')
+            ]
+        },
+        {
+            method: 'post',
+            route: '/sessions/:sessionId/invitations',
+            action: sessionController.inviteUser,
+            validation: [
+                param('sessionId').notEmpty().withMessage('Session ID is required'),
+                body('userId').notEmpty().withMessage('User ID is required')
+            ]
+        },
+        {
+            method: 'delete',
+            route: '/sessions/:sessionId/invitations/:userId',
+            action: sessionController.rejectInvitation,
+            validation: [
+                param('sessionId').notEmpty().withMessage('Session ID is required'),
+                param('userId').notEmpty().withMessage('User ID is required')
+            ]
+        },
+        {
+            method: 'delete',
+            route: '/sessions/:sessionId/participants/:userId',
+            action: sessionController.leaveSession,
+            validation: [
+                param('sessionId').notEmpty().withMessage('Session ID is required'),
+                param('userId').notEmpty().withMessage('User ID is required')
+            ]
+        },
+        {
+            method: 'post',
+            route: '/sessions/:sessionId/participants',
             action: sessionController.joinSession,
             validation: [
-                param('sessionId').notEmpty(),
-                param('sessionId').notEmpty().withMessage('Session ID is required')
+                param('sessionId').notEmpty().withMessage('Session ID is required'),
+                body('userId').notEmpty().withMessage('User ID is required')
             ]
         },
         {

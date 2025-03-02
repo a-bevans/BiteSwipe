@@ -1,0 +1,20 @@
+[{
+  "_id": {
+    "$oid": "67c0106e9be4429eab3392b7"
+  },
+  "email": "john@example.com",
+  "displayName": "John Doe",
+  "sessionHistory": [],
+  "restaurantInteractions": [],
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67c0106e9be4429eab3392b8"
+  },
+  "email": "jane@example.com",
+  "displayName": "Jane Smith",
+  "sessionHistory": [],
+  "restaurantInteractions": [],
+  "__v": 0
+}]

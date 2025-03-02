@@ -21,7 +21,7 @@ export class RestaurantService {
                     const primaryImage = details.photos_url && details.photos_url.length > 0 ? details.photos_url[0] : '';
                     const galleryImages = details.photos_url && details.photos_url.length > 1 ? details.photos_url.slice(1) : [];
 
-                    console.log('Creating new restaurant');
+                    console.log('Creating and Storing restaurant =: ', details);
 
                     const RestaurantData = {
                         name: details.name,
@@ -70,6 +70,7 @@ export class RestaurantService {
         }
     }
 
+
     async getRestaurants(restaurantIds: Types.ObjectId[]) {
         try {
             return await Restaurant.find({ _id: { $in: restaurantIds }});
@@ -78,4 +79,5 @@ export class RestaurantService {
             throw new Error('Failed to get restaurants');
         }
     }
+
 }

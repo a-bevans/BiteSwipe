@@ -5,19 +5,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "node-terminal",
-            "name": "dev",
-            "request": "launch",
-            "command": "npm run dev",
-            "cwd": "${workspaceFolder}",
-    
+            "name": "Attach to Process",
+            "type": "node",
+            "request": "attach",
+            "restart": true,
+            "port": 9229
         },
-        {
-            "type": "node-terminal",
-            "name": "start",
-            "request": "launch",
-            "command": "npm run start",
-            "cwd": "${workspaceFolder}",
-        }
     ]
 }

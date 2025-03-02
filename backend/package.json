@@ -5,14 +5,18 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "build": "tsc",
-    "dev": "dotenv -e .env -- npx nodemon -e .ts"
+    "dev": "dotenv -e .env -- npx nodemon --exec 'node --inspect -r ts-node/register' src/index.ts",
+    "seed": "dotenv -e .env -- ts-node src/scripts/seedDatabase.ts"
   },
   "dependencies": {
     "@types/mongoose": "^5.11.97",
+    "@types/morgan": "^1.9.9",
     "axios": "^1.7.9",
     "express": "^4.17.1",
     "express-validator": "^7.2.1",
+    "firebase-admin": "^13.1.0",
     "mongoose": "^6.12.0",
+    "morgan": "^1.10.0",
     "validator": "^13.12.0"
   },
   "devDependencies": {
@@ -20,7 +24,7 @@
     "dotenv": "^16.4.7",
     "dotenv-cli": "^5.0.0",
     "nodemon": "^3.1.9",
-    "ts-node": "^10.2.1",
+    "ts-node": "^10.9.2",
     "ts-node-dev": "^1.1.8",
     "typescript": "^4.4.3"
   }

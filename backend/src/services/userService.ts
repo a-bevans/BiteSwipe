@@ -1,4 +1,5 @@
-import { User } from '../models/user';
+import { UserModel } from '../models/user';
+import { Types } from 'mongoose';
 
 interface Location {
     latitude: number,
@@ -15,17 +16,26 @@ interface Restaurant {
 
 export class UserService {
     async createUser(email: string, displayName: string) {
-        const user = new User({
-            email: email,
-            displayName: displayName,
-            sessionHistory: [],
-            restaurantInteractions: []
-        });
-
-        return await user.save();
+        try {
+            const user = new UserModel({
+                email,
+                displayName,
+                sessionHistory: [],
+                restaurantInteractions: []
+            });
+            return await user.save();
+        } catch (error) {
+            console.error('Error creating user:', error);
+            throw error;
+        }
     }
 
-    async getUserByEmail(email: string) {
-        return await User.findOne({email: email});
+    async getUserById(userId: Types.ObjectId) {
+        try {
+            return await UserModel.findById(userId);
+        } catch (error) {
+            console.error('Error getting user:', error);
+            throw error;
+        }
     }
 }

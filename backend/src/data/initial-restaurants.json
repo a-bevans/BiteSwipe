@@ -1,0 +1,328 @@
+[{
+  "_id": {
+    "$oid": "67c00b25d66943addc35038b"
+  },
+  "name": "Freshii",
+  "location": {
+    "address": "3351 Wesbrook Mall, Vancouver, BC V6S 0E3, Canada",
+    "coordinates": {
+      "latitude": 49.25440099999999,
+      "longitude": -123.2354039
+    }
+  },
+  "contact": {
+    "phone": "(604) 343-4594",
+    "website": "https://www.freshii.com/"
+  },
+  "menu": {
+    "categories": []
+  },
+  "images": {
+    "primary": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ0grCH-kwK9HCXv-dgvpK9MrBqcekS0utn8aRhOsgXR-C7wdXbGnLJwR8AxIi2AIOOy6q8T9rWJQqjUudbIFNJvW7cuRZbyEWsIw0mUh11aZz4uCfkaKhHsdKY55ACUVicRaKX7ko6FTeLYIdMvtTVWNNvyzZYMMxdBj2PNJc8OI6GLHy1fFfh7UT1Qa10z-hT_HTN3WIZb56VrT9j0EP_umJdCn3BpuZej3zBR3_9aQdeu7ZFvL_6c9Z05rk67-wBqRtzUBpEiy9Q3ZomCYE9uxAuiSkbV6rvkBn2hVLgaT6s9dYXfMZ2C-3WgOCzHaAPNG_I1JTxs2gX_uDiXyA6rBGBD0YB0i6JKJNGM6Tp70OJNbsNVibsAlp1-kV5YiyuwoWLpzhkXpYsa9NZwoZKlQwn90GbLT7_9A9bhccOSt5d5&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+    "gallery": [
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ1qSRHDN1jvS6k5zPbI39mNnQtIfjsKt8INPTF9CmVJ9njkopCFrgqGLK4ttZAhN-R5fdnthalEaUN1p3AEdk5KNhkEk1rPpzCCGyrRybmp2j3ochnbLXvptkXYEaFBhBxEkX4eWX9cREm_T2MYoyGMeFhvqAFs9e-8xx7NS3oHQjYDNS4TspwakRXKby_5k-nU9C-cfhgp7eFU6uAXmFp8PtjI8uVaU2bs1ZuXe00-ucC07g2UqemOLNsy-i4tryDoEZmyOSBd6Upse1MRJIEuU0urU_ck7zOq9Ec8iXlMFW-QXwaY70B1_sYKinlvnJlpxP6y-qjqW2k4agns_eEUJp0zCbsi8D0U8p_BBZZjR7ZYk011FyyY-6qjCGASE0H_0s3ssorW0MsPmZlCnyDvdfZmcj0IEsMdALOJ4NXmHh-V&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ0wQ3s1Vu9qVkEHhw68hV90qgBg-BoMVw21iLMFzimy6b3Xr5PFixZgrxGFrXfZLCpaHRmliy_hBn50oJRsP3bYXo8dalaK-3Jq-IMweScZJiBEKhRvKqigLzTlYL0QIqv9OfwBMcSIf08ORhGTtr2vea-sr9nJOC2XPkFsw13_t_lSBaZPeNhPTcj7iIpYlM91CP0rK6K4_4LPEAD4ZATsv4QE0-VJkw6YCs_eYNm2bv_GnpjzmICZ8sDgXOvat026EBHlw8XSp2-tT7HzFE9V4jVo1Ou94b7nS23s10g2RGDx2avsgMLlzEciIJVS2DgGgpm8p9f6Wsq_oxVB2qhX-nSi7d_n4ZH-oNzrHNuw78rvw1wFVVqzzGjffZRRGbEM12FJ0SOnCK-1GcNTCpQsSb49ASEeHChqzhcKDykT&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ2-8ODUAlQLMyU954KdtaR01MNxTXjPbde5sbb7B9zXRWyWqZfYHXcDGPWlVmMj2KnHs47n7qUJhTBYYPiyBlzZCWBfg5iBXGrgqf0cXmRb51rMCXpe_ZJDjhZzmRkxxKrfPfCz5feDEJ93rDPRAUCR5Ngv-I5ZtNSs93WS73xECPu0sxIXlxCyWMDJyU6yYuI8QSPILWNUSPoc0yHBBl09ooR3zUzpVApWyx7R5tqgSrLTK6li7Q3OmCK0yomY9AkVetN-iHtLB9B6Rmvq-ubrRXMxO7M0ZolZBo9pu0cCvrJM8UhSFdYD0LxzBirFn5NF_zcDadnUC84Ily4RpORhxaoCB3fNGDYTQWRanIMwPNAfPq8CA2PKCAHZVtMiin2sz2zbdTXHiZSKTumoAhFV96ZBpXqU9yeZnbGd-Y0O&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ2frmZ8IWTPWdv9_fDdz7BE0cauoXo1D0_P1XmlvsJpTivBsS1G7gvzNGGTeCcYaEjN7DkifZ2HDt2Vk0W0pbVXw5ZhG5HpncLKSqLfGkIef1VaUWPTRra7ZdLs-U2Cjvg0MXMYl5B32snoadNCrXtwVZBlYyqcL5S-ctIY4gXJjVj3Q8nUBsou17r1rjzpXoqkU3hoJ9oUd_848OTKKYZgjxSKn-WtsteGIs_kmfXOzB9Cnld8V_FeDjESvCPJv_axG9PqHUk1akjFsY3InraI4_txOyyOPUlX4ZVzMViYHyS1wcdL-FSjlhhfoSvd9lq4qV30xidP8YNwdI0UZ6G6eWk3VB_hOBsvb_b3rJ6wrhiEmv-1E6Qs81-3dWVum5mZaVG-WiuVqXALqUzYgQCc4r9oCu9JfJxw1w5pM_1DS5Hm&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ0gbvgjNHFXF7r2NmWa89ogmB-hkZqsCeitxJMcr_W3C8izVXyPcf7tV7c2kIfaFkOQq7aJF2fHk6iYO5C3AOFqSILdOJ61kn7IYAg4QDk2AJ8p7QNAJD1mYIrBP5TaIKP01SSr4oYfY2yIwB5Kt0romOCJmbgoOJZPmSAYFSlL1i3squ8jDodmq30L-3uv7TSucPxvUi1CeMPQSFfG9_W2EBdBoUuXdDKuPaK1QHtU7A2gc2hEDrHBHqgmbrt_UbedomaZ8pf4uDVBke5dO06bfa1B07vQbiBSwxqFshrguVXiGWoYY-Kjf2py_HaHikYRC9RgQBvToI9tUibxPiZ-bEqSUPTUcCXXSXM1hvX8B98SrrPXm6YpOzQ5ybSk2mFLShsIN6Cy0MM1oJrB5vO4W6VQPcHygWgASdTBI2O-cydw&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ2b_cMgPE_dErgVtROrceZNkCP1meaRgRuqeWl4Z8xMBQLTZKoSDese4m8BwzCGbuWI3uoGm__IK_ZU7PpspEAlr2PP-GgApAaCXQ4hLvjmdV11O-FRO79KSMcY8UUlZ4--3mqA0OQ20RNr4Nl1xNB95eR6eEGkvKswu0-4NypFD36YnI1HUKe8GWocDwWmF9di7etJTj5cbSJjZR1JA_FduRtOBk-BRqQ1Fofxh2hiJ14aBpxFhqPJvVmWa9cgUHWA0xoHLkqJWl8LfvDm4Y58XqNiBo0Z8JjmHfJMCiSzYCWDkCLVQRId_qOAlJ_uNdSgbqJESNEQOjqIdQmFuc9WMFhzY1PgrcUKoUL50sZWZafLHRihi_vdcLC90eXXa9qpNWO8f1IVCJl9uqAXIW-kWby0ZM_TciE_R3azuSEzHQ&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ2n3b143qUZCfD29g43pRXe4AAr9cV4j9jrQyxq7sC2xEarTLKasLf_AR2-HWrJfcy6BH9l5ZNXVcetSrFqmo_xVQzst1G9yN9lzG5tEAegZaqPhTmkuSiGzikmjA5kNNjDg0DPbL7GLmM0SFAUkRbIsld_STOlI2iAlpkO_XNPD09_PR3--HoBrS-tHUkF5g8Dh8L_bnJ11GEbRTKoglz4n5kCf-cTjhAWeACAZCtDkqL9asXijeZoLHrUYURBT6TVmw0I6M_tiiZ8XVhWsU1KFehox4ZddK53SMGlVE68WQBmlu9eUZNoQLYpq62_CXLpKoLrd-L1SfheEQZSzI2PgAr9XyHbrcGtIJwghgwyQAwjPzOXEZeiOmNeywdt5GkqMsm5t3XtaSs5jHMRu6iwjnH7c1Im91sOKWpRQ5mVYBaw&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ0iwUu0eSVaXX-C3p6-LeUTl4GldJwa1pna0useibtxbZmImql5I_olCrUooxWVxLrkQ6FoIcM5Zh2bcJS6jRB5r-kSm609H05kHacjGzeYnjq4IqqzhyNPOqjalZXtWdxJiOR9LTgyFCGzE9msGm4Jssy7_IywxZsiqUMGigUfMOUgHiQn1LCH74YxmnQPGclKp6bVutzzhtsLua8k6lnquo6oblt8BuaIYK6Ih9hBBpwhGS33fXbq-cGyCS0_VisMnDlVRBDYG0098Z-ijISpCnGK6fOENSvMsZEZ2b4nXv98zyPCxwm1zo6NHuiHX3RaMlTUSxf9Za0MPfhn5O6svjrGgsXA8I-uJX85bhaDVr_ktvNZDxx8UqUl3kYCaITZsWJE3sgaGCesepvZfMJ50vLHLuvF-q0oGPXTAY5Rug&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ0MrqsyEZzQ4BewXpJuAmi9zsIrpKOIqz-Lsz8kDUAmlCf5QAYFhinYPVgh72ECBgNl00xeDGNh9nlwbA8eKc-bqhSHNFql_zelfMgdAb78kQPauFy6hosbSdezZ9ZKsH2NtJQvHIzul_ZMri0YclRrfjaLWJoNGqilEQJVKQqjC7yKckF2OBXm4h0u8ECTcvWZjcdIDhep-FgbKyesPK5BF0mTuFrmw8DUPJP985YkgqxozYMhO6TFnoxJuOdnu4ovz6apBQWwV6E23CkvTnWDrrwU24byM8jwve5mtJ4-IBsMq0ePhOKqSMo1a3xwb-vr8pdOpSB2PIcctSBWh__7bJuCjdTtPJK-Y4GbeSEMlGGeu36lk3_OYA4K4eX5wmirBUt_orSS27hRqCOODyhydRujKmSbksF_gVv6lIfA&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM"
+    ]
+  },
+  "sourceData": {
+    "googlePlaceId": "ChIJn4M4CdFyhlQRjn9GMZyBYhg",
+    "lastUpdated": {
+      "$date": "2025-02-27T06:50:13.856Z"
+    }
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67c00b25d66943addc35038e"
+  },
+  "name": "Togo Sushi UBC",
+  "location": {
+    "address": "3380 Shrum Lane, Vancouver, BC V6S 0B9, Canada",
+    "coordinates": {
+      "latitude": 49.2539939,
+      "longitude": -123.2353903
+    }
+  },
+  "contact": {
+    "phone": "(604) 222-9288",
+    "website": "http://www.togosushi.ca/"
+  },
+  "menu": {
+    "categories": []
+  },
+  "images": {
+    "primary": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ0yiNd1x0KU0tE52dbNNSNgPTVbdSJDYuHuvKWElFuJA0A65JT45662o-vzwrT6XCVwx66tz6E9eXujed2I22l0GzmAPXOZE11gbB_kGkNwEpVrJv9xi74I-ZsUeYEgCm0uP6tQmLrZb6-AAqauHyQTpGsYyjwqG-pWJbPGNneVDIimrj7U7Ocs&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+    "gallery": [
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ3RCzp5x9v2tTb7GuhAoD-_IM1zWjSfrfxvHroMrOsb3aKKQHx_koW5qZBgAi0hIeOjRGS8xPmVgXSVwkJCl7l7n0x6XFhG6PWw4W5gtQc0zdWvg-Q7kVvxELVXJDRjxvQSIsB7nDW3Zq-BuhBqzqbxLD9iixKv4OhOzFLhr0qj1_bza3IQWWlE&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ0jZixaPdAEHrzWC5oJH7jVPZFNvJrwCGxhhULswjZRisK_X1MQRm8Yj-mgD5tnYjF-hERLU9wiTfD2Q7QAHM1VGjuXmu6YuLf_1wcUpKD06GOAfzA55NschlAdjnU9fcZV4HJMHayovZyRdAkynxjs8te-nLP45OqH3--VuZL5ogwVE4CbWDqA&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ0TAKYiaCuNpMrDjopuUxcOjgw7vfTDP_ia2dmflVqLhNu8QKSOw_3tlO4g2Bwqbots8jJeXUO0P8QF3iqBncKrd6qhbA1-nWHNfbYy5mdWCTz5sJqSKd1NUmTCCatfeiXWl-qhRViSYbZ04BI6i8bidFD1OaqfwMyN_-YkA1lRAf-SBmjj4-KV&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ0yqKYITB73Xny0Qo_cJnwlCoEvLNhuQXVJ8eVMy1sdz54v97FMSPh0vwOUAUvRfRzRZ2W1xIT6SUXOcnCJy_6jj2xgbvStDnJ8PbmWQWT8t3U23Al57itlXTXOE2WbCVCEshjD2TMVoiBNoKhll6Mi_3ICQn-cW5NTy_RgOiI6DndYhJ9yNEtw&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ0UTyXYX7LB0SZWznpKi4nXvwueEYkapwJ7dKgzZT1Au07BuwyCQlEtSSfSpgn86SbRk9mLZAozLd8e9h3o-qN3_wFJsesbDy6UZWjbNbohkPjQTiQXjM0gkEr_-sLdHKsDvjDTzrx6hG9cifHjh31OB4UypuCIXbSxMTvMupyG42btjYr0WCbW&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ2XmijnvZY0vcWddpOI-kiyerMOVAhYK-MFmDSv8xnFHxGaNrFA-fUhnLM8D_0Y9oXGiaWm5JLPG-DSOOtKM1pnUeaa-0RFmCgZuzYfoTP59cgiKq28ym6lM80GVNHM6YcZy4IeHbyklwfsCZg_YOUek7YbAV-07j5tvov3Gq8QY7GrNeR-gBEI&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ3LW-_0oOH-vLNcf3R4d-G48xUqQMUoK7kPNzwXNyMpLCpWNNzOLHVsT2-3Qu-khHR1IHAhVA8xxTp7AGhTJ44CDZQsgN5vPeV-FK2-Bjgm8SRhMxi3MxkycO0k6e7T-QOn6UYe0sSr6j_iwD4watJDMPb057SoJBQnp8sfQqRu3WcQusSqK94&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ1qw-TOQSjQbYoJfjNRP_DoAwlP4E77QscBfh9C8ZiJ7hBBL8JmyYWQwXFZhM9mKiv5nYRL6qJtGrNAX66PShu_lBIrfYd40P-CmfHK7HnlapCowpdiiGbBUkwKgKTQKfl_tH4pKkniczeglL9gGKtXQb2edQVcaqTAvXRcrRlEi346pAqvK8Rl&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ1lHIjmjHtsQD9ey7mO6C8n-gDDDSI01oJ-ZwATSTdwC23iJlbX0JrcbTiB2JHpjJWu9-MFnMMsS6dPZUTUrYwjcU4d7-TYSruvkyI9LKb8pB7pyybmhdtVUGzqxwmkzWS3ILD7bFic5wIgi9E8YuLUpFXZkfSzNlKgKWoWDJH5aWIG_hjy6BoQ&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM"
+    ]
+  },
+  "sourceData": {
+    "googlePlaceId": "ChIJU21jMChzhlQRI7sOcRkhqfM",
+    "lastUpdated": {
+      "$date": "2025-02-27T06:50:13.997Z"
+    }
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67c00b26d66943addc350391"
+  },
+  "name": "Chef Hung Taiwanese Beef Noodle",
+  "location": {
+    "address": "3313 Shrum Lane #102, Vancouver, BC V6S 0C8, Canada",
+    "coordinates": {
+      "latitude": 49.2543948,
+      "longitude": -123.2361856
+    }
+  },
+  "contact": {
+    "phone": "(604) 228-8765",
+    "website": "http://www.chefhungnoodle.com/"
+  },
+  "menu": {
+    "categories": []
+  },
+  "images": {
+    "primary": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ33X3TD1kj89dmBcFXXoYdcEAu6LjLj69PTkTQuxgY9Ao8C3bIJzMSkvnCwm-rvfGyGqKU4iUrT_Qx8NFO-DpfVSa4g6xRkHktuO3GPvL0bCOppV3Wd6lDQV6u4T1CnuZkwZa9HIwPU0oCZgbg75xlXOSnavrTBiVDBTc4CTNn4eYsDlIjHwpVv&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+    "gallery": [
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ3lT4SDUB2RzgspG_gwOUFOHPYxVRoI5TOcmrU-ANlkg_5x9w_Ujq8ADM6YeKZ3862u-xI1SgeB7ue9xEPWs0WuNUqh7UsuH6RE-y5dEAPRoM5GqqZH_jS-JX8YRilUCs4gUmZJMJUp1okks2Ml6HDf50e7xWhhCVSPK_NCBHxFrnwdv_xt_zup&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ3RTeihGQQP6VqXCVA06ilrysaYMY7GpSO3qKeyG69Y3zIFiXTvrTLEuD6TfYqSa1GPL1LRKHngOUSUsu2vgkD7sEikibiOdI0N45glDJO-0OGWUXS5opdpz4yiEOM9vVLQLq5kICwZ1sGpNqTEGcjavQR3ISlt4vOVrgTAs-lN1Zto0nuiHUvV&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ2r9naiY__BPrgG3AY8djS33JEBdh6_Iq45E9pfUgOp_eC84kD-WNyUNX5vKqIE18TfKDUfhM5Q0UZTUR2HLe9d854XeXiddPb_Ywpyf6hU74tyNf6TJpDDVuI2wawBIVkFOvQ0k7zvtlwEKsBd-LmZUO1SwDYRQQn9KGscgj6lMc0BFVFNCd2R&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ3d8IIJ122rubBCCTRFuY_Tv1W3iemEMaOvEH5iZsvNdU2NgoI--SB_9GtKc-bmqJrpQrqvkNu-DYpzzXPI37HEcS7KVlOteipUR8V9-Plp605BnlOMnxeojReca80eT_REtA4KPo5JxT5xxab_xt4_L0mEj1ycwRwVnyyxWqWmCH5S6a_sNSgz&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ0HSpYYRQyY2sO4KXOFggBbfWeA7ZawyGWWZQxMEML6AOQkno-NK9FUO88oPdy2_xFmzpH8WKdlxpLIPipZFFqIAfYmg7oYtr779-V900qDWQJMm7kxct18FmXiLeqXTOUkmTeo61zRGWcMB1MFSOm5os7FBx5J_Ap1ZcnE-rUMAwsB_6TR87KK&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ3DITNdwDyisRz9AzugMMGEldPjNoK7XyGmmmQi9yCaGWP9GZcVGmcscREy1k2L1b8B2H_e1Oc5EGitT73IP8Z6E4VNmgfdPqPJn1F76bjb0g3_5HBt_pOxWMRyix0WLZKm3HyZFJ3tB_MQpRq_A1Pn-ajGo6XSMgxN0r2-WT1b_qNQpJQW54EO&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ1l5NzeTqc97upLjrbprCytu8KZYDxwVF4LLybrVhYLdF6b2cuL48G3lL-mLyDfvNJkhb0LLP1Zkael4nw264-31UieCukn2NqCTVGeuUYWvMs45bM2GmkuxA0V5b0QCMp918XZmz2Ea5WeK35tY2GviWoigca62TE-dqQg3quSFbBcRa9fcLp4&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ3uKkVkULiQDU4-Mqogf241ecJumqpcCmhouyYB6vvNxVowU2aiTdvoe5IrXvoB1SAl1CYBn3EdCv06A-MF46mfZw6icxOQa5VgMzH3Gx1vHJyPoGHYCex25yR2VHU5NLKWiZTlhm6NkQgwL1kihrpYaSKBMTufwzh3LktIxeW6yuFuib8DPM_P&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ2O0ldgiNQ8lpqrNJIwN3BIvKc33txsifIW8f6fJPNfMhhjThEBR1Un115_N6eY4OAW6nxzKNk0KYM0k3uSYGZBXYhtLL2jlzNVLp8gtkSOpVcPWjb1VE2eSfmBDLmbe2xhm0Ete_IioaodRTCurYpGmhRH1nvQ0VcKpwHl73Qmkb7CqUqT8Q-8&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM"
+    ]
+  },
+  "sourceData": {
+    "googlePlaceId": "ChIJE0-5DNFyhlQRVg3WV5ulaSY",
+    "lastUpdated": {
+      "$date": "2025-02-27T06:50:14.107Z"
+    }
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67c00b26d66943addc350394"
+  },
+  "name": "Nicli Pizzeria + Bar - Wesbrook",
+  "location": {
+    "address": "3339 Shrum Lane, Vancouver, BC V6T 1W5, Canada",
+    "coordinates": {
+      "latitude": 49.2540941,
+      "longitude": -123.2361408
+    }
+  },
+  "contact": {
+    "phone": "(604) 563-0012",
+    "website": "http://www.niclipizzeria.com/"
+  },
+  "menu": {
+    "categories": []
+  },
+  "images": {
+    "primary": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ0aD-rXfankhIlS2rlAo0g23t4CyzNmjZspiWmhDXsChqeaN7unLqXGV4HyF4Cg15_5KURm5CP12XrNoJVP4A6y8Qp7ouiCTMGmtL4pcIbNSPOrkZqSYHrt2aa9VYVUtyhMlidBEXpEd2-it7R8DfkZeeekFk5WbgnChpQ4NmlhnW0wlEdrUcKC&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+    "gallery": [
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ2VDqMclRKttwWasKg0Px66DHisGtAnl-mQOxdg-9tg-J_Q6r6CgO16RoU_vyBWydeaQxd715_JDQWU-x6_yBiveVF3A_sLYxo1NRDehBq3d0EvR8kH-5_sKozYr7EXKUmFeKi_soRIWchpxf_VXnR8OIey0NIVRAZX8MXKiAvu3NAInyhsMYKh&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ2pfMrOM_KMmll7XjJCPNgvshrH_uxM2EWIQzxyMGqsRLXT4JfSWgDw5gJNskNNqF2hGKHZmG0sBo0pGLMf4tzmlDcAYKxe2Hx68DkWtl9q5lsgJcoFOPDFKbl_KW5PnJKS9sLQzjKVMR9YexrgNYgEcDhXvXoEM1OnlaJF3fFyoMT-vscAmd8b&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ0f0wST0dLPQDO3wr60MR8flhy1rYzdAKgwuONAha1ki46mkF6gxfZi7IgK2C4d9PKxVGTaRlZvMHRjAGN7J5b_f-GJetOhyJpl0ep8sYwaA18zxoMuDdLqEsElAP_HnLS852gWqijOxMOCf5WYhlVocGrorzkU_5tSgsK6s1nHQeFzf0FnfIoD&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ0lZAYNi19SEWy0mEWpUOVibo-sEfYI89mnexhLZOXCpyEncOCbFrVEujJIRHj3WzKsRfrlBtrs5AroDE0qEZjW7q1rMsozsHzctoE-1K9nA1ZTNkoe3EBJZUN4VjtB4RXgsm022UTHcjOvDmZFVSWYO5VneWZZLuxOdHCnSMjoJGHD418_YS1c&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ2fWX2JTHJPFo0Pjh2HwmuOtputpeE9nOpvMkcdIL5Ap4e7E9v6qOvQpjh4sge1nAHDs3RhjAyxI8Tgo68qweeVeMm-e8LHY7c5GPrtsFRIfTAr3wKoYMzzCggFeRzsXfQbW63YMX-O6RfUqnN9ZDl-qSKGf0T3mKgO5rM4fXvHTLbOHVnBoeUI&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ1DstC0PofqIxIWha1EBbWiEHbEKOZBrvuqf4Rsiq16AlXoFxeDgMEqVxQYg_UEQzz6PZLgvmR8DlT3E7GP6eFsTI0_MbitutaXNX7QIULETbcBBBD08HcnbJZzHGXbFMAWZyAwWlT1yl_n0vhPBfZ1DSKTqtu7jemj4MhR4JOGpr3iZ7jD5A7U&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ31Kalt2z83pTEmNPJn0a0XbTZI-isohjyKbd0tOYj4MCwJbavKaeZKOukoqm0YbqtgrtBte7Q1YMH-FRxNtyikvOKEXzd0JTOxqMZ-aytv9126pmBMAQccNhbjV-71JmJZKO2YkwcfyWc5nKMkjfC0-mMrZtEUY0ydQYM20ggcqGyHlcTyEi88&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ2ubY8N158LudLAk-oQAcfIbIorF3X2YiqUjL8GFfI7u4sheg_OfkySF8TBPIDdEPR1lNxUeqKSPOnnNYwM5ZF-8g-G7hBWa4-IDpXvi7HFKMy7mPA7Rd0tYO_YPKXRqyA--RWy7Bx073dNGrNWNX9SZHfOvvskFO02HdkgYhJOE5QyCcrRkPAZ&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ3mfRCgIZBMX3fuhokZ7uom4VO8S-R81YrPtzqmx7ueHORDn0zqOtknLS4_NymOHdVGHJOWERZ0JQvpww7xISE7jW7BNH-5OgBm9-8fTT58Aif5ePImSPqo30JEdtdVocNmbtQOMGQv8cHZY3CrI321p90cH19gqRwHSR7CP0cCFdLUJdUr93c&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM"
+    ]
+  },
+  "sourceData": {
+    "googlePlaceId": "ChIJAzWCc9FyhlQRX8IUfcm5tl0",
+    "lastUpdated": {
+      "$date": "2025-02-27T06:50:14.219Z"
+    }
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67c00b26d66943addc350397"
+  },
+  "name": "Neptune Chinese Kitchen",
+  "location": {
+    "address": "3337 Shrum Lane, Vancouver, BC V6S 0C8, Canada",
+    "coordinates": {
+      "latitude": 49.2542663,
+      "longitude": -123.2360644
+    }
+  },
+  "contact": {
+    "phone": "(604) 559-7098",
+    "website": "https://www.neptunegroup.ca/ck-ubc"
+  },
+  "menu": {
+    "categories": []
+  },
+  "images": {
+    "primary": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ0fLPbGWWhf_6McltGGy6sLmTmWH1Vjxnd51dGIdYSMkjpLffqhpIaSX4mNoWE37fLdq7X8hrfyu35mTYMD248xouEvH9ABlLFKq3oyH1a36yam1XuAi9YtU5IkZsouiq_opBO2qd1-RsbRP-aGHe6sLcok-_BNiMejzAgfVTNxlxT_5lgh_CvQBg_kjwJDHvFh7g9BtadCykitctDnzBxuidR7YtWmqu7K3Qn0nrR6DKPlca7TSMaqsP936YHDFyAa8hbMdY1BnrfGhtSqAei9RHRYxBwrteAEF1CDYDl7c8o-KFLi4Cxd2DRKaWl2RYnrCk7wAzFmG4USSG8XmI_fys9-NO3DHFBcbBhKxCDIjhPJRp5NcbHKvtpMgR0JZ8NxTjmvGMgWF0VjL_QCOLDSeI7g3SKUw253FQ22WyIWcm1R&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+    "gallery": [
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ1akyFt7_VjEbum7D9E7vVkaWZXXyn1AI-l0eC-ks0mMMi0GP4BfhV_EyOEjPXhWSQuMlB9IE7ZIk6aGiPlpGjONrgh16y7D4O4csRR1_45qaQ8KI97s7iTfE0Hx07JUDU8XrPKoiAip9uAjILCZhmG6TN9bXS7kELrcCZeSMDps0rA11h2S7N0v0SZhxUnPjt7lVonUHl6kVQ1JJAlLT7HIZ_nVyjM_QkVaoFxdsz8Nx0KRNdZGKlQOnD9TbecOs93iKdv7BfqIZskxw0twk3s8jfYtlzDd5mAYyWOtnVRtqDGbGHvZDoBH_USnl2b742Ol07LMhhwUfPBoyWBTO0GfUhq-rHm-vt_OE1xkvHcZn0tS3zXfg5xrUI827esGPwpQXmzezw3ggLVkHoux01gLWEyjnW8poJngqp_3bZh&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ3K6w91DXA7uau6NJP82JzcSgQgDCoZzyQgq9iu-G6Yvyb_8PELQtdm6XbO4d6JHKg_LQjLp_pj5TdkttoH5v_F3RojFSq9jNsvXTtubpWgASCejy4fmDpZ4yuZryjcR9TTjb6r2rMQ9_o-3nCqsfPRE6QbHkkktfpix0h4glXCPTEqdDpbhTmR1btOQjTKqzjXSLeMMBDxU2t-Z14AmkLSwJ15dCIxbuBnSs0bzWzt1FtNzUmnPTNbseNcG8Stv33357mYinJsVosJAmZZUU6lCSeZDp8MAMn74x8yBNvwGVYl6s9P1ks-tyKrDsa6nhj_mYGLP1EDn9VZpyQ_980rPsbYKk3BbAzwBPXHXur7qvICJJzau6qY1utcAyNdP7XzOEijvWWILLYKdeP_-sow_s6or_MtkVO3sBLZo8UP&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ3SZwoWxNcs5MM_sgnv3RyaNg8L8h2Qdc1bNtpqb2UiXd5USTPr9NhonPttOUHiJ8VhlCwMH2G0wTCRry6H02cf9RiG49h6gjaYICfwzwgVn50tkt_ZoPnId4aOGXWl_2ct5KV7dxgLHeVWAAxxb_TSHqObSVnPSVWM1YiCYtXDnY7Pv0VIzL_WPwrVGAqAIZWkyWgeEhPqe3TbVK8NqdxvKgAKUvfvZdI6c8aMqUxGosSq8LQx1kYLIwV3YVW2h234-Mo8bnnmCow2hYEx6AW6F5tKlcsR3gYbwVXIY5qLMjG7N6GQpXuY5Sfvqob1vKWiUmZhqRi_Tfl19v_LB_Dx2ycSkdTeZwDvEaHaGKrQSAFAher-x_JHjOVxXh1D5m2aW_1zSRHjGYzsMbuzUoTpsZTJsu9vztRXE8LKQrpa&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ0PR3_2UF9tqGfQ2_Nwysq530jNYHWaZBJPoyaLN32qSj1_aOEahQEFftfgtxfge4vC_2Sa-fG3IFKCVq4BK7kSNeXF9HocZT5oAtlpPtOp50xdieyOEARocETS8eps-GpbNF7vCvqYOD-1njkNycy6NAuQB_1mara2ghC0EvYxcfhTxsau8T7639Yhyd1Y-4J-LlUCOKqpuogWtljjiIek22z-Dhi7tSJl_MPwYkkRYTRntsD6b0lvdcZ_8kUJtqknHNcTf41XjHTgImPJMDqIbsF2U-NHHsrnsX6JRKrIfEv-OskDA0M2SUL_yFcI6WMEzPCkLOTZ3EHmfdDPDunQmywPs4qvTv-HqmBaz_vebxq7Pqk2xgE1q0dtsPwqoi7hxXTxZy3Fuq2Qukqwhs0b7K0ssJsqeQLTpg-HX9LyRb07&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ2-HR7IRyKSWkoAkF5vAzCn5b_PTBrFc-h2DZagpuZkeN8LmuJwk_b427bcZvFeHrtx6rolem9bEiaWB_iau0tlA8gaTFmuNVfYivjY_OUf8BeqiVCbC-y2zQ6ZTjum-eXcb5yEJvuJk9dtPyXsypNOtrYal10aAqtkhTAAOktFlqih5PfXAJjwKJ9_03sC6adhjbx26Ro-R4Id1SAJQiXbAWM56z7pucHLLxyx_ssxb40bsjDrM5tzdLv4Woo43gBeh051DKHA6X0Ve2Aiq4mL7wguuER4wqfdpw8wOdExsj_VrwMFxRLVp-JIAQzfnZ4YAEJDB7qrR62gkAz-0ow_3_48zD-qR2b4KbiNw5SkBeCq0LGef45XjTAqbUdjUlCJ-GwWresbrBgA9nSCC1FNVmXp3lWN9_eBEn9oRbB1&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ0NBXqkufg1-o9iUeB9PyWUcknNSyxuJORYpGUnsjegS3vf80QjdKYrZyBbKSKKJI64HBc_TkVYG5iDWsMjVa9U8pA8pZHd_IR0UZSjpeUD84Yx4xTtqEe6DYKLeZUGhMUPtpTV_KJcZ1Ru-iyR-HplIgxIR53-_9CfsGF-bABTArNUJo-FKxd20w3GOwHmdeYhkiPyVqZDq9ph78Gu_i-HWGzqDJ3e4PpTuwjI2rFRlIS9Tgv6krn_S1JlWkNY29PVIlmYXmkA-y1NDnvpIye0_l84z0klWZu_FiRQvF9hkYTGBWW54LtjjRFQ3J2SVfLf6aFSXQLaSIjnx-XzBCqTv_7uIjUovBY5JRNSg9UFK9ywQeOEagQVkgC9ueiYELdjx08wimiijEHP0OSSY4C82AFzoqtIeZOg6I-0_sM&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ3vQJpaKNOHmLw5iJA5Lx1KtrFVhPevNH6HJpqwLOUYHb7phlPZzdtSQ8APX1L9q9hyeffPEPbxMTcE8ZVuTs7cCxxM44gV4srvLDu6q5UDFjuekPx0NQqot6EIX8MIB_ddTvTCKn2klePv-IfX3MZ60EYzi1ZKbfjqTYc4dJ3eGnj-foxXqN3QaKsWZDNWJgDStpHmXqV5ZMOynTr9uXSmyOKeTNxj4MKu6UvUJz7454einzNgGxCcq3UD2pZNUE_Sv-A3a46zgqoq0g7BjoTs_KmaVgI-FVNNs8GtG_koN3b0UlOB8FFfFVw57gAljLslmr0j6XC66_JMOqRSL7OB4pHkdDFN3REQknypNPxoL_xNgGd_VFD-rEmdaSLK3atZW62AUxzH3cKSOHzRWat26seYevj3EDh1SM3oNL9S&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ0f0t78DR3FQTsxfe3mw88LH9R7UzdVI1gTtkkNbyTrSOgghIRWwhziVl7fTq9uSGA1-0cFGCsuJ6hHTpQWLgQv51mT3RSonLS3sHr-kzlLD5-k6mH6PjnspJNFr9bda7XKvlhyMyzuER7SPuTAFLSfh6lMPwLiSacwKgvLOtbGFTEs4jkPYG6wPCnlt1jzGcI_h29MSnOboPsojVTVBwiRRoJQXUpKhH45BQ7xVW7Dnt0U7VqYuiB3vUwGyyQodSKv9vIhWE96UgUPcC0qkZO5w6MpVFDUknvQ8b-VEAqPUw0fA-IV6D_szHt1p0u9PXqAbGwGa7cir2GAI2d8GYl11SC72TGNZO2Cp3-MKgSb0N9GvAYPKzi8q2Qg5wyzwcCPv0PQoAbGf0fkqOL4hi96JzWe2osCMLaZ6obqfxEmFQ&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ354bM-SVZ_fVch7wmOP5v6-RxhVKe_ACastpHvM3W6-6QdU7igsS3u8FU7Tnw1acH7sdzAwY7bgcU0HHGv9qGvOTlAVpf8XEwGGc92U486YZSzYIMYToOsMFt8a8fvbTTduDFGK7pv1uc9Zw4t3TZX_r_t4XSskW3K3YqCYwHe-UoV89ROQGfTXvmVy6Is8NoeSgP2SAsKBPq1CJcC7Nq4-NmlnKrLRfbxa2psPpuSIKWF8fIUB7jlRnUmCr1tTqXgIiXwYWiDmTP0gebCVwzW83DWRDaGRMMI6kagEvVOkl-pmfQzjiWycNWwzOaDZcXYsQns7AEsFm9no7oBwkAXZnDMNDuuhR9Jn0PLlI0eZeXMbZqcPrwG23hMnLAy-ZOqpViDJKqaRNEnnfCjohAEfeKzYeRf-YOAHLWnUm0c&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM"
+    ]
+  },
+  "sourceData": {
+    "googlePlaceId": "ChIJX9lWc9FyhlQRo_l2A4pcjsc",
+    "lastUpdated": {
+      "$date": "2025-02-27T06:50:14.333Z"
+    }
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67c00b26d66943addc35039a"
+  },
+  "name": "Sports Illustrated Clubhouse",
+  "location": {
+    "address": "3340 Shrum Lane, Vancouver, BC V6T 1W5, Canada",
+    "coordinates": {
+      "latitude": 49.2542746,
+      "longitude": -123.2356509
+    }
+  },
+  "contact": {
+    "phone": "(236) 471-7643",
+    "website": "https://sportsillustratedeats.com/"
+  },
+  "menu": {
+    "categories": []
+  },
+  "images": {
+    "primary": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ2D6ioBQE136ratTjlQ-Pc0TQgAo9osO_1PDGmn0UCMAIHo2lFeSf8CvX35RUmzRX5Ga8E0H9d8K8LLQumB8ZR8XgHKd2k4-3udn0fUk-VO4R4SDr8AtyOb3EiHVVRyIjtT13sw0UG1xl3mEWM2fqJgTA_cu5cmRbOVxwM89qjM2obD8FwgOpHD&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+    "gallery": [
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ1I0kbBk82vQkqSBt_sjC_ggftX3ymUfO3Qltd8qUZRk-zkmItk6xXnOs7uD-to5QLWE7ym4xR0nQoFVAzJ2mhTr2hqS1-rOUrAD3HPH8AWIB8NGgFWhTzSN2OtrwIlgLu-SMRBRMGl2XlYbUrcgvfTFL3k9Uy6E4RpfLF1rAImr5he-2oKUUQ-&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ0V3CfjKsmFYVlifNiKnwdn91cm-AHFqBkv7dQtbdf4WyXTN0tbyl6r6DFuL_EsJ9Ci6uMO9oO-4dciDXZmnp7-zLjrvsrj0RxQIxrx-YK0hnvdyEhdrC8JAecnwTE3gDZeaL5oJzfenhvcgoXn09Q0XkUVV8BPRZHvifO44zfqQRzkyGGfJBpN&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ1WUhtFJI28iB8bjGaB9kucZQ3xozQlbDW2WohoPCpkJB3C0S8KPv1aMAi8qUMvinwfhnyeYzPCPRrF9WELdAO-C339fKUGiJcbqYSr-qp5JpmtQuoIzpMfBdJNEeqzKs-hSgM0c6qGsULmys3xFcfOLKraQ8C8lUezHCoeNoT0r5RTfyyL2Clr&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ3CP5px4qK82TcO5P--7l_qO7PVi-f4lEsIIjK_qtIcXBtDmvAZ9CKMZgY3ZEoToBCIl0wNuRJd7BNr2sqgluP5D8l0dlIWNEn--H2xWokz4FzOdExjReHXF0oV-N-fX0UxejnBdnj7pHGAJ4Z92qWa8C_CDxVS6dTkOEqig8sqVvPFl4hxIbO8&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ0LdriDSapExVEDagJTblQ4O-BVxGXbmo4U6JTc8JvBrHyJD6-mDbgNX90_8YxusuTLIjwxAZgouI5rmwB9_QtM0MWlHg_z9gxf35wzMUnGLpc_cLCw3ua4t5GCYEPMdNhrqon8byACOgsY49SRz5oxFIZnCwpfhr5XWxfaS6zY8boHkcFPtsWS&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ3H6q0vkO-ICe2Ka76_koEToCt_g8aXGjeuarA3L4EwuOZRnrnj6U_VeUVerHz6CRYCeCfIE6vpvQpcwsXVe712nr815Jm9Zv4pU9vnQKf4IOL1tGwrcj2HQFf7O-B-8BzZp6nnXvWXvTDMoeRWkkTg81eYo4-6m0I9JZzzkEhPb6YAQknKi9oC&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ39sgq6FbHQoFtcBuPJsATSu9DZ3F08tuGFih6jdpfJEVPK1DRy5IpBZPWlgsJ-eakrok7PMM3gR6ofX2aJRU7lpuYZiDYjLPsufSKE1h5Go2Tcebh-KFD6Wby440viOtbUe1WlunQlYZserbIOs32As0-3n_I45QRIXG78tdL3wBQPkkhGnFOW&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ217K2Ki2b2_lEaOGqPN5oRP-GvDLlaav5LebfGjSz1E2qxHna91VXdPR_sVVfhgZSCle4_3UJh5pTpmIMeX0P6g-I-CK8BfQ989yJQQKjzfJ4SJgcIYJVFZnqNze1eKDCDx2pJjiBJBPySTkIBwWZfHO0bNz9OXHgd6geGfo9US1KgPOfISKF7&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ2khLdRXScZCblFZDqkxW18ea1r36IMkygvXGMthVyhuEcbccGhnF25dILqixN2dUjVx6EYa1tXlzVIwctP8FWLyWOVV3x_dNT6mzQAwW2ppivxMiJRPhJl0IdkZTXK7Ju0Vc45kZjHGs5kllH_KN83CnFeCn2PfzCg4-oBpbRODTt3cHq5CQ5F&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM"
+    ]
+  },
+  "sourceData": {
+    "googlePlaceId": "ChIJIyyVtphzhlQRhPBtX8mCzfs",
+    "lastUpdated": {
+      "$date": "2025-02-27T06:50:14.468Z"
+    }
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67c00b26d66943addc35039d"
+  },
+  "name": "Big Star Sandwich Co.",
+  "location": {
+    "address": "3317 Wesbrook Mall, Vancouver, BC V6S 0E3, Canada",
+    "coordinates": {
+      "latitude": 49.25469129999999,
+      "longitude": -123.2357134
+    }
+  },
+  "contact": {
+    "phone": "(604) 933-9069",
+    "website": "https://bigstarsandwich.com/"
+  },
+  "menu": {
+    "categories": []
+  },
+  "images": {
+    "primary": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ0TeqvuOGp0JR3MB_PKLp8LfnVSJXGAU6bLoAk2mDHjdxzQOvSLV4TevoKsrG_gLNtHowCx73duJKlbkMZnsVEAbC99SDxlbnBYzPnEC1xSSQvyzGmY6yjRjoz_GCS0ocbRQDDIwRAyEehPVzoO5opHGi1oFjPIhP_S3IvuwhA2f547_o1HOdmCA0pJ1Tj-t0Op4XcLQ1h6JgS2o5NaqUi9UfJW8Juok0sCcWJh625Kz-k17LRkRaieXSnuUVno6BX4Jymk1sGMl4aAsngDIhs20YtjoSGDReyLG0XJJkwoHT-wbrPso5zx-A&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+    "gallery": [
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ2aeaaHBtWTzWM7iLkbi6k11IhkEEPhSGVJRNehBgln3EIrLAc7KWQ-gTcgxW94NbJoIyTcJJJ06vakKKvregy3RInzSq0p661OXOapHo4ys-wMfzEkNQZ5RdBVDUgySOpV8OgHEpGQMc7SrW7A3A5gJ0PMQ1Zi9Nl49_olwYzlBt4L3uQSeYL7-qBRDLOQewQRhfPe2nCcait-EuMDYR3nr4jb1dj3wy5thkZPwb9jz3c9tyUsO9tOZ5iJegurCfwuudOvtluUAGbl_7ta5DQljqA_bkzuT3j9sJ1YYK16awV9RDVBBhu-q2o2UnbGsHM61oK7jx5fTqdlTDoH8dyG8UHy9cPuIjQbgvZQzTHMgIcv79KuIQms38QXrlG5ODyVpD1QcosUeU7GHxYt1N4dodR4br1VoZl3OIhQ04XrGw&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ1cNlHA73GAJcPaE2WZCL0aRhKKhf2euV2PT8wrT1G8phbhXZeRpq6VH44mg6eTMhn8MWGpNkjD1LyBUY50ifgff-2_zEYhdW7RCDZ94oB3Y_NMi7sNeI5f5wkrP0PeA02sdGMattqqeYPafdK1190_r0SDGuo9kOmCAjxQOks4ilokGBbJ-Tb6SxeH2OaKfdK0wq0jGAxWxFcphybqaESlIVH3qfL1FrFEUDF6VX2sRrIOSbN7Yig8lHjN6RHq0_NFmlrxspZDulvytPfS7_MRn76UTtSMJC3vsfzjIVaGxwp-Sl_fGHsmVDBdiZGWBYVPVM9-SGch4R_tK_Xf5uNtMDUKsUkWgqX8YTYUjmsBK3hdBt7FmoRUVSeaiLFqE84mFLZ30vlE1nXjncxiYu6iuK2q6C2CPgSraycGLO0a2a_X&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ3Idvv8YBBPcNQuMNvLCjEqUSX94sRjPAfD--ZMGoyUSrqMrdt6P1bmFrtfGLz-kDVriG6_P9EC2bAS3mmr7Ixs6_Z3pqhIuuyGDyQ9DN14O6ZACopDHTut_67BJST7qcuyKtbdEIKcXvUsiVcfZZ6Qyy8-BP6orD5c5z1bXMqJyXzgKFg9bopXCmKyfD92_iUkkzwRLQq3z1icOkO3g6O1iV7D6twZBGmEbiPedkhVyINiN1Er3hVdPyd_DrP6TUjeU3AXeFLI53fDUo3828gbDIHMBor8lGXsUHkF6PIAleECa9Iec4xzEe235i3kKUYWeyX1m8EOAcVkUT6mC3zPZa0d5ndZET4rsGcDHLS6Ca2Xl9K6C-Ne2EYRsjqSpp5lE1W4s5DPXvyW0cDpgbYfdS-VfhXEhIMtK0XYa7Jt&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ14YSIoxVMw1esgtOB4G9VMOuLomlQzdbKSGrFRSBhmsT98vZEAi2ScHHO66Nj0rJqd_nAJDi204NjH0_HzpoObaaFXk3e3Wtl0Hnqk7P82MS-1K4H2LXoOuR73dgoxGn0QptAATkM9-4zBy6gUE58E70qLeNsUw_WEndl-zjN2i-u_xpzjyWNbPjnNZKpxa7ZR0ffo6prmY4lOYdKT_jnn9A9XznNQYDrMX0tpOpErQYWzClf5oecEekSFw9lywJB_E-e4cFEL4gBAfjRxhEPPj7ob-nY_WGM-AQz-0r1hGRy3CR-1pgEFNeCaROBs_-QAtV-FtXD_iCxYp6e0qfz11-ZzNMU5unFiOsvZT086c5-sr66nnB4sk67kdVzBUDTEBV5as1b7mKyNkM2yJu4ggXZIzDlhmaA1v_Yq1So&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ3gEz4G4vFqOLIHB4WlzBEFzz7vgZckFuyt23KzoQkOjmUnhhtO8qtv0hOR4_yLCfd7QiGRBQ423TJvHdncIrEnbjI3wl46yKlql28c2OKHkXprk4MA_ntMo0f47XbYDNim3Ulf0EJLqgWfvt7PtvEwMDM5wn8jJyD8EuqXzjRHPB52wqjvlvdkwSmLzhXEcNsVqPZIlmL46IdyPaTAk14fPU7lYJ79PNBLSPaWn2I4eQ6zWaXdG2yq2WttsaEMB9gTpoQoFnaeZ2Bu3ucAe9IEN9WRkaQnX4cPvmE5zUSfHNpZ64rEcqLbI_DonVz0jzJSrwxqxNdVPjaocfF_S-K-HtdhrNO6DLrXm9hbFhAu8DV_YNoUHCfSYWuVNoGTZzilXFISlvHpM0qDThatrjAQcyrWFjgBtteysm7ukgVUZau5&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ191tcy_m4pyJJYNv5Yz7QTB6yh9EgB4WTv-OQnCdHsz9FcBtrpguvXnjQOm_W3gUTaOAnPOgt03xlcs5qHdn098MlrnzmFsYOQRFCaEh_igfDJ_oYr6-Zqhv5XKqMASyNWRTEfkmlKdEgFAkmjzjeo6zl1Jy0suoG5OCfU9C8mBR56StQjKFG7Ny4x3KYTzS5vEQam15yL1t9jxnGyGczUCkl5ZvBskYROpiPaRMI6NbNpmYzBgwhvdu3BZ4qKAGNj6F-ObBpPEFdrOeaxqlcd_JxZ8HmND0Tab7DTHo7EsxRIWIL_-x6Nl-rMODxSOJ3h3VPKpxef3b1ZURz2mgMsZdN7lBAiDvda5ohSdVqGT92QCMK_G2Zs9L5MVVmzxenJYoSaSx62NGIMS3Out5a5z39lTIn5iQKHPqWEM2An&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ3xtqXpTGRr33mcxomBdBpeE799Du7nKGqM6EArLq3JLk5rTyZskBRoIiwuNlnL2k5zJWfW85BY-wA-PZuvRGriHvEKvV3YdzFlvmPtZA5WIYdh8ZItfd7QNBMZW3dedDPR-Y0lxJHjpbv4a66ppGat11YgJ90ceBlEutUcE47-EoN2lMJtiKT3PxIHWp77bFNyBLIU9r3KBd3k9opMtF9TuRnamSH3stR08cwwWXEP1iqRy1sVEtNPMdMa-lTJb33Tz2nEFQzcwo8gb398gPQw7nnF_XeERBhSNQz8NAdzB6VZeU-b10XjvB7HmnWE8f8-hTJ4zIVWaJqxindVqCXE-GYi9G7ilO9wz77JG6HzGCcpNLT3wE1gNBOtFwLiTHBc_xxryAcwXCxCrLyk1LR5vHOwW-cSMiHwliYHgYSt7k4c&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ2wlWTDyv2hX5M46xQF4gzDHs2k0Sy7s4YZyVStAWo48FKWCVaa8L9ehhG4mwE90U2QzAcAyHhjCqtu6DNoRxliI3WTcNZ0oiZ4sGM9i7qjLucZfeiE9WVYA2FR9Lj1uaDmzEt1y79kyLwoGQ6ltbAyVKzvuMUg8JhzACGY6sFvrP1hpkxZlkS79RBsjsOYYGMrQGCTGBXfC6eWGdg6SqabFKaDhQ3DumHLemAwJRgmD6E0JjygfQXpOU_4BnOKf6acKc94eOGJWxhP7Szgq9o9ysnD7cgbhVsvSRH6eNwq4ytES_EcP1z6L5dT86E2igoJO-yPqFr9QFAiVI7OMiHBRc11MyhOT-OW5lH1a5P0CsftltpOP0nCJ7hv4OeldvBHs622qEtG5xCjuoZS1Bhsn5IYD5nTs_cwE_NEAE9_&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ0_NzRUcsRmv-_a45XBkOU0sLpa7Fv0rg0-Vkgcdj5HSejAJM_XK7hdLEUphZWLZSyhO6Csuinv6P9R54Sz-0px_pK2rKTm9mTQ-n7B-iH5MIrUF9YN0oFdfApzQ0fKi5vUIa0YHt_ayQRoWfa3JDX4g3KZU-NBmYUkxIOLdikP1T2XrqZadGiUEq5ZjM2uwMopAu26yrn5C6X4S_HXagwTZvHerHP20_kDSClsagM6P38snXHnohX3e6v_TIRB_kkXmT-X7bbBX7gzjttdx3P5zALLq_CWnMIIqwZyBHAdgHJ0BZva4xISMvX_haqBsXYOP85oytuL1SSrUgSuYSh6sGHFATM6kSSIQdUqjn7VFTW7objslMOqHhZWldB4LGRUiso-Jo_w6O2c12iDLFkvstsfLMgh01sXw6Rw3pLzDcmE&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM"
+    ]
+  },
+  "sourceData": {
+    "googlePlaceId": "ChIJr8izT6NzhlQRyVm0D8ql1oY",
+    "lastUpdated": {
+      "$date": "2025-02-27T06:50:14.582Z"
+    }
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67c00b26d66943addc3503a0"
+  },
+  "name": "Poke by Ryuu Japanese Kitchen (UBC)",
+  "location": {
+    "address": "3358 Wesbrook Mall, Vancouver, BC V6S 0A5, Canada",
+    "coordinates": {
+      "latitude": 49.25438620000001,
+      "longitude": -123.2350295
+    }
+  },
+  "contact": {
+    "phone": "(604) 423-3688",
+    "website": "https://ryuuorder.com/"
+  },
+  "menu": {
+    "categories": []
+  },
+  "images": {
+    "primary": "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ0pad3y1EW3q9HWimhMzevjsI46WUsKvr-JMytet98mhI5o_rY_LXjMu76q9rID1nXpySfrr50e807ZJlBU3dxAVPy0IQFx-CfBtkbbn0NuFXIxmaF15YkA-wnBx5u9Wub8DwfAILAnhvuZ8jp-jG7IzCdbINzQFcdTg4Fc9V2bo12Si6BHyLAH63IMVBcpglIJPgsKxleOnipjzn5bgFGcUzcPAkWvieA_tevIRgzcOWVouvHXFJLWnWHpKBexroxcHGmTUmFK1kNRK-FWFItxbW7fmwHnfzrq29u9E6tvoJ6PXAWErimjBFYydxte9WDRvmJXrdPIFXAnOLJJFpbhbztiOpjB8hGNnUpibyfs9PU1b-OZu4AcAtvfx5MASuPCyi5BXb-WDScpVLba3awbspssbfYENwLOc9tZFAtxHv6K&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+    "gallery": [
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ2Ab_iZNVcYUlQIcd39nSLPKUayy5cObAudCYb5ChJ9LgRGZ9CfPuKitDJiRmtLoEAErUywxmz4orbibIEcDx--NpxCckaVRGl3PfluBmh6PGbBiawE8xcawR3Yvw5ruojVEU1M-tLoptmjOAdP8GKPtvlOVrczMqZ9BDsY3tX-eu2hoWrKZnSnJfwDZmGBN8yepnoZIdbXZPlw1MpPmcg4h9TAEyf1PcdP5PjDUSrHuFVZ0R044MkpGUGyKPKKGZ-aS2qOz3JSYl9N8mzYPR1i_1tmoY-9fXuyGi1DIrPvAiiLMBYiqRbg6C71P7lDIZYy6Lq5C-CEmXuBILEQwmzHqHEZl8iuEXasXLwu2Dnk_lDZR0DNXMJfGuE_kzACKcnn-vgi3ofqlaU66unZTO56nCp-y_eDm1LLzy4-HoM&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ2bwc52tZSqdIL9PWhMFU1HkuEY5hAnAJt2zIaZQx8g3wclS7nXT3ftsvW9caQSfe2Ud1pRFXKYAE2NSxuZovXbRpSHB-NrW1JOjSusY7hwSK1OSINLrmYgIIi7YhXEBJs3gA4AO_lyMCTPDVbv6LTlw2pjM2qqM7TXuxGGkVSA2L2gNZPYySwtGEDUi36-EGTHas2vjo197pDpAocib--htKuAogCihhkkIA6RJBIiLkOg1Yqm2tJpG7jR0ZD15zOvt1vW-unZHU7ewP4IUogkoB9zVoysyIvSjC495Rc9qpOUWwYHHjtd3B-mhaYPdQbMVJ0YZxwNcCZQMWo_BT8k0FaNtcFc3EHHtWw-p5-We4nSOoMKlPqGHN3Wz26-_H0xzv85PrD4JvZjrLSkRH4kl7Y56Bq3CLe1mQ-Y0GKNDw&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ07FDGg_KFzLcs-z95rBqaFS-iC22ltLJdJr__t6CurXK40mVRb_BguKAhmrDRPARDolxdfCRdFAjMjxhqHYNXFpEwLtVEDx7cXVn3NK4zzJKkpeTExfPGQBB0i_N-3iAc2IxjGUa3ARLDGsMa3ISKIVaGGDvZXckxuXui_Tx8yk6Z-ay-Pu2p9ygYmgAd_2aEkNVspqJ0cLJJC4UQ1wSEQMGUAuLIrFWTeAdNhz6MKziZpTgASygEWayB0nmEk9twZgjuuK1Oo95vw07_dsRAvgOwNydpMBX0wsj8gWwnf9jjARA9-Wx1PnhViXfIabcrOGXMvs3CgmrQYhkE6teJgwYXWNZSZ7yG29PW9qvGxE-7y6kxzDUwRioBNFypfVGmUF5Zbd5KHGaQeLNXtAi5iD8pA-4PkINNMQEl2VdGN&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ0L_oCW5pFcVkV5jVFM8Kh1RkzmrTV6QodefKGS-BHD-xe85b0qwhHRfql2ejP8exdpiP5WPb44UttNIHRwP9J61UTkZ9FWTTUo1gVtnpFBTk5DecgdlIEz-zC3lt9CV2jvVjz8u1jSTWUlQArjvi2Tmub76A3eT5OOOzlCl2VBz-SdluMEWytDd9Bq4qPK-qKSPGwVr4tUZRfriWD_Yk697exoNDdD3KrzZCQsVoTI_GfX8Yx0ghhPFQxqReoD8Ili0LUwaNyvXTLpRCSwRET-VJ5rhWpDcEmP6lLIuwibidnjir4DRgxNdJwsjsqjultH_bzhW6nRZDKRv5Hsmf5mfSf_iduSIgxZxUrsSMMXtmthgmPvzph_oC_1WjeEWnIt5owcwuXNS883c_Vq3kTTsHJ6lOiPQztZHzY8JJA&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ2dB-UMqSkaAkMMEiw-d-KgUyv-FaZiQJ8tvifNaaoH3NK1bnmNQy8wlsqffw1b_VyKjOZBXG78u7kgdjojhCxJy5qHBJyldpYk-vDzbD9CquMVzVHamNYLLgus6nj2y_CUq62onIVMa4g_B7-5RKYOxn2_4R7G9HYpvMlAj5khftJn1XHBOvyPZUbCakvrgqm8J5dDCF7JNFsl2He5XfDgpLArCjbV19cxUvfrTRwONUoMqtuUacNB4uixRohFqQdv9d52dj-HTW9phWpznGfCNKZGXfx1vLx8DEN-G5qezb2REfyyA7vXZyiHqYYD5qYeZzwUitCCiXyT2yFg1B0FaGyedMkAQbXHWaAxaNQdOZiVssUj89MoYoY-KkSgh8T8pevqZCpQj1D6lZf8ENT0zJeg60jImMrzy01wQJ04Ou-k&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ1wLRsaSwurS0b2awe2t4bzEf5nFPbHzulkcrpQBi53omUf34yQXWMoGsXu2x831d_CZFlvn6pf2GRI5ndWo61mjYN5mDkRYKORmLn3ErmwRquTC6_xkcp007vmmSjdAJMkIB-HqIOlwnN30LU7LR514QvPfokvEejCacERZ4HPLtlmvFvhgE6EWRsL162yQgop5MBdli7C3IIYzf_T0wIhZRg_Z0UBCIX1rYTNubZS2F1U96xaGfqqTzVcstMEpDnAenn8TxSO_MZZAnu7CRfJEWSo1pGxzmbofQYKM5f2ghPNrMaA1tZHJ1NNo43XhWcW6L8QQXMDxLmP63B3_ViBC2mrdBhRBT-I4y-NISgcfoRA821kuH2lUsmEpZD0_CUug9sHyVuNt8t2h1_j-rPC9E7iMaQCy8Q3djLM1kNZNE_j&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ26d87-4Ic8t7UYxU_soZAjTde_YPrckeZJJhSY4SlQV7d5kY2gHyNrxchSfSebTFj4VKB2NizSyZcT6RWcoWRo0_fTKQmvnvpm04VJlwybD_U_JAKrIRd3bJvhZwM9irXQ87iFCjpQwHguyxGAn3hEw4iuMeawSeXH0bqn85YdgwyCKPDD9NtxnNGNFnrN824OG9K2_-UXKNbjxMm1zMSqlj6uIHfnY_m_PiX1OXxen0_l0F-mdff7y2cAcxDv0Tht_M2TgUMHhOfTl3BaqfmckMpYCb_uDq8dJzpCB01wxS1AnrE65Gwr2s7R6S8EuTmADgHaGDAZdVumHgqqH-Er4drIWvjAdQQkeWZNzbTkV607UsUuh1f5VFpQ4M2_nWaDb0iwEQpyrPyr7TCZTovpfrN-Ot8wS-Zus-MOr_uO&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ0DBLUxdryNWhJ1O-9GZaljhC3di4hxHPAJikB1mn9PctPRKPgCT4nTB9M_zv6DSQksTXkCgdKujDAkE3f8TauiEmjmVMJadlx-l7huK-uQbElGjsIsi-LEjVqiRuLPVK3KdI_pe_hgsw9tFRd7QK_jVniNkif3C8OCsFM4R9nWk1UGC9om1-2W7xlwaHroVvEUn_M7niTNh8od0aRXVcJRD6Um_gtjU1b80-6SYT4Y88-oZx-I2v119qUQprCzdhbjE5Av0mfyZuzfC47MAlHQCGX64MMMVTy_mf6SodMBMi1DnFuhSBaHc8qiyDtPyCtDrilsqWxKW2LtXnjD77NaKWulJDDDHn-33fKnCuX6X6YAfNZ73ob4CzLGKhsg35fWoIkbrxM7bR87sp6fTj57kg7JGOMXjt9fjg0zSlZzgASg&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM",
+      "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=AUy1YQ2nVYCqdQsDH7-DAHeU4AQNWUEGilQAIbGeIp0AwBMX5FDZUAuw_WrBudLfr8PNX7fHdAuUtQakz51tWkxsHIdwK-Nzn9Yb8IldZy1hNZO6tJIDeKhuj9rAUyAtPzFwQnxUmIIhYKe6mDdzmOGqko4MN2XpOQ0Bt4bo2cqHDvKw-H_F4m4NK4IEE9VEQrrTYMSogBlCr1Ratx61T-BbDIs60pnyvA8VRX3TVNt_NS5FovmjOV_MENx57MA0v7pQ9QN1l35_k25DKNs2l4xw8l0ejPFezS198BzTHVt8ey4z_exz7WXylRUT9downSmrmxefBcL6MEe6pqV91xVTd9i9Wn_iJoRDpLCiIN_cp_n4sCZVtOb3MakyVbpzTF_3P74HVFGSkbM-xiq8pW52XWo2y5eoL39P1CzHiZetkIoa&key=AIzaSyAC-i_tIVlGmDOU7QiyHKlPvjJR8JxsSKM"
+    ]
+  },
+  "sourceData": {
+    "googlePlaceId": "ChIJd_nWwW9zhlQRcZDWzsKXFgI",
+    "lastUpdated": {
+      "$date": "2025-02-27T06:50:14.740Z"
+    }
+  },
+  "__v": 0
+}]

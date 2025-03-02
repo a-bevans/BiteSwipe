@@ -115,52 +115,6 @@ resource "azurerm_linux_virtual_machine" "vm" {
     azurerm_network_interface.nic.id,
   ]
 
-  custom_data = base64encode(<<-EOF
-    #!/bin/bash
-    
-    echo "[Setup] Starting VM configuration..."
-    
-    echo "[Setup] Updating package lists..."
-    apt-get update
-    
-    echo "[Setup] Installing prerequisites..."
-    apt-get install -y \
-      apt-transport-https \
-      ca-certificates \
-      curl \
-      software-properties-common
-
-    echo "[Setup] Adding Docker repository..."
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-    add-apt-repository \
-      "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-      $(lsb_release -cs) \
-      stable"
-
-    echo "[Setup] Installing Docker..."
-    apt-get update
-    apt-get install -y docker-ce docker-ce-cli containerd.io
-
-    echo "[Setup] Installing Docker Compose..."
-    curl -L "https://github.com/docker/compose/releases/download/v2.24.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-    chmod +x /usr/local/bin/docker-compose
-
-    echo "[Setup] Configuring Docker permissions..."
-    usermod -aG docker adminuser
-
-    echo "[Setup] Starting Docker service..."
-    systemctl start docker
-    systemctl enable docker
-
-    echo "[Setup] Creating application directories..."
-    mkdir -p /app/backend
-    chown -R adminuser:adminuser /app
-
-    echo "[Setup] Configuration complete!"
-    touch /tmp/setup_complete
-  EOF
-  )
-
   admin_ssh_key {
     username   = var.admin_username
     public_key = file(var.ssh_public_key_path)
@@ -177,7 +131,49 @@ resource "azurerm_linux_virtual_machine" "vm" {
     sku       = "20_04-lts-gen2"
     version   = "latest"
   }
-  
+
+  custom_data = base64encode(<<-EOF
+    #!/bin/bash
+    set -ex
+
+    # Update package list
+    apt-get update
+
+    # Install Docker and Docker Compose
+    apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    apt-get update
+    apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose
+
+    # Configure Docker
+    systemctl enable docker
+    systemctl start docker
+    usermod -aG docker adminuser
+
+    # Create app directory and set permissions
+    mkdir -p /app/backend
+    chown -R adminuser:adminuser /app
+    chmod -R 755 /app
+
+    # Create a script that will be run after first login
+    cat > /home/adminuser/setup_docker.sh << 'SETUP'
+    #!/bin/bash
+    # Verify docker works
+    docker ps
+    if [ $? -eq 0 ]; then
+        touch /tmp/docker_verified
+    fi
+    SETUP
+
+    chmod +x /home/adminuser/setup_docker.sh
+    chown adminuser:adminuser /home/adminuser/setup_docker.sh
+
+    # Mark setup as complete
+    touch /tmp/setup_complete
+    EOF
+  )
+
   tags = {
     owner = var.owner_tag
   }
@@ -190,12 +186,12 @@ resource "null_resource" "deploy_backend" {
   }
 
   provisioner "local-exec" {
-    command = <<-EOT
+    command = <<-EOF
       #!/bin/bash
       set -x  # Enable debug output
       set -e  # Exit on error
       
-      SSH_KEY="/Users/vm/.ssh/to_azure/CPEN321.pem"
+      SSH_KEY="$HOME/.ssh/to_azure/CPEN321.pem"
       VM_IP="${azurerm_public_ip.public_ip.ip_address}"
       SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=10"
 
@@ -208,7 +204,7 @@ resource "null_resource" "deploy_backend" {
       
       # Wait for SSH to be available
       echo "[Deploy] Waiting for SSH to become available..."
-      for i in {1..30}; do
+      for i in $(seq 1 30); do
         if ssh $SSH_OPTS -i $SSH_KEY adminuser@$VM_IP "echo 'SSH connection successful'" 2>/dev/null; then
           echo "[Deploy] SSH is now available"
           break
@@ -219,7 +215,7 @@ resource "null_resource" "deploy_backend" {
 
       # Wait for setup to complete
       echo "[Deploy] Waiting for setup script to complete..."
-      for i in {1..30}; do
+      for i in $(seq 1 30); do
         if ssh $SSH_OPTS -i $SSH_KEY adminuser@$VM_IP "test -f /tmp/setup_complete && echo 'Setup complete file found'"; then
           echo "[Deploy] Setup script completed successfully"
           break
@@ -230,19 +226,33 @@ resource "null_resource" "deploy_backend" {
         sleep 10
       done
 
+      # Run Docker verification script
+      echo "[Deploy] Verifying Docker setup..."
+      ssh $SSH_OPTS -i $SSH_KEY adminuser@$VM_IP "~/setup_docker.sh"
+      
+      # Wait for Docker verification
+      echo "[Deploy] Waiting for Docker verification..."
+      for i in $(seq 1 10); do
+        if ssh $SSH_OPTS -i $SSH_KEY adminuser@$VM_IP "test -f /tmp/docker_verified"; then
+          echo "[Deploy] Docker verified successfully"
+          break
+        fi
+        echo "[Deploy] Attempt $i: Waiting for Docker verification..."
+        sleep 5
+      done
+
       # Copy files
       echo "[Deploy] Copying backend files..."
       BACKEND_PATH="$(pwd)/../../backend"
       echo "[Deploy] Backend path: $BACKEND_PATH"
       ls -la $BACKEND_PATH
       
-      # Make sure .env file exists and has the right content
-      echo "[Deploy] Verifying .env file..."
-      ssh $SSH_OPTS -i $SSH_KEY adminuser@$VM_IP "
-        echo 'PORT=3000' > /app/backend/.env
-        echo 'DB_URI=mongodb://mongo:27017' >> /app/backend/.env
-        cat /app/backend/.env
-      "
+      # Create .env file first
+      echo "[Deploy] Creating .env file..."
+      ssh $SSH_OPTS -i $SSH_KEY adminuser@$VM_IP "cat > /app/backend/.env" << 'ENVFILE'
+PORT=3000
+DB_URI=mongodb://mongo:27017/biteswipe
+ENVFILE
       
       echo "[Deploy] Copying backend files..."
       scp $SSH_OPTS -i $SSH_KEY -r $BACKEND_PATH/* adminuser@$VM_IP:/app/backend/
@@ -263,7 +273,7 @@ resource "null_resource" "deploy_backend" {
         echo '[Deploy] Containers started successfully!'
         docker ps
       "
-    EOT
+    EOF
   }
 
   depends_on = [
