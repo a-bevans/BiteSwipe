@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
@@ -60,17 +61,29 @@ app.get('/health', (req, res) => {
     res.status(200).json({ status: 'healthy' });
 });
 
-const port = process.env.PORT || 3000;
-const dbUrl = process.env.DB_URI || 'mongodb://localhost:27017/biteswipe';
+// ---------------------------------------------------------
+// ENV
+// ---------------------------------------------------------
+const port = process.env.PORT;
+if (!port) {
+    throw new Error('Missing environment variable: PORT. Add PORT=<number> to .env');
+}
+
+const dbUrl = process.env.DB_URI;
+if (!dbUrl) {
+    throw new Error('Missing environment variable: DB_URI. Add DB_URI=<url> to .env');
+}
 
 // Define SSL certificate paths
-const sslCertPath = process.env.SSL_CERT_PATH || path.join(__dirname, 'cert.pem');
-const sslKeyPath = process.env.SSL_KEY_PATH || path.join(__dirname, 'key.pem');
+const sslCertPath = process.env.SSL_CERT_PATH;
+const sslKeyPath = process.env.SSL_KEY_PATH;
+if (!sslCertPath || !sslKeyPath) {
+    throw new Error('Missing environment variable: SSL_CERT_PATH or SSL_KEY_PATH. Add SSL_CERT_PATH=<path> and SSL_KEY_PATH=<path> to .env');
+}
 
 // Basic startup info
 console.log('\n=== Server Configuration ===');
 console.log(`HTTPS Port: ${port}`);
-console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 console.log(`SSL Cert Path: ${sslCertPath}`);
 console.log(`SSL Key Path: ${sslKeyPath}`);
 console.log('=========================\n');
@@ -90,7 +103,6 @@ mongoose.connect(dbUrl, {
         console.log(`Database: ${mongoose.connection.name}`);
         console.log(`Host: ${mongoose.connection.host}`);
         console.log(`Port: ${mongoose.connection.port}`);
-        console.log(`Clickable URL: \x1b[34mhttp://${mongoose.connection.host}:${mongoose.connection.port}/${mongoose.connection.name}\x1b[0m`);
         console.log('============================\n');
 
         // Attempt to start HTTPS server if SSL certificates exist
@@ -126,25 +138,36 @@ mongoose.connect(dbUrl, {
                     console.log(`HTTPS server is running on port ${port}`);
                 });
             } else {
-                // If certificates are not found, log warning and start HTTP server
+                // Exit with error if certificates are not found
                 if (!fs.existsSync(sslCertPath)) {
-                    console.warn(`Warning: SSL certificate file not found at: ${sslCertPath}`);
+                    console.error(`ERROR: SSL certificate file not found at absolute path: ${path.resolve(sslCertPath)}`);
                 }
                 if (!fs.existsSync(sslKeyPath)) {
-                    console.warn(`Warning: SSL key file not found at: ${sslKeyPath}`);
+                    console.error(`ERROR: SSL key file not found at absolute path: ${path.resolve(sslKeyPath)}`);
                 }
                 
-                console.warn('Starting server in HTTP mode because SSL certificates were not found.');
-                app.listen(port, () => {
-                    console.log(`HTTP server is running on port ${port}`);
-                });
+                console.error('\n=== SSL Configuration Error ===');
+                console.error('Server requires SSL certificates to operate.');
+                console.error('Attempted to find certificates at:');
+                console.error(`Certificate: ${path.resolve(sslCertPath)}`);
+                console.error(`Key: ${path.resolve(sslKeyPath)}`);
+                console.error('Set these environment variables to specify certificate locations:');
+                console.error('  SSL_CERT_PATH - path to certificate file');
+                console.error('  SSL_KEY_PATH - path to key file');
+                console.error('===============================\n');
+                
+                process.exit(1); // Exit with error code
             }
         } catch (error) {
             console.error('Error starting HTTPS server:', error);
-            console.warn('Starting server in HTTP mode due to SSL configuration error.');
-            app.listen(port, () => {
-                console.log(`HTTP server is running on port ${port}`);
-            });
+            console.error('\n=== SSL Configuration Error ===');
+            console.error('Failed to start HTTPS server due to SSL configuration error.');
+            console.error('Attempted to find certificates at:');
+            console.error(`Certificate: ${path.resolve(sslCertPath)}`);
+            console.error(`Key: ${path.resolve(sslKeyPath)}`);
+            console.error('===============================\n');
+            
+            process.exit(1); // Exit with error code
         }
     })
     .catch(error => {

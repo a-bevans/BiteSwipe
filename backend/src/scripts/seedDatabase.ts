@@ -14,7 +14,8 @@ const DATA_DIR = path.join(__dirname, '../../data');
 const INITIAL_RESTAURANTS_FILE = 'initial-restaurants.json';
 const INITIAL_USERS_FILE = 'initial-users.json';
 const INITIAL_SESSIONS_FILE = 'initial-sessions.json';
-const DB_URI = process.env.DB_URI || 'mongodb://localhost:27017/biteswipe'
+const DB_URI = process.env.DB_URI || 'mongodb://localhost:27017/biteswipe';
+console.log(`Database URI: ${DB_URI} [Source: ${process.env.DB_URI ? 'ENV' : 'DEFAULT'}]`);
 
 interface MongoDocument {
     _id?: { $oid: string } | string;

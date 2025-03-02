@@ -16,7 +16,7 @@ provider "azurerm" {
 resource "azurerm_resource_group" "rg" {
   name     = "${var.owner_tag}-biteswipe-resources"
   location = var.location
-  
+
   tags = {
     owner = var.owner_tag
   }
@@ -28,7 +28,7 @@ resource "azurerm_virtual_network" "vnet" {
   address_space       = ["10.0.0.0/16"]
   location            = var.location
   resource_group_name = azurerm_resource_group.rg.name
-  
+
   tags = {
     owner = var.owner_tag
   }
@@ -50,7 +50,7 @@ resource "azurerm_public_ip" "public_ip" {
   allocation_method   = "Static"
   sku                 = "Standard"
   domain_name_label   = "${var.owner_tag}-biteswipe"
-  
+
   tags = {
     owner = var.owner_tag
   }
@@ -66,9 +66,9 @@ resource "azurerm_network_interface" "nic" {
     name                          = "internal"
     subnet_id                     = azurerm_subnet.subnet.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id         = azurerm_public_ip.public_ip.id
+    public_ip_address_id          = azurerm_public_ip.public_ip.id
   }
-  
+
   tags = {
     owner = var.owner_tag
   }
@@ -86,12 +86,12 @@ resource "azurerm_network_security_group" "nsg" {
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "*"
-    source_port_range         = "*"
-    destination_port_range    = "*"
-    source_address_prefix     = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
-  
+
   tags = {
     owner = var.owner_tag
   }
@@ -108,7 +108,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
   name                = "${var.owner_tag}-biteswipe"
   resource_group_name = azurerm_resource_group.rg.name
   location            = var.location
-  size                = "Standard_B2s"  # 2 vCPUs, 4GB RAM
+  size                = "Standard_B2s" # 2 vCPUs, 4GB RAM
   admin_username      = var.admin_username
 
   network_interface_ids = [

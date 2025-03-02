@@ -6,28 +6,41 @@ import * as path from 'path';
 let messaging: admin.messaging.Messaging | null = null;
 
 try {
-    // Path to the credentials file - should be in the backend directory
-    const credentialsFile = 'biteswipe-132f1-firebase-adminsdk-fbsvc-76c5bb6fe5.json';
-    const credentialsPath = path.join(__dirname, '..', '..', credentialsFile);
+    // Path to the credentials file - can be set via environment variable or use default
+    const credentialsPathname = process.env.FIREBASE_CREDENTIALS_JSON_PATHNAME;
+    if (!credentialsPathname) {
+        throw new Error('Firebase credentials JSON pathname is required. Add FIREBASE_CREDENTIALS_JSON_PATHNAME=<pathname> to .env'); 
+    }
 
     // Check if credentials file exists
-    if (fs.existsSync(credentialsPath)) {
-        console.log(`Using Firebase credentials from file: ${credentialsPath}`);
+    if (fs.existsSync(credentialsPathname)) {
+        console.log(`Using Firebase credentials from file: ${credentialsPathname}`);
         
         // Read the file as string and parse it to a JSON object
-        const serviceAccountStr = fs.readFileSync(credentialsPath, 'utf8');
-        const serviceAccount = JSON.parse(serviceAccountStr);
+        const serviceAccountStr = fs.readFileSync(credentialsPathname, 'utf8');
         
-        if (!admin.apps.length) {
-            admin.initializeApp({
-                credential: admin.credential.cert(serviceAccount as ServiceAccount)
-            });
+        // Debug info - show file size and first few chars
+        console.log(`Firebase credentials file size: ${serviceAccountStr.length} bytes`);
+        console.log(`Firebase credentials file starts with: ${serviceAccountStr.substring(0, 20)}...`);
+        
+        try {
+            const serviceAccount = JSON.parse(serviceAccountStr);
+            
+            if (!admin.apps.length) {
+                admin.initializeApp({
+                    credential: admin.credential.cert(serviceAccount as ServiceAccount)
+                });
+            }
+            
+            messaging = admin.messaging();
+            console.log('Firebase initialized successfully');
+        } catch (parseError) {
+            console.error('ERROR parsing Firebase credentials JSON:', parseError);
+            console.error('First 50 characters of file:', serviceAccountStr.substring(0, 50));
+            console.error('This may indicate the file was corrupted during copying or deployment');
         }
-        
-        messaging = admin.messaging();
-        console.log('Firebase initialized successfully');
     } else {
-        console.warn(`WARNING: Firebase credentials file not found at ${credentialsPath}`);
+        console.warn(`WARNING: Firebase credentials file not found at ${credentialsPathname}`);
         console.warn('Firebase notifications will not be available');
     }
 } catch (error) {
