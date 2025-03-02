@@ -5,7 +5,7 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "build": "tsc",
-    "dev": "dotenv -e .env -- npx nodemon --exec 'node --inspect -r ts-node/register' src/index.ts",
+    "dev": "dotenv -e .env -- npx nodemon --exec \"node --inspect -r ts-node/register\" src/index.ts",
     "seed": "dotenv -e .env -- ts-node src/scripts/seedDatabase.ts"
   },
   "dependencies": {

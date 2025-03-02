@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { UserModel } from '../models/user';
-import { Restaurant } from '../models/rest';
+import { Restaurant } from '../models/restaurant';
 import { Session } from '../models/session';
 import * as fs from 'fs';
 import * as path from 'path';

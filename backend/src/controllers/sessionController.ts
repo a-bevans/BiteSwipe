@@ -25,6 +25,8 @@ export class SessionController {
         this.rejectInvitation = this.rejectInvitation.bind(this);
         this.leaveSession = this.leaveSession.bind(this);
 
+        this.getResultForSession = this.getResultForSession.bind(this);
+
     }
 
     async getSession(req: Request, res: Response) {
@@ -208,9 +210,9 @@ export class SessionController {
     async sessionSwiped(req, res: Response) {
         try {
             const { sessionId } = req.params;
-            const { userId, restaurantId, swipe} = req.body;
+            const { userId, restaurantId, liked} = req.body;
 
-            const session = await this.sessionManager.sessionSwiped(new Types.ObjectId(sessionId), userId, restaurantId, swipe);
+            const session = await this.sessionManager.sessionSwiped(new Types.ObjectId(sessionId), userId, restaurantId, liked);
 
             res.json({ success: true, session: session._id });
         } catch (error) {
@@ -223,11 +225,24 @@ export class SessionController {
     async startSession(req, res: Response) {
         try {
             const { sessionId } = req.params;
-            const { userId } = req.body;
+            const { userId, time } = req.body;
 
-            const session = await this.sessionManager.startSession(new Types.ObjectId(sessionId), userId);
+            const session = await this.sessionManager.startSession(new Types.ObjectId(sessionId), userId, Number(time));
 
             res.json({ success: true, session: session._id });
+        } catch (error) {
+            console.log(error);
+
+            res.status(500).json({ error: error });
+        }
+    }
+
+    async getResultForSession(req, res: Response) {
+        try {
+            const { sessionId } = req.params;
+
+            const result = await this.sessionManager.getResultForSession(new Types.ObjectId(sessionId));
+            res.json({ success: true, result });
         } catch (error) {
             console.log(error);
 

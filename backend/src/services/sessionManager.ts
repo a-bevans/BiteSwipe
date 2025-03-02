@@ -67,65 +67,7 @@ export class SessionManager {
         }
     }
 
-
-    // // ATOMIC (EVANTAULLY HERE)
-    // async joinSession(sessionId: Types.ObjectId, userId: string) {
-    //     const session = await Session.findOne({
-    //         _id: sessionId,
-    //         status: { $ne: 'COMPLETED'}
-    //     });
-
-    //     if (!session) {
-    //         throw new Error('Session not found or already Completed');
-    //     }
-
-    //     if ( session.creator.toString() === userId) {
-    //         throw new Error('User is the creator of the session');
-    //     }
-
-    //     const userObjId = new mongoose.Types.ObjectId(userId);  
-
-    //     const updatedSession = await Session.findOneAndUpdate(
-    //         {
-    //             _id: sessionId,
-    //             status: { $ne: 'COMPLETED'},
-    //             'participants.userId': { $ne: userObjId }
-    //         },
-    //         {
-    //             $push: {
-    //                 participants: {
-    //                     userId: userObjId,
-    //                     preferences: []
-    //                 }
-    //             },
-    //             # TODOD
-    //             $remove: {
-    //                 participants: {
-    //                     userId: userObjId,
-    //                     pendingInvitations: []
-    //                 }
-    //             }
-    //         },
-    //         { new: true, runValidators: true}
-    //     );
-
-    //     if (!updatedSession) {
-    //         const existingSession = await Session.findOne({
-    //             _id: sessionId,
-    //             'participants.userId': userObjId
-    //         });
-
-    //         if(existingSession) {
-    //             throw new Error('User already in session');
-    //         } else {
-    //             throw new Error('Session not found or already Completed');
-    //         }
-    //     }
-
-    //     return updatedSession;
-    // }
-
-    // TODO add routes
+    
     async sessionSwiped(sessionId: Types.ObjectId, userId: string, restaurantId: string, swipe: boolean) {
         const userObjId = new mongoose.Types.ObjectId(userId);
 
@@ -202,35 +144,42 @@ export class SessionManager {
     }
 
     async joinSession(sessionId: Types.ObjectId, userId: Types.ObjectId): Promise<ISession> {
-        const session = await Session.findById(sessionId);
-        if (!session) {
-            throw new Error('Session not found');
+        // Use findOneAndUpdate for atomic operation
+        const updatedSession = await Session.findOneAndUpdate(
+            {
+                _id: sessionId,
+                status: { $ne: 'COMPLETED' },
+                pendingInvitations: userId,
+                'participants.userId': { $ne: userId }
+            },
+            {
+                $pull: { pendingInvitations: userId },
+                $push: {
+                    participants: {
+                        userId: userId,
+                        preferences: []
+                    }
+                }
+            },
+            { new: true, runValidators: true }
+        );
+    
+        if (!updatedSession) {
+            // Determine the specific reason for failure
+            const session = await Session.findById(sessionId);
+            
+            if (!session) {
+                throw new Error('Session not found');
+            } else if (session.status === 'COMPLETED') {
+                throw new Error('Cannot join a completed session');
+            } else if (session.participants.some(p => p.userId.equals(userId))) {
+                throw new Error('User is already a participant');
+            } else {
+                throw new Error('User has not been invited to this session');
+            }
         }
-
-        if (session.status === 'COMPLETED') {
-            throw new Error('Cannot join a completed session');
-        }
-
-        // Check if user is already a participant
-        if (session.participants.some(p => p.userId.equals(userId))) {
-            throw new Error('User is already a participant');
-        }
-
-        // Check if user has been invited
-        const inviteIndex = session.pendingInvitations.findIndex(id => id.equals(userId));
-        if (inviteIndex === -1) {
-            throw new Error('User has not been invited to this session');
-        }
-
-        // Remove from pending invitations and add to participants
-        session.pendingInvitations.splice(inviteIndex, 1);
-        session.participants.push({
-            userId: userId,
-            preferences: []
-        });
-
-        await session.save();
-        return session;
+    
+        return updatedSession;
     }
 
     async getUserSessions(userId: Types.ObjectId): Promise<ISession[]> {
@@ -342,7 +291,7 @@ export class SessionManager {
         }
     }
 
-    async startSession(sessionId: Types.ObjectId, userId: string) {
+    async startSession(sessionId: Types.ObjectId, userId: string, time: number) {
         const userObjId = new mongoose.Types.ObjectId(userId);
 
         const session = await Session.findOneAndUpdate(
@@ -373,9 +322,54 @@ export class SessionManager {
             } catch (error) {
                 console.log(`Failed to complete session: ${sessionId}`);
             }
-        }, 1 * 60 * 1000);
+        }, time * 60 * 1000);
 
         return session;
+    }
+
+
+    async getResultForSession(sessionId: Types.ObjectId) {
+        const session = await Session.findById(sessionId);
+        if (!session) {
+            throw new Error('Session not found');
+        }
+
+        if (session.status !== 'COMPLETED') {
+            throw new Error('Session is not completed');
+        }
+
+        const participants = session.participants;
+        
+        const restaurantVotes = new Map<string, number>();
+
+        for (const restaurant of session.restaurants) {
+            restaurantVotes.set(restaurant.restaurantId.toString(), 0);
+        }
+
+        for (const participant of participants) {
+            for (const preference of participant.preferences) {
+                if (preference.liked) {
+                    const restaurantId = preference.restaurantId.toString();
+
+                    const currentCount = restaurantVotes.get(restaurantId) || 0;
+                    restaurantVotes.set(restaurantId, currentCount + 1);
+                }
+            }
+        }
+        
+        for (const restaurant of session.restaurants) {
+            const votes = restaurantVotes.get(restaurant.restaurantId.toString()) || 0;
+            restaurant.positiveVotes = votes;
+            restaurant.totalVotes = participants.length;
+            restaurant.score = votes / participants.length;
+        }
+
+        await session.save();
+
+        const winnerRestaurant = [...restaurantVotes.entries()].reduce((a, e) => e[1] > a[1] ? e : a, ['', 0]);
+        const winnerRestaurantId = winnerRestaurant[0];
+
+        return this.restaurantService.getRestaurant(new mongoose.Types.ObjectId(winnerRestaurantId));
     }
 
 }

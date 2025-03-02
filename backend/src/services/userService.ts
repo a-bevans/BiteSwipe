@@ -16,6 +16,12 @@ interface Restaurant {
 
 export class UserService {
     async createUser(email: string, displayName: string) {
+        const existingUser = await this.getUserByEmail(email);
+        
+        if (existingUser) {
+            throw new Error('User already exists');
+        }
+
         try {
             const user = new UserModel({
                 email,

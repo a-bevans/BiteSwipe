@@ -87,6 +87,14 @@ export const sessionRoutes = (sessionManager: SessionManager) => {
             validation: [
                 param('sessionId').notEmpty()
             ]
+        },
+        {
+            method: 'get',
+            route: '/sessions/:sessionId/result',
+            action: sessionController.getResultForSession,
+            validation: [
+                param('sessionId').notEmpty()   
+            ]
         }
     ];
 };

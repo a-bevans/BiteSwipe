@@ -1,4 +1,4 @@
-import { Restaurant } from '../models/rest';
+import { Restaurant } from '../models/restaurant';
 import { FilterQuery, Types } from 'mongoose';
 import { GooglePlacesService } from './externalAPIs/googleMaps';
 
@@ -77,6 +77,15 @@ export class RestaurantService {
         } catch (error) {
             console.error(error);
             throw new Error('Failed to get restaurants');
+        }
+    }
+
+    async getRestaurant(restaurantId: Types.ObjectId) {
+        try {
+            return await Restaurant.findOne({ _id: restaurantId });
+        } catch (error) {   
+            console.error(error);
+            throw new Error('Failed to get restaurant');
         }
     }
 
