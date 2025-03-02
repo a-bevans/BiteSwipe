@@ -69,22 +69,56 @@ if not AZURE_VM_PRIVATE_KEY_PATHNAME.is_file():
 
 
 def run_command(command, cwd=None):
-    """Run a command and return its output."""
+    """Run a command and stream its output in real-time."""
     try:
-        result = subprocess.run(
+        # Use Popen to create a process we can read from as it runs
+        process = subprocess.Popen(
             command,
             cwd=cwd,
-            check=True,
             shell=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            text=True
+            text=True,
+            bufsize=1  # Line buffered
         )
-        print(result.stdout)
-        return True
-    except subprocess.CalledProcessError as e:
-        print(f"Error executing command: {command}")
-        print(f"Error output: {e.stderr}")
+        
+        # Stream output in real-time
+        stdout_data = []
+        stderr_data = []
+        
+        # Function to handle output stream
+        def read_stream(stream, data_list, prefix):
+            for line in iter(stream.readline, ''):
+                if line:
+                    print(f"{prefix}: {line.rstrip()}")
+                    data_list.append(line)
+            stream.close()
+        
+        # Create threads to read stdout and stderr concurrently
+        import threading
+        stdout_thread = threading.Thread(target=read_stream, args=(process.stdout, stdout_data, "OUT"))
+        stderr_thread = threading.Thread(target=read_stream, args=(process.stderr, stderr_data, "ERR"))
+        
+        # Start the threads
+        stdout_thread.start()
+        stderr_thread.start()
+        
+        # Wait for threads to complete
+        stdout_thread.join()
+        stderr_thread.join()
+        
+        # Wait for the process to finish and get the return code
+        return_code = process.wait()
+        
+        if return_code == 0:
+            return True
+        else:
+            print(f"Command failed with exit code: {return_code}")
+            return False
+            
+    except Exception as e:
+        print(f"Exception occurred while executing command: {command}")
+        print(f"Exception details: {e}")
         return False
 
 def set_script_directory():
