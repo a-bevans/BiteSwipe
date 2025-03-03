@@ -28,6 +28,16 @@ jobs:
       with:
         python-version: '3.x'
 
+    - name: Setup Azure CLI
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: '1.5.0'
+
     - name: Setup SSH Keys
       run: |
         mkdir -p ~/.ssh/to_azure
@@ -42,34 +52,12 @@ jobs:
         echo "PORT=3000" > backend/.env
         echo "DB_URI=mongodb://mongo:27017/biteswipe" >> backend/.env
         echo "GOOGLE_MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY }}" >> backend/.env
-
-    - name: Create Firebase Credentials File
-      run: |
-        echo "${{ secrets.FIREBASE_CREDENTIALS_JSON }}" > backend/biteswipe-132f1-firebase-adminsdk-fbsvc-76c5bb6fe5.json
-        chmod 600 backend/biteswipe-132f1-firebase-adminsdk-fbsvc-76c5bb6fe5.json
-        ls -la backend/biteswipe-132f1-firebase-adminsdk-fbsvc-76c5bb6fe5.json
-
-    - name: Setup Azure CLI
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v2
-      with:
-        terraform_version: '1.5.0'
-
-    - name: Destroy Existing Infrastructure
-      run: |
-        cd backend/scripts
-        python3 destroy_infra.py || true  # Run destroy and continue even if it fails
-
-    - name: Wait for Resource Cleanup
-      run: sleep 30  # Wait for resources to be fully destroyed
+        echo "FIREBASE_CREDENTIALS_JSON_PATHNAME=/app/backend/biteswipe-132f1-firebase-adminsdk-fbsvc-76c5bb6fe5.json" >> backend/.env
 
     - name: Deploy New Infrastructure
       run: |
         cd backend/scripts
+        chmod +x import_resource_group.sh
         python3 deploy_infra.py
       env:
         ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}

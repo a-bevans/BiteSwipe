@@ -4,7 +4,6 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
         {
             "name": "Attach to local Process",
             "type": "node",
@@ -12,5 +11,21 @@
             "restart": true,
             "port": 9229
         },
+        {
+            "name": "Attach to Remote Backend",
+            "type": "node",
+            "request": "attach",
+            "port": 9229,
+            "address": "hamaney-biteswipe.westus2.cloudapp.azure.com",
+            "localRoot": "${workspaceFolder}",
+            "remoteRoot": "/app/backend",
+            "preLaunchTask": "SSHTunnel",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js"
+            ]
+        }
     ]
 }

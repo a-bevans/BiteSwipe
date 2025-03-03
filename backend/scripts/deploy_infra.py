@@ -69,22 +69,56 @@ if not AZURE_VM_PRIVATE_KEY_PATHNAME.is_file():
 
 
 def run_command(command, cwd=None):
-    """Run a command and return its output."""
+    """Run a command and stream its output in real-time."""
     try:
-        result = subprocess.run(
+        # Use Popen to create a process we can read from as it runs
+        process = subprocess.Popen(
             command,
             cwd=cwd,
-            check=True,
             shell=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            text=True
+            text=True,
+            bufsize=1  # Line buffered
         )
-        print(result.stdout)
-        return True
-    except subprocess.CalledProcessError as e:
-        print(f"Error executing command: {command}")
-        print(f"Error output: {e.stderr}")
+        
+        # Stream output in real-time
+        stdout_data = []
+        stderr_data = []
+        
+        # Function to handle output stream
+        def read_stream(stream, data_list, prefix):
+            for line in iter(stream.readline, ''):
+                if line:
+                    print(f"{prefix}: {line.rstrip()}")
+                    data_list.append(line)
+            stream.close()
+        
+        # Create threads to read stdout and stderr concurrently
+        import threading
+        stdout_thread = threading.Thread(target=read_stream, args=(process.stdout, stdout_data, "OUT"))
+        stderr_thread = threading.Thread(target=read_stream, args=(process.stderr, stderr_data, "ERR"))
+        
+        # Start the threads
+        stdout_thread.start()
+        stderr_thread.start()
+        
+        # Wait for threads to complete
+        stdout_thread.join()
+        stderr_thread.join()
+        
+        # Wait for the process to finish and get the return code
+        return_code = process.wait()
+        
+        if return_code == 0:
+            return True
+        else:
+            print(f"Command failed with exit code: {return_code}")
+            return False
+            
+    except Exception as e:
+        print(f"Exception occurred while executing command: {command}")
+        print(f"Exception details: {e}")
         return False
 
 def set_script_directory():
@@ -261,89 +295,106 @@ def is_in_terraform_state(resource_address):
 
 def import_existing_resources(owner_tag):
     """Import existing resources into Terraform state."""
-    print(f"Searching for existing resources with prefix '{owner_tag}-biteswipe'...")
+    print(f"\n🔍 Searching for existing resources with prefix '{owner_tag}-biteswipe'...")
     
-    # Get subscription ID (and validate it's not None)
+    # Get subscription ID
     subscription_id = get_azure_subscription_id()
     if not subscription_id:
         print("Cannot import resources: No valid subscription ID")
-        return []
-        
-    # Define resources to import
+        return False
+
+    # Define specific resources to import
     resources_to_import = [
-        ("Microsoft.Network/publicIPAddresses", f"{owner_tag}-biteswipe-public-ip", "azurerm_public_ip", "public_ip"),
-        ("Microsoft.Network/virtualNetworks", f"{owner_tag}-biteswipe-network", "azurerm_virtual_network", "vnet"),
-        ("Microsoft.Network/networkInterfaces", f"{owner_tag}-biteswipe-nic", "azurerm_network_interface", "nic"),
-        ("Microsoft.Compute/virtualMachines", f"{owner_tag}-biteswipe", "azurerm_linux_virtual_machine", "vm"),
-        ("Microsoft.Network/networkSecurityGroups", f"{owner_tag}-biteswipe-nsg", "azurerm_network_security_group", "nsg")
+        {
+            'type': 'azurerm_resource_group',
+            'name': 'rg',
+            'id': f"/subscriptions/{subscription_id}/resourceGroups/{owner_tag}-biteswipe-resources"
+        },
+        {
+            'type': 'azurerm_subnet',
+            'name': 'subnet',
+            'id': f"/subscriptions/{subscription_id}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/virtualNetworks/{owner_tag}-biteswipe-network/subnets/{owner_tag}-internal"
+        },
+        {
+            'type': 'azurerm_virtual_network',
+            'name': 'vnet',
+            'id': f"/subscriptions/{subscription_id}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/virtualNetworks/{owner_tag}-biteswipe-network"
+        },
+        {
+            'type': 'azurerm_network_security_group',
+            'name': 'nsg',
+            'id': f"/subscriptions/{subscription_id}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/networkSecurityGroups/{owner_tag}-biteswipe-nsg"
+        },
+        {
+            'type': 'azurerm_public_ip',
+            'name': 'public_ip',
+            'id': f"/subscriptions/{subscription_id}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/publicIPAddresses/{owner_tag}-biteswipe-public-ip"
+        },
+        {
+            'type': 'azurerm_network_interface',
+            'name': 'nic',
+            'id': f"/subscriptions/{subscription_id}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/networkInterfaces/{owner_tag}-biteswipe-nic"
+        },
+        {
+            'type': 'azurerm_linux_virtual_machine',
+            'name': 'vm',
+            'id': f"/subscriptions/{subscription_id}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Compute/virtualMachines/{owner_tag}-biteswipe"
+        },
+        {
+            'type': 'azurerm_network_interface_security_group_association',
+            'name': 'nic_nsg_association',
+            'id': f"/subscriptions/{subscription_id}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/networkInterfaces/{owner_tag}-biteswipe-nic|/subscriptions/{subscription_id}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/networkSecurityGroups/{owner_tag}-biteswipe-nsg"
+        }
     ]
-    
-    imported_resources = []
-    
-    for resource_type, resource_name, tf_type, tf_name in resources_to_import:
-        try:
-            # Check if the resource exists first
-            try:
-                subprocess.run(
-                    ["az", "resource", "show",
-                     "--resource-group", f"{owner_tag}-biteswipe-resources",
-                     "--resource-type", resource_type,
-                     "--name", resource_name],
-                    check=True,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE
-                )
-            except subprocess.CalledProcessError:
-                print(f"Resource {resource_type}/{resource_name} does not exist, skipping import")
-                continue
-                
-            # Check if resource is already in the Terraform state
-            resource_address = f"{tf_type}.{tf_name}"
-            if is_in_terraform_state(resource_address):
-                print(f"Resource {resource_name} is already in Terraform state as {resource_address}, skipping import")
-                imported_resources.append((resource_type, resource_name))
-                continue
-                
-            resource_id = f"/subscriptions/{subscription_id}/resourceGroups/{owner_tag}-biteswipe-resources/providers/{resource_type}/{resource_name}"
-            print(f"Importing {resource_name} as {tf_type}.{tf_name}...")
-            subprocess.run(
-                ["terraform", "import", f"{tf_type}.{tf_name}", resource_id],
-                cwd=TERRAFORM_DIR,
-                check=True
-            )
-            print(f"Successfully imported {tf_type}: {tf_name}")
-            imported_resources.append((resource_type, resource_name))
-        except subprocess.CalledProcessError as e:
-            print(f"Warning: Failed to import {tf_type}: {tf_name}")
-            print(f"Error: {e}")
-    
-    # Try to import network interface associations after all resources are imported
-    try:
-        # Check if both the NIC and NSG were imported successfully
-        if any(r[0] == "Microsoft.Network/networkInterfaces" for r in imported_resources) and \
-           any(r[0] == "Microsoft.Network/networkSecurityGroups" for r in imported_resources):
-                
-            # Check if the association is already in the state
-            if is_in_terraform_state("azurerm_network_interface_security_group_association.nic_nsg_association"):
-                print("Network interface association already in state, skipping import")
-                return imported_resources
-                
-            print("Importing network interface association...")
-            nic_id = f"/subscriptions/{subscription_id}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/networkInterfaces/{owner_tag}-biteswipe-nic"
-            nsg_id = f"/subscriptions/{subscription_id}/resourceGroups/{owner_tag}-biteswipe-resources/providers/Microsoft.Network/networkSecurityGroups/{owner_tag}-biteswipe-nsg"
-            association_id = f"{nic_id}|{nsg_id}"
-            
-            # Import the network interface association
-            subprocess.run(
-                ["terraform", "import", "azurerm_network_interface_security_group_association.nic_nsg_association", association_id],
-                cwd=TERRAFORM_DIR,
-                check=True
-            )
-            print("Successfully imported network interface association")
-    except subprocess.CalledProcessError:
-        print("Warning: Failed to import network interface association")
+
+    success = True
+    for resource in resources_to_import:
+        resource_type = resource['type']
+        resource_name = resource['name']
+        resource_id = resource['id']
+
+        # Check if resource already exists in Terraform state
+        check_state_cmd = f"terraform state show {resource_type}.{resource_name}"
+        result = subprocess.run(check_state_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
-    return imported_resources
+        if result.returncode == 0:
+            print(f"Resource {resource_type}.{resource_name} already in Terraform state, skipping import.")
+            continue
+
+        # For network interface security group association, we need to check if it exists in Azure first
+        if resource_type == 'azurerm_network_interface_security_group_association':
+            # Extract NIC and NSG IDs from the composite ID
+            nic_id, nsg_id = resource_id.split('|')
+            
+            # Check if the association exists by checking if the NIC has an NSG
+            check_cmd = ["az", "network", "nic", "show", "--ids", nic_id, "--query", "networkSecurityGroup.id", "-o", "tsv"]
+            result = subprocess.run(check_cmd, capture_output=True, text=True)
+            
+            if result.returncode == 0 and result.stdout.strip() == nsg_id:
+                print(f"Importing {resource_type}.{resource_name}...")
+                import_cmd = f"terraform import {resource_type}.{resource_name} '{resource_id}'"
+                subprocess.run(import_cmd, shell=True, check=True)
+                print(f"✅ Successfully imported {resource_type}.{resource_name}")
+            else:
+                print(f"Resource {resource_id} does not exist in Azure, skipping...")
+            continue
+
+        # For all other resources, check if they exist in Azure
+        print(f"Importing {resource_type}.{resource_name}...")
+        import_cmd = f"terraform import {resource_type}.{resource_name} {resource_id}"
+        try:
+            subprocess.run(import_cmd, shell=True, check=True)
+            print(f"✅ Successfully imported {resource_type}.{resource_name}")
+        except subprocess.CalledProcessError as e:
+            print(f"Failed to import {resource_type}.{resource_name}: {e}")
+            success = False
+
+    if success:
+        print("\n✅ All resources imported successfully!")
+    else:
+        print("\n⚠️ Some resources failed to import. Check the logs above for details.")
+    
+    return success
 
 def run_terraform_commands(owner_tag):
     """Run Terraform plan and apply commands with prompt for approval."""
@@ -379,20 +430,40 @@ def update_ssh_config():
     """Update SSH config with the new server IP."""
     script_path = script_dir / "update_ssh_config_with_new_ips.py"
     
-    # Get the public IP from Terraform output
-    try:
-        server_ip = subprocess.check_output(
-            ["terraform", "output", "-raw", "server_public_ip"],
-            cwd=TERRAFORM_DIR
-        ).decode('utf-8').strip()
-    except subprocess.CalledProcessError:
-        print("Warning: Could not get server IP from Terraform output. Waiting for IP to be available...")
-        # Wait a bit and try again as sometimes it takes time for the IP to be assigned
-        time.sleep(30)
-        server_ip = subprocess.check_output(
-            ["terraform", "output", "-raw", "server_public_ip"],
-            cwd=TERRAFORM_DIR
-        ).decode('utf-8').strip()
+    # Get the public IP from Terraform output with retries
+    max_retries = 5
+    retry_delay = 10  # Start with 10 seconds
+    server_ip = None
+    
+    for attempt in range(1, max_retries + 1):
+        try:
+            print(f"Attempt {attempt}/{max_retries}: Getting server IP from Terraform output...")
+            server_ip = subprocess.check_output(
+                ["terraform", "output", "-raw", "server_public_ip"],
+                cwd=TERRAFORM_DIR
+            ).decode('utf-8').strip()
+            
+            if server_ip:
+                print(f"Successfully retrieved server IP: {server_ip}")
+                break
+            else:
+                print("Warning: Empty server IP returned from Terraform output.")
+        except subprocess.CalledProcessError as e:
+            print(f"Warning: Could not get server IP from Terraform output (Attempt {attempt}/{max_retries})")
+            print(f"Error details: {str(e)}")
+            
+            if attempt < max_retries:
+                wait_time = retry_delay * (2 ** (attempt - 1))  # Exponential backoff
+                print(f"Waiting {wait_time} seconds before retry...")
+                time.sleep(wait_time)
+            else:
+                print("Error: Failed to get server IP after multiple attempts.")
+                print("Please ensure Terraform has been applied successfully and the Azure resources are properly created.")
+                raise Exception("Failed to retrieve server public IP from Terraform output")
+    
+    if not server_ip:
+        print("Error: Unable to obtain a valid server IP after all retry attempts.")
+        raise Exception("Failed to obtain a valid server IP")
 
     subprocess.run(
         [

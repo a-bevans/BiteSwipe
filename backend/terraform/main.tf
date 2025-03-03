@@ -16,7 +16,7 @@ provider "azurerm" {
 resource "azurerm_resource_group" "rg" {
   name     = "${var.owner_tag}-biteswipe-resources"
   location = var.location
-  
+
   tags = {
     owner = var.owner_tag
   }
@@ -28,7 +28,7 @@ resource "azurerm_virtual_network" "vnet" {
   address_space       = ["10.0.0.0/16"]
   location            = var.location
   resource_group_name = azurerm_resource_group.rg.name
-  
+
   tags = {
     owner = var.owner_tag
   }
@@ -50,7 +50,7 @@ resource "azurerm_public_ip" "public_ip" {
   allocation_method   = "Static"
   sku                 = "Standard"
   domain_name_label   = "${var.owner_tag}-biteswipe"
-  
+
   tags = {
     owner = var.owner_tag
   }
@@ -66,9 +66,9 @@ resource "azurerm_network_interface" "nic" {
     name                          = "internal"
     subnet_id                     = azurerm_subnet.subnet.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id         = azurerm_public_ip.public_ip.id
+    public_ip_address_id          = azurerm_public_ip.public_ip.id
   }
-  
+
   tags = {
     owner = var.owner_tag
   }
@@ -86,12 +86,12 @@ resource "azurerm_network_security_group" "nsg" {
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "*"
-    source_port_range         = "*"
-    destination_port_range    = "*"
-    source_address_prefix     = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
-  
+
   tags = {
     owner = var.owner_tag
   }
@@ -108,12 +108,22 @@ resource "azurerm_linux_virtual_machine" "vm" {
   name                = "${var.owner_tag}-biteswipe"
   resource_group_name = azurerm_resource_group.rg.name
   location            = var.location
-  size                = "Standard_B2s"  # 2 vCPUs, 4GB RAM
+  size                = "Standard_B2s" # 2 vCPUs, 4GB RAM
   admin_username      = var.admin_username
 
   network_interface_ids = [
     azurerm_network_interface.nic.id,
   ]
+
+  allow_extension_operations                             = true
+  bypass_platform_safety_checks_on_user_schedule_enabled = false
+  encryption_at_host_enabled                             = false
+  patch_assessment_mode                                  = "ImageDefault"
+  patch_mode                                             = "ImageDefault"
+  provision_vm_agent                                     = true
+  secure_boot_enabled                                    = false
+  vtpm_enabled                                           = false
+  vm_agent_platform_updates_enabled                      = false
 
   admin_ssh_key {
     username   = var.admin_username
@@ -123,6 +133,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
+    disk_size_gb         = 30
   }
 
   source_image_reference {
@@ -136,6 +147,9 @@ resource "azurerm_linux_virtual_machine" "vm" {
     #!/bin/bash
     set -ex
 
+    ROOT_PATH="/app"
+    BACKEND_PATH="$ROOT_PATH/backend"
+
     # Update package list
     apt-get update
 
@@ -146,35 +160,15 @@ resource "azurerm_linux_virtual_machine" "vm" {
     apt-get update
     apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose
 
-    # Install Certbot for SSL certificates
-    apt-get install -y certbot
-
     # Configure Docker
     systemctl enable docker
     systemctl start docker
     usermod -aG docker adminuser
 
     # Create app directory and set permissions
-    mkdir -p /app/backend
-    chown -R adminuser:adminuser /app
-    chmod -R 755 /app
-
-    # Generate self-signed certificate
-    echo "Generating self-signed SSL certificate..."
-    SERVER_NAME=$(hostname)
-    
-    # Generate a self-signed certificate valid for 1 year (365 days)
-    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-      -keyout /app/backend/key.pem \
-      -out /app/backend/cert.pem \
-      -subj "/C=US/ST=Washington/L=Seattle/O=BiteSwipe/OU=Development/CN=$SERVER_NAME"
-    
-    # Set proper permissions
-    chmod 600 /app/backend/key.pem
-    chmod 644 /app/backend/cert.pem
-    chown -R adminuser:adminuser /app/backend
-    
-    echo "Self-signed certificate generated successfully."
+    mkdir -p $BACKEND_PATH
+    chown -R adminuser:adminuser $ROOT_PATH
+    chmod -R 755 $ROOT_PATH
 
     # Create a script that will be run after first login
     cat > /home/adminuser/setup_docker.sh << 'SETUP'
@@ -199,9 +193,6 @@ resource "azurerm_linux_virtual_machine" "vm" {
   }
 }
 
-
-
-
 # Add locals block for environment variables
 locals {
   # Read and extract Google Maps API key from .env
@@ -213,6 +204,17 @@ locals {
   ))
 }
 
+# Add Azure storage blob data source and download step for Firebase cert
+data "azurerm_storage_account" "certs" {
+  name                = "productionstorageaccoun2"
+  resource_group_name = "CPEN321RSRCGROUP"
+}
+
+data "azurerm_storage_blob" "firebase_cert" {
+  name                   = "biteswipe-132f1-firebase-adminsdk-fbsvc-76c5bb6fe5.json"
+  storage_account_name   = data.azurerm_storage_account.certs.name
+  storage_container_name = "production-container"
+}
 
 # Separate deployment resource that can be triggered independently
 resource "null_resource" "deploy_backend" {
@@ -232,6 +234,7 @@ resource "null_resource" "deploy_backend" {
       VM_FQDN="${azurerm_public_ip.public_ip.fqdn}"
       SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=10"
       BACKEND_PATH="$(pwd)/../../backend"
+      BACKEND_REMOTE_PATH="/app/backend"
 
       # --- Functions ---
       
@@ -299,19 +302,14 @@ resource "null_resource" "deploy_backend" {
         return 1
       }
       
-      # Verify SSL certificates are present
-      verify_certificates() {
-        echo "[Deploy] Verifying SSL certificates..."
-        ssh $SSH_OPTS -i $SSH_KEY adminuser@$VM_IP "ls -la /app/backend/cert.pem /app/backend/key.pem" || echo "Warning: SSL certificates not found"
-      }
-      
       # Create environment file
       create_env_file() {
         echo "[Deploy] Creating .env file..."
-        ssh $SSH_OPTS -i $SSH_KEY adminuser@$VM_IP "cat > /app/backend/.env" << ENVFILE
+        ssh $SSH_OPTS -i $SSH_KEY adminuser@$VM_IP "cat > $BACKEND_REMOTE_PATH/.env" << ENVFILE
 PORT=3000
 DB_URI=mongodb://mongo:27017/biteswipe
 GOOGLE_MAPS_API_KEY=${local.google_maps_api_key}
+FIREBASE_CREDENTIALS_JSON_PATHNAME=$BACKEND_REMOTE_PATH/biteswipe-132f1-firebase-adminsdk-fbsvc-76c5bb6fe5.json
 ENVFILE
       }
       
@@ -319,14 +317,25 @@ ENVFILE
       copy_backend_files() {
         echo "[Deploy] Copying backend files..."
         ls -la $BACKEND_PATH
-        scp $SSH_OPTS -i $SSH_KEY -r $BACKEND_PATH/* adminuser@$VM_IP:/app/backend/
+        
+        # Download Firebase cert from Azure Storage using account key
+        echo "[Deploy] Downloading Firebase cert from Azure Storage..."
+        az storage blob download \
+          --account-name ${data.azurerm_storage_account.certs.name} \
+          --container-name production-container \
+          --name ${data.azurerm_storage_blob.firebase_cert.name} \
+          --file $BACKEND_PATH/biteswipe-132f1-firebase-adminsdk-fbsvc-76c5bb6fe5.json \
+          --account-key "${data.azurerm_storage_account.certs.primary_access_key}"
+        
+        # Copy files to VM
+        scp $SSH_OPTS -i $SSH_KEY -r $BACKEND_PATH/* adminuser@$VM_IP:$BACKEND_REMOTE_PATH/
         
         # Verify the Firebase credentials file was copied
         echo "[Deploy] Verifying Firebase credentials file..."
         ssh $SSH_OPTS -i $SSH_KEY adminuser@$VM_IP "
-          if [ -f /app/backend/biteswipe-132f1-firebase-adminsdk-fbsvc-76c5bb6fe5.json ]; then
+          if [ -f $BACKEND_REMOTE_PATH/biteswipe-132f1-firebase-adminsdk-fbsvc-76c5bb6fe5.json ]; then
             echo '[Deploy] Firebase credentials file found'
-            ls -la /app/backend/biteswipe-132f1-firebase-adminsdk-fbsvc-76c5bb6fe5.json
+            ls -la $BACKEND_REMOTE_PATH/biteswipe-132f1-firebase-adminsdk-fbsvc-76c5bb6fe5.json
           else
             echo '[Deploy] FATAL ERROR: Firebase credentials file not found!'
             echo '[Deploy] Deployment cannot continue without Firebase credentials.'
@@ -340,7 +349,7 @@ ENVFILE
         echo "[Deploy] Starting Docker services..."
         ssh $SSH_OPTS -i $SSH_KEY adminuser@$VM_IP "
           set -x
-          cd /app/backend
+          cd $BACKEND_REMOTE_PATH
           pwd
           ls -la
           echo '[Deploy] Verifying environment variables:'
@@ -349,6 +358,10 @@ ENVFILE
           docker-compose down --remove-orphans || true
           echo '[Deploy] Building and starting containers...'
           docker-compose up -d --build
+          if [ \$? -ne 0 ]; then
+            echo \"[Deploy] ERROR: Docker-compose failed\"
+            exit 1
+          fi
           echo '[Deploy] Containers started successfully!'
           
           # Wait for containers to stabilize
@@ -400,7 +413,7 @@ ENVFILE
       wait_for_ssh
       wait_for_setup
       verify_docker
-      verify_certificates
+
       create_env_file
       copy_backend_files
       start_services

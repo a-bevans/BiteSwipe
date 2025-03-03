@@ -1,9 +1,7 @@
+import 'dotenv/config';
 import express from 'express';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
-import https from 'https';
-import fs from 'fs';
-import path from 'path';
 import { userRoutes } from './routes/userRoutes';
 import { sessionRoutes } from './routes/sessionRoutes';
 import { UserService } from './services/userService';
@@ -51,7 +49,6 @@ app.get('/', (req, res) => {
         buildTime: buildTimestamp,
         version: '1.0.0',
         status: 'online',
-        documentation: '/api/docs'
     });
 });
 
@@ -60,19 +57,22 @@ app.get('/health', (req, res) => {
     res.status(200).json({ status: 'healthy' });
 });
 
-const port = process.env.PORT || 3000;
-const dbUrl = process.env.DB_URI || 'mongodb://localhost:27017/biteswipe';
+// ---------------------------------------------------------
+// ENV
+// ---------------------------------------------------------
+const port = process.env.PORT;
+if (!port) {
+    throw new Error('Missing environment variable: PORT. Add PORT=<number> to .env');
+}
 
-// Define SSL certificate paths
-const sslCertPath = process.env.SSL_CERT_PATH || path.join(__dirname, 'cert.pem');
-const sslKeyPath = process.env.SSL_KEY_PATH || path.join(__dirname, 'key.pem');
+const dbUrl = process.env.DB_URI;
+if (!dbUrl) {
+    throw new Error('Missing environment variable: DB_URI. Add DB_URI=<url> to .env');
+}
 
 // Basic startup info
 console.log('\n=== Server Configuration ===');
-console.log(`HTTPS Port: ${port}`);
-console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-console.log(`SSL Cert Path: ${sslCertPath}`);
-console.log(`SSL Key Path: ${sslKeyPath}`);
+console.log(`HTTP Port: ${port}`);
 console.log('=========================\n');
 
 // Configure mongoose connection with all recommended options
@@ -83,73 +83,23 @@ mongoose.connect(dbUrl, {
     socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
     family: 4 // Use IPv4, skip trying IPv6
 })
-    .then(() => {
-        console.log('\n=== MongoDB Connection Info ===');
-        console.log('Connection Status: Connected');
-        console.log(`Full URL: \x1b[34m${dbUrl}\x1b[0m`);
-        console.log(`Database: ${mongoose.connection.name}`);
-        console.log(`Host: ${mongoose.connection.host}`);
-        console.log(`Port: ${mongoose.connection.port}`);
-        console.log(`Clickable URL: \x1b[34mhttp://${mongoose.connection.host}:${mongoose.connection.port}/${mongoose.connection.name}\x1b[0m`);
-        console.log('============================\n');
+.then(() => {
+    console.log('\n=== MongoDB Connection Info ===');
+    console.log('Connection Status: Connected');
+    console.log(`Full URL: \x1b[34m${dbUrl}\x1b[0m`);
+    console.log('===========================\n');
 
-        // Attempt to start HTTPS server if SSL certificates exist
-        try {
-            console.log(`Checking for SSL certificates:`);
-            console.log(`- Certificate file exists: ${fs.existsSync(sslCertPath)}`);
-            console.log(`- Key file exists: ${fs.existsSync(sslKeyPath)}`);
-            
-            if (fs.existsSync(sslCertPath) && fs.existsSync(sslKeyPath)) {
-                console.log(`Loading certificates from:`);
-                console.log(`- Cert: ${sslCertPath}`);
-                console.log(`- Key: ${sslKeyPath}`);
-                
-                const httpsOptions = {
-                    key: fs.readFileSync(sslKeyPath),
-                    cert: fs.readFileSync(sslCertPath)
-                };
-                
-                // Log certificate info
-                try {
-                    const keyData = fs.readFileSync(sslKeyPath, 'utf8');
-                    const certData = fs.readFileSync(sslCertPath, 'utf8');
-                    console.log(`Key file length: ${keyData.length} chars`);
-                    console.log(`Cert file length: ${certData.length} chars`);
-                    console.log(`Key file starts with: ${keyData.substring(0, 40)}...`);
-                    console.log(`Cert file starts with: ${certData.substring(0, 40)}...`);
-                } catch (e) {
-                    console.error('Error reading certificate files for logging:', e);
-                }
-                
-                const httpsServer = https.createServer(httpsOptions, app);
-                httpsServer.listen(port, () => {
-                    console.log(`HTTPS server is running on port ${port}`);
-                });
-            } else {
-                // If certificates are not found, log warning and start HTTP server
-                if (!fs.existsSync(sslCertPath)) {
-                    console.warn(`Warning: SSL certificate file not found at: ${sslCertPath}`);
-                }
-                if (!fs.existsSync(sslKeyPath)) {
-                    console.warn(`Warning: SSL key file not found at: ${sslKeyPath}`);
-                }
-                
-                console.warn('Starting server in HTTP mode because SSL certificates were not found.');
-                app.listen(port, () => {
-                    console.log(`HTTP server is running on port ${port}`);
-                });
-            }
-        } catch (error) {
-            console.error('Error starting HTTPS server:', error);
-            console.warn('Starting server in HTTP mode due to SSL configuration error.');
-            app.listen(port, () => {
-                console.log(`HTTP server is running on port ${port}`);
-            });
-        }
-    })
-    .catch(error => {
-        console.error('\n=== MongoDB Connection Error ===');
-        console.error('Failed to connect to MongoDB');
-        console.error('Error:', error.message);
-        console.error('=============================\n');
+    // Start HTTP server
+    app.listen(port, () => {
+        console.log(`\n=== Server Started ===`);
+        console.log(`Server is running on http://localhost:${port}`);
+        console.log(`Build Time: ${buildTimestamp}`);
+        console.log('====================\n');
     });
+})
+.catch(error => {
+    console.error('\n=== MongoDB Connection Error ===');
+    console.error('Failed to connect to MongoDB');
+    console.error('Error:', error.message);
+    console.error('=============================\n');
+});
