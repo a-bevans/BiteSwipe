@@ -224,7 +224,7 @@ resource "null_resource" "deploy_backend" {
 
   provisioner "local-exec" {
     # Setup and initial connectivity checks
-    on_failure = "fail"
+    on_failure = fail
     command = <<EOF
       #!/bin/bash
       set -x  # Enable debug output
@@ -304,7 +304,7 @@ EOF
   
   provisioner "local-exec" {
     # Environment preparation
-    on_failure = "fail"
+    on_failure = fail
     command = <<EOF
       #!/bin/bash
       set -x  # Enable debug output
@@ -332,7 +332,7 @@ EOF
   
   provisioner "local-exec" {
     # File deployment
-    on_failure = "fail"
+    on_failure = fail
     command = <<EOF
       #!/bin/bash
       set -x  # Enable debug output
@@ -380,7 +380,7 @@ EOF
   
   provisioner "local-exec" {
     # Service deployment and validation
-    on_failure = "fail"
+    on_failure = fail
     command = <<EOF
       #!/bin/bash
       set -x  # Enable debug output
