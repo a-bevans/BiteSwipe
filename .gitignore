@@ -16,3 +16,5 @@ backend/biteswipe-132f1-firebase-adminsdk-fbsvc-76c5bb6fe5.json
 backend/key.pem
 backend/cert.pem
 */dist/*
+*/coverage/*
+test.env
