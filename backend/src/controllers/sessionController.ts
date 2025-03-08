@@ -204,15 +204,18 @@ export class SessionController {
     async getRestaurantsInSession(req, res: Response) {
         try {
             const { sessionId } = req.params;
-            //console.log('Session ID from params and the body:', sessionId, req.body); 
+            if (!Types.ObjectId.isValid(sessionId)) {
+                return res.status(400).json({ error: 'Invalid session ID format' });
+            }
 
             const restaurants = await this.sessionManager.getRestaurantsInSession(new Types.ObjectId(sessionId));
-            
-            res.json({ success: true, restaurants });
+            res.json(restaurants);
         } catch (error) {
-            console.log(error);
-
-            res.status(500).json({ error: error });
+            console.error('Error fetching restaurants:', error);
+            if (error instanceof Error && (error as any).code === 'SESSION_NOT_FOUND') {
+                return res.status(404).json({ error: 'Session not found' });
+            }
+            res.status(500).json({ error: 'Internal server error' });
         }
     }
 
