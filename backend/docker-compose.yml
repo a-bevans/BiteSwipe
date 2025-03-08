@@ -54,7 +54,9 @@ services:
       - app_network
 
   nginx:
-    image: nginx:latest
+    build:
+      context: ../nginx
+      dockerfile: Dockerfile
     container_name: nginx_https
     restart: unless-stopped
     ports:
@@ -62,9 +64,6 @@ services:
       - "80:80"
     volumes:
       - ../nginx/conf.d:/etc/nginx/conf.d
-      - ../nginx/docker-entrypoint:/usr/local/bin/docker-entrypoint
-    entrypoint: ["sh", "/usr/local/bin/docker-entrypoint/nginx-entrypoint.sh"]
-    command: ["nginx", "-g", "daemon off;"]
     networks:
       - app_network
     depends_on:
