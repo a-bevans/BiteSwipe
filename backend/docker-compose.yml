@@ -62,8 +62,8 @@ services:
       - "80:80"
     volumes:
       - ../nginx/conf.d:/etc/nginx/conf.d
-      - ../nginx/docker-entrypoint/nginx-entrypoint.sh:/usr/local/bin/nginx-entrypoint.sh
-    entrypoint: ["/usr/local/bin/nginx-entrypoint.sh"]
+      - ../nginx/docker-entrypoint:/usr/local/bin/docker-entrypoint
+    entrypoint: ["sh", "/usr/local/bin/docker-entrypoint/nginx-entrypoint.sh"]
     command: ["nginx", "-g", "daemon off;"]
     networks:
       - app_network
