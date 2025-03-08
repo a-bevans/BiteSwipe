@@ -21,6 +21,8 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    networks:
+      - app_network
 
   app:
     build:
@@ -32,8 +34,9 @@ services:
     restart: unless-stopped
     env_file:
       - .env
+    expose:
+      - "${PORT}"
     ports:
-      - "${PORT}:${PORT}"
       - "9229:9229"  # Debug port
     depends_on:
       - mongo
@@ -47,7 +50,35 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    networks:
+      - app_network
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx_https
+    restart: unless-stopped
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - ../nginx/conf.d:/etc/nginx/conf.d
+      - ../nginx/docker-entrypoint/nginx-entrypoint.sh:/usr/local/bin/nginx-entrypoint.sh
+    entrypoint: ["/usr/local/bin/nginx-entrypoint.sh"]
+    command: ["nginx", "-g", "daemon off;"]
+    networks:
+      - app_network
+    depends_on:
+      - app
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 volumes:
   mongo_data:
     driver: local
+
+networks:
+  app_network:
+    driver: bridge
