@@ -19,7 +19,7 @@ jest.mock('mongoose', () => {
       return this.str;
     }
 
-    equals(other: any) {
+    equals(other: unknown) {
       return other?.toString() === this.str;
     }
 
