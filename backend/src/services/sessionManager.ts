@@ -103,8 +103,8 @@ export class SessionManager {
         if (!Types.ObjectId.isValid(sessionId) || !Types.ObjectId.isValid(userId)) {
             throw new Error('Invalid ID format');
         }
-        const sessionObjId = new Types.ObjectId(sessionId);
-        const userObjId = new mongoose.Types.ObjectId(userId);
+        const sessionObjId = new Types.ObjectId(sessionId) as unknown as mongoose.Types.ObjectId;
+        const userObjId = new Types.ObjectId(userId) as unknown as mongoose.Types.ObjectId;
 
         const session = await Session.findOneAndUpdate(
             {
