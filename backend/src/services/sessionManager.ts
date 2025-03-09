@@ -58,10 +58,8 @@ export class SessionManager {
                     location: settings
                 },
                 restaurants: restaurants.map(r => {
-                    // Ensure r is properly typed to fix the 'never' type issue
-                    const restaurant = r as any;
                     return {
-                        restaurantId: restaurant._id,
+                        restaurantId: r._id,
                         score: 0,
                         totalVotes: 0,
                         positiveVotes: 0
