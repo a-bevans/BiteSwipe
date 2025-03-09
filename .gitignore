@@ -23,4 +23,4 @@ test.env
 .codacyignore
 */codacy/.env
 backend/scripts/codacy/.env
-backend/scripts/codacy/*_analysis.json
+backend/scripts/codacy/*_analysis*.json
