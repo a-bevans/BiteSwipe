@@ -49,9 +49,9 @@ export class UserController {
             }
 
             res.json(user);
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Error fetching user:', error);
-            if (error?.message?.includes('Invalid user ID format')) {
+            if (error instanceof Error && error.message.includes('Invalid user ID format')) {
                 return res.status(400).json({ error: 'Invalid user ID format' });
             }
             res.status(500).json({ error: 'Internal Server Error' });

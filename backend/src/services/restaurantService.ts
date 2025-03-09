@@ -18,7 +18,10 @@ export class RestaurantService {
 
                 if(!restaurant_exist) {
                     const details = await this.googlePlacesService.getPlaceDetails(place.place_id);
-                
+                    if(!details) {
+                        console.error(`Failed to get details for place ID: ${place.place_id}`);
+                        continue;
+                    }
                     const primaryImage = details.photos_url && details.photos_url.length > 0 ? details.photos_url[0] : '';
                     const galleryImages = details.photos_url && details.photos_url.length > 1 ? details.photos_url.slice(1) : [];
 
