@@ -17,7 +17,7 @@ export class SessionManager {
     }
     
     async createSession(
-        userId: string | Types.ObjectId,
+        userId: string,
         settings: {
             latitude: number;
             longitude: number;
@@ -25,6 +25,7 @@ export class SessionManager {
         }
     ): Promise<ISession> {
         try {
+            // Validate and convert userId to ObjectId
             if (!Types.ObjectId.isValid(userId)) {
                 throw new Error('Invalid user ID format');
             }

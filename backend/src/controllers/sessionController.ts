@@ -59,7 +59,7 @@ export class SessionController {
             }
 
             const session = await this.sessionManager.createSession(
-                new Types.ObjectId(userId),
+                userId,
                 {
                     latitude: parseFloat(latitude),
                     longitude: parseFloat(longitude),
