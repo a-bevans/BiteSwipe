@@ -205,7 +205,7 @@ export class SessionController {
         }
     }
 
-    async getRestaurantsInSession(req, res: Response) {
+    async getRestaurantsInSession(req: Request, res: Response) {
         try {
             const { sessionId } = req.params;
             if (!Types.ObjectId.isValid(sessionId)) {
@@ -223,7 +223,7 @@ export class SessionController {
         }
     }
 
-    async sessionSwiped(req, res: Response) {
+    async sessionSwiped(req: Request, res: Response) {
         try {
             const { sessionId } = req.params;
             const { userId, restaurantId, liked} = req.body;
@@ -238,7 +238,7 @@ export class SessionController {
         }
     }
 
-    async startSession(req, res: Response) {
+    async startSession(req: Request, res: Response) {
         try {
             const { sessionId } = req.params;
             const { userId, time } = req.body;
@@ -253,7 +253,7 @@ export class SessionController {
         }
     }
 
-    async userDoneSwiping(req, res: Response) {
+    async userDoneSwiping(req: Request, res: Response) {
         try {
             const { sessionId } = req.params;
             const { userId } = req.body;
@@ -268,7 +268,7 @@ export class SessionController {
         }
     }
 
-    async getResultForSession(req, res: Response) {
+    async getResultForSession(req: Request, res: Response) {
         try {
             const { sessionId } = req.params;
 
