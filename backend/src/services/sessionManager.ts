@@ -28,7 +28,7 @@ export class SessionManager {
             if (!Types.ObjectId.isValid(userId)) {
                 throw new Error('Invalid user ID format');
             }
-            const userObjectId = new Types.ObjectId(userId);
+            const userObjectId = new Types.ObjectId(userId) as unknown as mongoose.Types.ObjectId;
             
             // Check if user exists
             const user = await UserModel.findById(userObjectId);
@@ -157,10 +157,9 @@ export class SessionManager {
         if (!Types.ObjectId.isValid(sessionId) || !Types.ObjectId.isValid(userId)) {
             throw new Error('Invalid ID format');
         }
-        const sessionObjectId = new Types.ObjectId(sessionId);
-        const userObjectId = new Types.ObjectId(userId);
+        const sessionObjectId = new Types.ObjectId(sessionId) as unknown as mongoose.Types.ObjectId;
+        const userObjectId = new Types.ObjectId(userId) as unknown as mongoose.Types.ObjectId;
 
-        // Use findOneAndUpdate for atomic operation
         const updatedSession = await Session.findOneAndUpdate(
             {
                 _id: sessionObjectId,
@@ -202,9 +201,8 @@ export class SessionManager {
         if (!Types.ObjectId.isValid(userId)) {
             throw new Error('Invalid user ID format');
         }
-        const userObjectId = new Types.ObjectId(userId);
+        const userObjectId = new Types.ObjectId(userId) as unknown as mongoose.Types.ObjectId;
 
-        // Use findOneAndUpdate for atomic operation
         const updatedSession = await Session.findOneAndUpdate(
             {
                 joinCode: joinCode,
@@ -247,7 +245,7 @@ export class SessionManager {
             if (!Types.ObjectId.isValid(userId)) {
                 throw new Error('Invalid user ID format');
             }
-            const userObjectId = new Types.ObjectId(userId);
+            const userObjectId = new Types.ObjectId(userId) as unknown as mongoose.Types.ObjectId;
             const sessions = await Session.find({
                 $or: [
                     { creator: userObjectId },
@@ -269,7 +267,7 @@ export class SessionManager {
             if (!Types.ObjectId.isValid(sessionId)) {
                 throw new Error('Invalid session ID format');
             }
-            const sessionObjId = new Types.ObjectId(sessionId);
+            const sessionObjId = new Types.ObjectId(sessionId) as unknown as mongoose.Types.ObjectId;
             
             const session = await Session.findById(sessionObjId);
             if (!session) {
@@ -288,10 +286,9 @@ export class SessionManager {
         if (!Types.ObjectId.isValid(sessionId) || !Types.ObjectId.isValid(userId)) {
             throw new Error('Invalid ID format');
         }
-        const sessionObjectId = new Types.ObjectId(sessionId);
-        const userObjectId = new Types.ObjectId(userId);
+        const sessionObjectId = new Types.ObjectId(sessionId) as unknown as mongoose.Types.ObjectId;
+        const userObjectId = new Types.ObjectId(userId) as unknown as mongoose.Types.ObjectId;
 
-        // Use findOneAndUpdate for atomic operation
         const updatedSession = await Session.findOneAndUpdate(
             {
                 _id: sessionObjectId,
@@ -328,8 +325,8 @@ export class SessionManager {
         if (!Types.ObjectId.isValid(sessionId) || !Types.ObjectId.isValid(userId)) {
             throw new Error('Invalid ID format');
         }
-        const sessionObjectId = new Types.ObjectId(sessionId);
-        const userObjectId = new Types.ObjectId(userId);
+        const sessionObjectId = new Types.ObjectId(sessionId) as unknown as mongoose.Types.ObjectId;
+        const userObjectId = new Types.ObjectId(userId) as unknown as mongoose.Types.ObjectId;
 
         // Use findOneAndUpdate to perform an atomic operation
         const updatedSession = await Session.findOneAndUpdate(
@@ -369,7 +366,7 @@ export class SessionManager {
             if (!Types.ObjectId.isValid(sessionId)) {
                 throw new Error('Invalid session ID format');
             }
-            const sessionObjId = new Types.ObjectId(sessionId);
+            const sessionObjId = new Types.ObjectId(sessionId) as unknown as mongoose.Types.ObjectId;
             
             const session = await Session.findOne({
                 _id: sessionObjId
@@ -393,8 +390,8 @@ export class SessionManager {
         if (!Types.ObjectId.isValid(sessionId) || !Types.ObjectId.isValid(userId)) {
             throw new Error('Invalid ID format');
         }
-        const sessionObjId = new Types.ObjectId(sessionId);
-        const userObjId = new mongoose.Types.ObjectId(userId);
+        const sessionObjId = new Types.ObjectId(sessionId) as unknown as mongoose.Types.ObjectId;
+        const userObjId = new Types.ObjectId(userId) as unknown as mongoose.Types.ObjectId;
 
         const session = await Session.findOneAndUpdate(
             {
@@ -433,8 +430,8 @@ export class SessionManager {
         if (!Types.ObjectId.isValid(sessionId) || !Types.ObjectId.isValid(userId)) {
             throw new Error('Invalid ID format');
         }
-        const sessionObjId = new Types.ObjectId(sessionId);
-        const userObjId = new mongoose.Types.ObjectId(userId);
+        const sessionObjId = new Types.ObjectId(sessionId) as unknown as mongoose.Types.ObjectId;
+        const userObjId = new Types.ObjectId(userId) as unknown as mongoose.Types.ObjectId;
 
         const session = await Session.findOneAndUpdate(
             {
@@ -464,7 +461,7 @@ export class SessionManager {
         if (!Types.ObjectId.isValid(sessionId)) {
             throw new Error('Invalid session ID format');
         }
-        const sessionObjId = new Types.ObjectId(sessionId);
+        const sessionObjId = new Types.ObjectId(sessionId) as unknown as mongoose.Types.ObjectId;
         
         const session = await Session.findById(sessionObjId);
         if (!session) {
