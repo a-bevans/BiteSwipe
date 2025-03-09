@@ -18,3 +18,9 @@ backend/cert.pem
 */dist/*
 */coverage/*
 test.env
+*/.codacy-cache/*
+*/codacy-results.json
+.codacyignore
+*/codacy/.env
+backend/scripts/codacy/.env
+backend/scripts/codacy/*_analysis.json
