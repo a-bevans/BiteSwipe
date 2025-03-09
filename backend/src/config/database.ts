@@ -1,4 +1,4 @@
-import mongoose  from 'mongoose';
+import mongoose from 'mongoose';
 import { Db } from 'mongodb';
 
 export class Database {

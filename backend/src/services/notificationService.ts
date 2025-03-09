@@ -1,4 +1,3 @@
-import admin from '../config/firebase';
 import { getMessaging } from '../config/firebase';
 import { Types } from 'mongoose';
 import { UserModel } from '../models/user';

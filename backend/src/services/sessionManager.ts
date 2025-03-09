@@ -1,7 +1,6 @@
-import { StringExpressionOperatorReturningArray, Types } from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import { Session, ISession, SessionStatus } from '../models/session';
 import { RestaurantService } from './restaurantService';
-import mongoose, { ObjectId } from 'mongoose';
 import { UserModel } from '../models/user';
 
 interface CustomError extends Error {
