@@ -114,23 +114,23 @@ async function seedDatabase() {
             .map((restaurant: any) => ({
                 ...(restaurant._id && { _id: restaurant._id }),
                 name: restaurant.name,
-                address: restaurant.location?.address || '',
+                address: restaurant.location?.address ?? '',
                 location: {
                     type: 'Point',
                     coordinates: [
-                        restaurant.location?.coordinates?.longitude || 0,
-                        restaurant.location?.coordinates?.latitude || 0
+                        restaurant.location?.coordinates?.longitude ?? 0,
+                        restaurant.location?.coordinates?.latitude ?? 0
                     ]
                 },
-                phoneNumber: restaurant.contact?.phone || '',
-                website: restaurant.contact?.website || '',
-                primaryImage: restaurant.images?.primary || '',
-                galleryImages: restaurant.images?.gallery || [],
-                cuisine: restaurant.cuisine || '',
-                priceRange: restaurant.priceRange || '',
-                rating: restaurant.rating || 0,
-                openingHours: restaurant.openingHours || '',
-                googlePlaceId: restaurant.sourceData?.googlePlaceId || ''
+                phoneNumber: restaurant.contact?.phone ?? '',
+                website: restaurant.contact?.website ?? '',
+                primaryImage: restaurant.images?.primary ?? '',
+                galleryImages: restaurant.images?.gallery ?? [],
+                cuisine: restaurant.cuisine ?? '',
+                priceRange: restaurant.priceRange ?? '',
+                rating: restaurant.rating ?? 0,
+                openingHours: restaurant.openingHours ?? '',
+                googlePlaceId: restaurant.sourceData?.googlePlaceId ?? ''
             }));
 
         const insertedRestaurants = await Restaurant.insertMany(transformedRestaurants);

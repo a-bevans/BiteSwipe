@@ -26,7 +26,7 @@ export class GooglePlacesService {
                     location: `${latitude},${longitude}`,
                     radius: radius,
                     type: 'restaurant',
-                    keyword: keyword || 'food',
+                    keyword: keyword ?? 'food',
                     key: this.apiKey
                 }
             });
@@ -38,7 +38,7 @@ export class GooglePlacesService {
 
             const restaurantsOnly = response.data.results.filter((place: any) => {
                 // Check if the place has restaurant-related types
-                const types = place.types || [];
+                const types = place.types ?? [];
                 const restaurantTypes = [
                     'restaurant', 
                     'food', 

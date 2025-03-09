@@ -34,8 +34,8 @@ export class RestaurantService {
                             }
                         },
                         contact: {
-                            phone: details.formatted_phone_number || ' ',
-                            website: details.website || ' '
+                            phone: details.formatted_phone_number ?? ' ',
+                            website: details.website ?? ' '
                         },
                         menu: {
                             categories: []
@@ -44,8 +44,8 @@ export class RestaurantService {
                             primary: primaryImage,
                             gallery: galleryImages
                         },
-                        priceLevel: details.price_level || 0,
-                        rating: details.rating || 0,
+                        priceLevel: details.price_level ?? 0,
+                        rating: details.rating ?? 0,
                         openingHours: details.opening_hours ? {
                             openNow: details.opening_hours.open_now,
                             weekdayText: details.opening_hours.weekday_text
