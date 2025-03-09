@@ -48,22 +48,29 @@ export class SessionController {
 
     async createSession(req: Request, res: Response) {
         try {
-            const { userId, latitude, longitude, radius } = req.body;
+            const { userId, latitude, longitude, radius } = req.body as { 
+                userId: string, 
+                latitude: string | number, 
+                longitude: string | number, 
+                radius: string | number 
+            };
+            
+            // Convert coordinates to numbers
+            const lat = typeof latitude === 'string' ? parseFloat(latitude) : latitude;
+            const lng = typeof longitude === 'string' ? parseFloat(longitude) : longitude;
+            const rad = typeof radius === 'string' ? parseFloat(radius) : radius;
 
             // Validate userId is a valid ObjectId
             if (!Types.ObjectId.isValid(userId)) {
                 return res.status(400).json({ error: 'Invalid user ID format' });
             }
 
-            // Convert userId to string explicitly to ensure type safety
-            const userIdString: string = userId.toString();
-
             const session = await this.sessionManager.createSession(
-                userIdString,
+                userId,
                 {
-                    latitude: parseFloat(latitude),
-                    longitude: parseFloat(longitude),
-                    radius: parseFloat(radius)
+                    latitude: lat,
+                    longitude: lng,
+                    radius: rad
                 }
             );
 
