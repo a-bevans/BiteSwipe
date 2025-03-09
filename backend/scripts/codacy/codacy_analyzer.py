@@ -18,6 +18,15 @@ import urllib.error
 from typing import Dict, List, Any, Optional, Union
 from pathlib import Path
 
+# ANSI color codes for terminal output
+class Colors:
+    GREEN = '\033[92m'
+    RED = '\033[91m'
+    YELLOW = '\033[93m'
+    BLUE = '\033[94m'
+    BOLD = '\033[1m'
+    END = '\033[0m'
+
 # Load environment variables from .env file if it exists
 try:
     from dotenv import load_dotenv
@@ -381,12 +390,14 @@ class CodacyAnalyzer:
             print("\nIssue changes:")
             for delta_type, count in analysis["by_delta_type"].items():
                 if count > 0:
-                    print(f"  {delta_type.upper()}: {count}")
+                    color = Colors.RED if delta_type.upper() == 'ADDED' else Colors.GREEN if delta_type.upper() == 'FIXED' else ''
+                    print(f"  {color}{delta_type.upper()}: {count}{Colors.END}")
             
         print("\nIssues by severity:")
         for severity, count in analysis["by_severity"].items():
             if count > 0:
-                print(f"  {severity.upper()}: {count}")
+                color = Colors.RED if severity.upper() == 'ERROR' else Colors.YELLOW
+                print(f"  {color}{severity.upper()}: {count}{Colors.END}")
         
         print("\nIssues by category:")
         for category, count in analysis["by_category"].items():
@@ -401,12 +412,14 @@ class CodacyAnalyzer:
         if analysis["issues"]:
             print("\nExample issues (first 5):")
             for i, issue in enumerate(analysis["issues"][:5]):
-                print(f"  {i+1}. [{issue['severity'].upper()}] {issue['message']}")
+                severity_color = Colors.RED if issue['severity'].upper() == 'ERROR' else Colors.YELLOW
+                status_color = Colors.RED if issue.get('delta_type') == 'Added' else Colors.GREEN if issue.get('delta_type') == 'Fixed' else ''
+                print(f"  {i+1}. [{severity_color}{issue['severity'].upper()}{Colors.END}] {issue['message']}")
                 print(f"     File: {issue['file']}:{issue['line']}")
                 if issue.get("line_text"):
                     print(f"     Code: {issue['line_text'][:100]}{'...' if len(issue['line_text']) > 100 else ''}")
                 if issue.get("delta_type"):
-                    print(f"     Status: {issue['delta_type']}")
+                    print(f"     Status: {status_color}{issue['delta_type']}{Colors.END}")
     
     def print_suggestions(self, suggestions: Dict):
         """Print suggestions for fixing issues"""
@@ -414,13 +427,20 @@ class CodacyAnalyzer:
             print("\nNo automatic fix suggestions available.")
             return
         
-        print("\n===== FIX SUGGESTIONS =====")
+        print(f"\n{Colors.BOLD}===== FIX SUGGESTIONS ====={Colors.END}")
         for file_path, file_suggestions in suggestions.items():
-            print(f"\nFile: {file_path}")
+            print(f"\n{Colors.BOLD}File: {file_path}{Colors.END}")
             for suggestion in file_suggestions:
-                status_info = f" [{suggestion['status'].upper()}]" if 'status' in suggestion else ""
-                print(f"  Line {suggestion['line']}{status_info}: {suggestion['issue']}")
-                print(f"    Suggestion: {suggestion['fix']}")
+                status = suggestion.get('status', '')
+                status_color = Colors.RED if status == 'Added' else Colors.GREEN if status == 'Fixed' else ''
+                status_info = f" [{status_color}{status.upper()}{Colors.END}]" if status else ""
+                
+                severity_color = Colors.RED if 'ERROR' in suggestion['issue'] else Colors.YELLOW if 'WARNING' in suggestion['issue'] else ''
+                issue_text = suggestion['issue'].replace('ERROR:', f"{severity_color}ERROR:{Colors.END}")
+                issue_text = issue_text.replace('WARNING:', f"{Colors.YELLOW}WARNING:{Colors.END}")
+                
+                print(f"  Line {suggestion['line']}{status_info}: {issue_text}")
+                print(f"    Suggestion: {Colors.BLUE}{suggestion['fix']}{Colors.END}")
 
 
 def main():
@@ -430,7 +450,7 @@ def main():
     parser.add_argument("--branch", default=None, help="Current branch to analyze")
     parser.add_argument("--base", default="main", help="Base branch to compare against (default: main)")
     parser.add_argument("--pr", help="Pull request ID to analyze")
-    parser.add_argument("--output", help="Output file for results (JSON format)")
+    parser.add_argument("--output", help="Output file for results (JSON format, default: pr<PR_ID>_analysis.json or branch_analysis.json)")
     parser.add_argument("--repo", default="BiteSwipe", help="Repository name (default: BiteSwipe)")
     parser.add_argument("--org", default="a-bevans", help="Organization name (default: a-bevans)")
     parser.add_argument("--debug", action="store_true", help="Enable debug mode")
@@ -509,19 +529,125 @@ def main():
     if not "error" in analysis:
         analyzer.print_suggestions(suggestions)
     
-    # Save results if output file specified
+    # Save results to file (either specified or default)
+    # Get the directory where this script is located
+    script_dir = Path(__file__).parent.absolute()
+    
+    # Prepare base filename
     if args.output:
+        # If the output path is absolute, use it as is, otherwise make it relative to the script directory
         output_path = Path(args.output)
-        output_data = {
-            "raw_results": results,
-            "analysis": analysis,
-            "suggestions": suggestions
-        }
+        if not output_path.is_absolute():
+            output_path = script_dir / output_path
+        # Use the provided filename as the base name
+        base_name = output_path.stem
+        output_dir = output_path.parent
+    else:
+        # Create default output filename based on what was analyzed, in the script directory
+        if args.pr:
+            base_name = f"pr{args.pr}_analysis"
+        else:
+            base_name = "branch_analysis"
+        output_dir = script_dir
+    
+    # Create paths for all output files
+    all_issues_path = output_dir / f"{base_name}.json"
+    fixed_issues_path = output_dir / f"{base_name}_fixed.json"
+    added_issues_path = output_dir / f"{base_name}_added.json"
+    
+    # Prepare the complete output data
+    output_data = {
+        "raw_results": results,
+        "analysis": analysis,
+        "suggestions": suggestions
+    }
+    
+    # Save the complete output data
+    with open(all_issues_path, 'w') as f:
+        json.dump(output_data, f, indent=2)
+    
+    # Filter issues by delta_type
+    fixed_issues = [issue for issue in analysis.get("issues", []) if issue.get("delta_type") == "Fixed"]
+    added_issues = [issue for issue in analysis.get("issues", []) if issue.get("delta_type") == "Added"]
+    
+    # Create filtered analysis for fixed issues
+    fixed_analysis = {
+        "total_issues": len(fixed_issues),
+        "by_severity": {},
+        "by_category": {},
+        "by_file": {}
+    }
+    
+    # Create filtered analysis for added issues
+    added_analysis = {
+        "total_issues": len(added_issues),
+        "by_severity": {},
+        "by_category": {},
+        "by_file": {}
+    }
+    
+    # Populate the filtered analysis with categorized data
+    for issue in fixed_issues:
+        severity = issue.get("severity", "Unknown")
+        category = issue.get("category", "Unknown")
+        file_path = issue.get("file", "Unknown")
         
-        with open(output_path, 'w') as f:
-            json.dump(output_data, f, indent=2)
+        fixed_analysis["by_severity"][severity] = fixed_analysis["by_severity"].get(severity, 0) + 1
+        fixed_analysis["by_category"][category] = fixed_analysis["by_category"].get(category, 0) + 1
         
-        print(f"\nResults saved to {output_path}")
+        if file_path not in fixed_analysis["by_file"]:
+            fixed_analysis["by_file"][file_path] = []
+        fixed_analysis["by_file"][file_path].append(issue)
+    
+    for issue in added_issues:
+        severity = issue.get("severity", "Unknown")
+        category = issue.get("category", "Unknown")
+        file_path = issue.get("file", "Unknown")
+        
+        added_analysis["by_severity"][severity] = added_analysis["by_severity"].get(severity, 0) + 1
+        added_analysis["by_category"][category] = added_analysis["by_category"].get(category, 0) + 1
+        
+        if file_path not in added_analysis["by_file"]:
+            added_analysis["by_file"][file_path] = []
+        added_analysis["by_file"][file_path].append(issue)
+    
+    # Filter suggestions for fixed and added issues
+    fixed_suggestions = {}
+    added_suggestions = {}
+    
+    for file_path, file_suggestions in suggestions.items():
+        fixed_file_suggestions = [s for s in file_suggestions if s.get("status") == "Fixed"]
+        added_file_suggestions = [s for s in file_suggestions if s.get("status") == "Added"]
+        
+        if fixed_file_suggestions:
+            fixed_suggestions[file_path] = fixed_file_suggestions
+        
+        if added_file_suggestions:
+            added_suggestions[file_path] = added_file_suggestions
+    
+    # Save fixed issues data
+    fixed_output_data = {
+        "analysis": fixed_analysis,
+        "suggestions": fixed_suggestions
+    }
+    
+    with open(fixed_issues_path, 'w') as f:
+        json.dump(fixed_output_data, f, indent=2)
+    
+    # Save added issues data
+    added_output_data = {
+        "analysis": added_analysis,
+        "suggestions": added_suggestions
+    }
+    
+    with open(added_issues_path, 'w') as f:
+        json.dump(added_output_data, f, indent=2)
+    
+    # Print output file paths
+    print(f"\n{Colors.BOLD}Results saved to:{Colors.END}")
+    print(f"  {Colors.BLUE}All issues: {all_issues_path.absolute()}{Colors.END}")
+    print(f"  {Colors.GREEN}Fixed issues: {fixed_issues_path.absolute()}{Colors.END}")
+    print(f"  {Colors.RED}Added issues: {added_issues_path.absolute()}{Colors.END}")
 
 
 if __name__ == "__main__":

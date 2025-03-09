@@ -54,12 +54,16 @@ export class SessionController {
         try {
             const { userId, latitude, longitude, radius } = req.body;
 
+            // Validate userId is a valid ObjectId
             if (!Types.ObjectId.isValid(userId)) {
                 return res.status(400).json({ error: 'Invalid user ID format' });
             }
 
+            // Convert userId to string explicitly to ensure type safety
+            const userIdString: string = userId.toString();
+
             const session = await this.sessionManager.createSession(
-                userId,
+                userIdString,
                 {
                     latitude: parseFloat(latitude),
                     longitude: parseFloat(longitude),
