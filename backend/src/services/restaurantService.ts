@@ -10,7 +10,8 @@ export class RestaurantService {
         try {
             const places = await this.googlePlacesService.searchNearby(location.latitude, location.longitude, location.radius, keyword);
 
-            const savedRestaurants = [];
+            // Properly type the savedRestaurants array to fix the 'never' type issue
+            const savedRestaurants: any[] = [];
             for (const place of places) {
 
                 const restaurant_exist = await Restaurant.findOne({ 'sourceData.googlePlaceId': place.place_id });

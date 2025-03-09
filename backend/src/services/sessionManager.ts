@@ -57,12 +57,16 @@ export class SessionManager {
                 settings: {
                     location: settings
                 },
-                restaurants: restaurants.map(r => ({
-                    restaurantId: r._id,
-                    score: 0,
-                    totalVotes: 0,
-                    positiveVotes: 0
-                })),
+                restaurants: restaurants.map(r => {
+                    // Ensure r is properly typed to fix the 'never' type issue
+                    const restaurant = r as any;
+                    return {
+                        restaurantId: restaurant._id,
+                        score: 0,
+                        totalVotes: 0,
+                        positiveVotes: 0
+                    };
+                }),
                 joinCode: joinCode,
                 status: 'CREATED' as SessionStatus,
                 expiresAt: expiresAt

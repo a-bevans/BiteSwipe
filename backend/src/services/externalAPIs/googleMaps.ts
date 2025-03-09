@@ -9,10 +9,12 @@ export class GooglePlacesService {
     };
 
     constructor() {
-        this.apiKey = process.env.GOOGLE_MAPS_API_KEY;
-        if (!this.apiKey) {
+        const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+        if (!apiKey) {
             throw new Error('Google Maps API key is required. Add GOOGLE_MAPS_API_KEY=<key> to .env');
         }
+        // TypeScript now knows apiKey is definitely a string
+        this.apiKey = apiKey;
         this.searchNearby = this.searchNearby.bind(this);
         this.getPlaceDetails = this.getPlaceDetails.bind(this);
     }
