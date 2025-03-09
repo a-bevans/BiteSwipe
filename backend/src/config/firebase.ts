@@ -1,5 +1,5 @@
-import admin = require("firebase-admin")
-import { ServiceAccount } from 'firebase-admin';
+import * as admin from 'firebase-admin';
+import type { ServiceAccount } from 'firebase-admin';
 import * as fs from 'fs';
 
 let messaging: admin.messaging.Messaging | null = null;
