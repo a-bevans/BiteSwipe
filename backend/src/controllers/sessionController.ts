@@ -35,11 +35,7 @@ export class SessionController {
             const sessionId = req.params.sessionId;
             console.log('Session ID from params:', sessionId);
             
-            if (!Types.ObjectId.isValid(sessionId)) {
-                return res.status(400).json({ error: 'Invalid session ID format' });
-            }
-
-            const session = await this.sessionManager.getSession(new Types.ObjectId(sessionId));
+            const session = await this.sessionManager.getSession(sessionId);
             res.json(session);
         } catch (error) {
             console.error('Error fetching session:', error);
@@ -83,11 +79,6 @@ export class SessionController {
             const sessionId = req.params.sessionId;
             const { email } = req.body;
 
-            if (!Types.ObjectId.isValid(sessionId)) {
-                return res.status(400).json({ error: 'Invalid session format' });
-            }
-
-            
             const user = await UserModel.findOne({ email });
             
             if (!user) {
@@ -95,8 +86,8 @@ export class SessionController {
             }
             
             const session = await this.sessionManager.addPendingInvitation(
-                new Types.ObjectId(sessionId),
-                user._id
+                sessionId,
+                user._id.toString()
             );
 
             // Send notification to invited user
@@ -125,13 +116,9 @@ export class SessionController {
             const joinCode = req.params.joinCode;
             const { userId } = req.body;
 
-            if (!Types.ObjectId.isValid(userId)) {
-                return res.status(400).json({ error: 'Invalid session or user ID format' });
-            }
-
             const session = await this.sessionManager.joinSession(
                 joinCode,
-                new Types.ObjectId(userId)
+                userId
             );
 
             res.json(session);
@@ -150,14 +137,7 @@ export class SessionController {
         try {
             const { sessionId, userId } = req.params;
 
-            if (!Types.ObjectId.isValid(sessionId) || !Types.ObjectId.isValid(userId)) {
-                return res.status(400).json({ error: 'Invalid session or user ID format' });
-            }
-
-            const session = await this.sessionManager.rejectInvitation(
-                new Types.ObjectId(sessionId),
-                new Types.ObjectId(userId)
-            );
+            const session = await this.sessionManager.rejectInvitation(sessionId, userId);
 
             res.json(session);
         } catch (error) {
@@ -178,14 +158,7 @@ export class SessionController {
         try {
             const { sessionId, userId } = req.params;
 
-            if (!Types.ObjectId.isValid(sessionId) || !Types.ObjectId.isValid(userId)) {
-                return res.status(400).json({ error: 'Invalid session or user ID format' });
-            }
-
-            const session = await this.sessionManager.leaveSession(
-                new Types.ObjectId(sessionId),
-                new Types.ObjectId(userId)
-            );
+            const session = await this.sessionManager.leaveSession(sessionId, userId);
 
             res.json(session);
         } catch (error) {
@@ -208,11 +181,7 @@ export class SessionController {
     async getRestaurantsInSession(req: Request, res: Response) {
         try {
             const { sessionId } = req.params;
-            if (!Types.ObjectId.isValid(sessionId)) {
-                return res.status(400).json({ error: 'Invalid session ID format' });
-            }
-
-            const restaurants = await this.sessionManager.getRestaurantsInSession(new Types.ObjectId(sessionId));
+            const restaurants = await this.sessionManager.getRestaurantsInSession(sessionId);
             res.json(restaurants);
         } catch (error) {
             console.error('Error fetching restaurants:', error);
@@ -228,7 +197,7 @@ export class SessionController {
             const { sessionId } = req.params;
             const { userId, restaurantId, liked} = req.body;
 
-            const session = await this.sessionManager.sessionSwiped(new Types.ObjectId(sessionId), userId, restaurantId, liked);
+            const session = await this.sessionManager.sessionSwiped(sessionId, userId, restaurantId, liked);
 
             res.json({ success: true, session: session._id });
         } catch (error) {
@@ -243,7 +212,7 @@ export class SessionController {
             const { sessionId } = req.params;
             const { userId, time } = req.body;
 
-            const session = await this.sessionManager.startSession(new Types.ObjectId(sessionId), userId, Number(time));
+            const session = await this.sessionManager.startSession(sessionId, userId, Number(time));
 
             res.json({ success: true, session: session._id });
         } catch (error) {
@@ -258,7 +227,7 @@ export class SessionController {
             const { sessionId } = req.params;
             const { userId } = req.body;
 
-            const session = await this.sessionManager.userDoneSwiping(new Types.ObjectId(sessionId), userId);
+            const session = await this.sessionManager.userDoneSwiping(sessionId, userId);
 
             res.json({ success: true, session: session._id });
         } catch (error) {
@@ -272,7 +241,7 @@ export class SessionController {
         try {
             const { sessionId } = req.params;
 
-            const result = await this.sessionManager.getResultForSession(new Types.ObjectId(sessionId));
+            const result = await this.sessionManager.getResultForSession(sessionId);
             res.json({ success: true, result });
         } catch (error) {
             console.log(error);
