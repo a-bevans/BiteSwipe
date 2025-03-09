@@ -19,18 +19,13 @@ output "server_name" {
 }
 
 output "app_url" {
-  value = "https://${azurerm_public_ip.public_ip.fqdn}:3000"
+  value = "https://${azurerm_public_ip.public_ip.fqdn}"
   description = "The URL to access the application"
 }
 
 output "app_ip_url" {
-  value = "https://${azurerm_public_ip.public_ip.ip_address}:3000"
+  value = "https://${azurerm_public_ip.public_ip.ip_address}"
   description = "The IP-based URL to access the application"
-}
-
-output "mongodb_url" {
-  value = "mongodb://${azurerm_public_ip.public_ip.fqdn}:27017"
-  description = "The MongoDB connection URL"
 }
 
 output "ssh_command" {

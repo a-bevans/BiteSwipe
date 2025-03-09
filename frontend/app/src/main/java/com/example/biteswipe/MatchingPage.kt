@@ -91,6 +91,7 @@ class MatchingPage : AppCompatActivity(), ApiHelper {
         recyclerView.adapter = adapter
         Log.d(TAG, "Set up cards")
         val endpoint = "/sessions/$sessionId/restaurants"
+        // TODO: the response has changed. Update parseRestaurants
         apiRequest(
             context = this@MatchingPage,
             endpoint = endpoint,

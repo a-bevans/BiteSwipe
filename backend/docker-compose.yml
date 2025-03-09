@@ -1,12 +1,12 @@
-version: '3.3'
+version: "3.3"
 
 services:
   mongo:
     image: mongo:latest
     container_name: mongo_instance
     restart: unless-stopped
-    ports:
-      - "27017:27017"
+    expose:
+      - "27017"
     volumes:
       - mongo_data:/data/db
     command: >
@@ -21,6 +21,8 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    networks:
+      - app_network
 
   app:
     build:
@@ -32,9 +34,10 @@ services:
     restart: unless-stopped
     env_file:
       - .env
+    expose:
+      - "${PORT}"
     ports:
-      - "${PORT}:${PORT}"
-      - "9229:9229"  # Debug port
+      - "9229:9229" # Debug port
     depends_on:
       - mongo
     healthcheck:
@@ -47,7 +50,36 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    networks:
+      - app_network
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx_https
+    restart: unless-stopped
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/docker-entrypoint/docker-entrypoint.sh:/docker-entrypoint-custom.sh
+      - ./nginx/certs:/etc/ssl
+    entrypoint: ["/docker-entrypoint-custom.sh"]
+    command: ["nginx", "-g", "daemon off;"]
+    networks:
+      - app_network
+    depends_on:
+      - app
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 volumes:
   mongo_data:
     driver: local
+
+networks:
+  app_network:
+    driver: bridge

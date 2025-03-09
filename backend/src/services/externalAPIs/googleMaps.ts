@@ -9,10 +9,12 @@ export class GooglePlacesService {
     };
 
     constructor() {
-        this.apiKey = process.env.GOOGLE_MAPS_API_KEY;
-        if (!this.apiKey) {
+        const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+        if (!apiKey) {
             throw new Error('Google Maps API key is required. Add GOOGLE_MAPS_API_KEY=<key> to .env');
         }
+        // TypeScript now knows apiKey is definitely a string
+        this.apiKey = apiKey;
         this.searchNearby = this.searchNearby.bind(this);
         this.getPlaceDetails = this.getPlaceDetails.bind(this);
     }
@@ -24,7 +26,7 @@ export class GooglePlacesService {
                     location: `${latitude},${longitude}`,
                     radius: radius,
                     type: 'restaurant',
-                    keyword: keyword || 'food',
+                    keyword: keyword ?? 'food',
                     key: this.apiKey
                 }
             });
@@ -36,7 +38,7 @@ export class GooglePlacesService {
 
             const restaurantsOnly = response.data.results.filter((place: any) => {
                 // Check if the place has restaurant-related types
-                const types = place.types || [];
+                const types = (place.types || []) as string[];
                 const restaurantTypes = [
                     'restaurant', 
                     'food', 

@@ -32,11 +32,15 @@ def get_owner_tag(prefix=None):
     if prefix:
         return prefix
         
-    # Check if we're running on GitHub Actions main branch
+    # Check if we're running on GitHub Actions main or develop branch
     github_ref = os.getenv('GITHUB_REF')
-    if github_ref and github_ref == 'refs/heads/main':
-        # Use a fixed production tag for main branch
-        return "master"
+    if github_ref:
+        if github_ref == 'refs/heads/main':
+            # Use a fixed production tag for main branch
+            return "master"
+        elif github_ref == 'refs/heads/develop':
+            # Use a fixed development tag for develop branch
+            return "dev"
     
     # For any other case, try to read from terraform.tfvars
     try:

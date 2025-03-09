@@ -1,7 +1,6 @@
-import { StringExpressionOperatorReturningArray, Types } from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import { Session, ISession, SessionStatus } from '../models/session';
 import { RestaurantService } from './restaurantService';
-import mongoose, { ObjectId } from 'mongoose';
 import { UserModel } from '../models/user';
 
 interface CustomError extends Error {
@@ -17,7 +16,7 @@ export class SessionManager {
     }
     
     async createSession(
-        userId: Types.ObjectId,
+        userId: string,
         settings: {
             latitude: number;
             longitude: number;
@@ -25,8 +24,14 @@ export class SessionManager {
         }
     ): Promise<ISession> {
         try {
+            // Validate and convert userId to ObjectId
+            if (!Types.ObjectId.isValid(userId)) {
+                throw new Error('Invalid user ID format');
+            }
+            const userObjectId = new Types.ObjectId(userId) as unknown as mongoose.Types.ObjectId;
+            
             // Check if user exists
-            const user = await UserModel.findById(userId);
+            const user = await UserModel.findById(userObjectId);
             if (!user) {
                 const error = new Error() as CustomError;
                 error.code = 'USER_NOT_FOUND';
@@ -42,27 +47,29 @@ export class SessionManager {
             const joinCode = await this.generateUniqueJoinCode();
 
             const session = new Session({
-                creator: userId,
+                creator: userObjectId,
                 participants: [{
-                    userId: userId,
+                    userId: userObjectId,
                     preferences: []
                 }],
                 pendingInvitations: [],
                 settings: {
                     location: settings
                 },
-                restaurants: restaurants.map(r => ({
-                    restaurantId: r._id,
-                    score: 0,
-                    totalVotes: 0,
-                    positiveVotes: 0
-                })),
+                restaurants: restaurants.map(r => {
+                    return {
+                        restaurantId: r._id,
+                        score: 0,
+                        totalVotes: 0,
+                        positiveVotes: 0
+                    };
+                }),
                 joinCode: joinCode,
                 status: 'CREATED' as SessionStatus,
                 expiresAt: expiresAt
             });
 
-            session.doneSwiping = [userId];
+            session.doneSwiping = [userObjectId];
 
             await session.save();
             return session;
@@ -92,12 +99,16 @@ export class SessionManager {
     }
 
     
-    async sessionSwiped(sessionId: Types.ObjectId, userId: string, restaurantId: string, swipe: boolean) {
-        const userObjId = new mongoose.Types.ObjectId(userId);
+    async sessionSwiped(sessionId: string, userId: string, restaurantId: string, swipe: boolean) {
+        if (!Types.ObjectId.isValid(sessionId) || !Types.ObjectId.isValid(userId)) {
+            throw new Error('Invalid ID format');
+        }
+        const sessionObjId = new Types.ObjectId(sessionId) as unknown as mongoose.Types.ObjectId;
+        const userObjId = new Types.ObjectId(userId) as unknown as mongoose.Types.ObjectId;
 
         const session = await Session.findOneAndUpdate(
             {
-                _id: sessionId,
+                _id: sessionObjId,
                 status: { $eq: 'MATCHING' },
                 'participants.userId': userObjId,
                 'participants': {
@@ -124,7 +135,7 @@ export class SessionManager {
 
         if (!session){
             const existingSession = await Session.findOne({
-                _id: sessionId,
+                _id: sessionObjId,
                 'participants': {
                     $elemMatch : {
                         userId: userObjId,
@@ -142,19 +153,24 @@ export class SessionManager {
         return session;
     }
 
-    async addPendingInvitation(sessionId: Types.ObjectId, userId: Types.ObjectId): Promise<ISession> {
-        // Use findOneAndUpdate for atomic operation
+    async addPendingInvitation(sessionId: string, userId: string): Promise<ISession> {
+        if (!Types.ObjectId.isValid(sessionId) || !Types.ObjectId.isValid(userId)) {
+            throw new Error('Invalid ID format');
+        }
+        const sessionObjectId = new Types.ObjectId(sessionId) as unknown as mongoose.Types.ObjectId;
+        const userObjectId = new Types.ObjectId(userId) as unknown as mongoose.Types.ObjectId;
+
         const updatedSession = await Session.findOneAndUpdate(
             {
-                _id: sessionId,
+                _id: sessionObjectId,
                 status: { $ne: 'COMPLETED' },
-                'participants.userId': { $ne: userId },
-                pendingInvitations: { $ne: userId }
+                'participants.userId': { $ne: userObjectId },
+                pendingInvitations: { $ne: userObjectId }
             },
             {
                 $push: { 
-                    pendingInvitations: userId,
-                    doneSwiping: userId
+                    pendingInvitations: userObjectId,
+                    doneSwiping: userObjectId
                 }
             },
             { new: true, runValidators: true }
@@ -163,15 +179,15 @@ export class SessionManager {
         // Handle failure cases
         if (!updatedSession) {
             // Find the session to determine the specific error
-            const session = await Session.findById(sessionId);
+            const session = await Session.findById(sessionObjectId);
             
             if (!session) {
                 throw new Error('Session not found');
             } else if (session.status === 'COMPLETED') {
                 throw new Error('Cannot invite users to a completed session');
-            } else if (session.participants.some(p => p.userId.equals(userId))) {
+            } else if (session.participants.some(p => p.userId.equals(userObjectId))) {
                 throw new Error('User is already a participant');
-            } else if (session.pendingInvitations.some(id => id.equals(userId))) {
+            } else if (session.pendingInvitations.some(id => id.equals(userObjectId))) {
                 throw new Error('User has already been invited');
             } else {
                 throw new Error('Failed to invite user to session');
@@ -181,20 +197,24 @@ export class SessionManager {
         return updatedSession;
     }
 
-    async joinSession(joinCode: String, userId: Types.ObjectId): Promise<ISession> {
-        // Use findOneAndUpdate for atomic operation
+    async joinSession(joinCode: String, userId: string): Promise<ISession> {
+        if (!Types.ObjectId.isValid(userId)) {
+            throw new Error('Invalid user ID format');
+        }
+        const userObjectId = new Types.ObjectId(userId) as unknown as mongoose.Types.ObjectId;
+
         const updatedSession = await Session.findOneAndUpdate(
             {
                 joinCode: joinCode,
                 status: { $ne: 'COMPLETED' },
-                pendingInvitations: userId,
-                'participants.userId': { $ne: userId }
+                pendingInvitations: userObjectId,
+                'participants.userId': { $ne: userObjectId }
             },
             {
-                $pull: { pendingInvitations: userId },
+                $pull: { pendingInvitations: userObjectId },
                 $push: {
                     participants: {
-                        userId: userId,
+                        userId: userObjectId,
                         preferences: []
                     }
                 }
@@ -210,7 +230,7 @@ export class SessionManager {
                 throw new Error('Session not found');
             } else if (session.status === 'COMPLETED') {
                 throw new Error('Cannot join a completed session');
-            } else if (session.participants.some(p => p.userId.equals(userId))) {
+            } else if (session.participants.some(p => p.userId.equals(userObjectId))) {
                 throw new Error('User is already a participant');
             } else {
                 throw new Error('User has not been invited to this session');
@@ -220,13 +240,17 @@ export class SessionManager {
         return updatedSession;
     }
 
-    async getUserSessions(userId: Types.ObjectId): Promise<ISession[]> {
+    async getUserSessions(userId: string): Promise<ISession[]> {
         try {
+            if (!Types.ObjectId.isValid(userId)) {
+                throw new Error('Invalid user ID format');
+            }
+            const userObjectId = new Types.ObjectId(userId) as unknown as mongoose.Types.ObjectId;
             const sessions = await Session.find({
                 $or: [
-                    { creator: userId },
-                    { 'participants.userId': userId },
-                    { pendingInvitations: userId }
+                    { creator: userObjectId },
+                    { 'participants.userId': userObjectId },
+                    { pendingInvitations: userObjectId }
                 ],
                 status: { $ne: 'COMPLETED' as SessionStatus }
             }).sort({ createdAt: -1 }); // Most recent first
@@ -238,14 +262,18 @@ export class SessionManager {
         }
     }
 
-    async getSession(sessionId: Types.ObjectId): Promise<ISession> {
+    async getSession(sessionId: string): Promise<ISession> {
         try {
-            const session = await Session.findById(sessionId);
+            if (!Types.ObjectId.isValid(sessionId)) {
+                throw new Error('Invalid session ID format');
+            }
+            const sessionObjId = new Types.ObjectId(sessionId) as unknown as mongoose.Types.ObjectId;
+            
+            const session = await Session.findById(sessionObjId);
             if (!session) {
                 const error = new Error('Session not found') as Error & { code?: string };
                 error.code = 'SESSION_NOT_FOUND';
                 throw error;
-
             }
             return session;
         } catch (error) {
@@ -254,17 +282,22 @@ export class SessionManager {
         }
     }
 
-    async rejectInvitation(sessionId: Types.ObjectId, userId: Types.ObjectId): Promise<ISession> {
-        // Use findOneAndUpdate for atomic operation
+    async rejectInvitation(sessionId: string, userId: string): Promise<ISession> {
+        if (!Types.ObjectId.isValid(sessionId) || !Types.ObjectId.isValid(userId)) {
+            throw new Error('Invalid ID format');
+        }
+        const sessionObjectId = new Types.ObjectId(sessionId) as unknown as mongoose.Types.ObjectId;
+        const userObjectId = new Types.ObjectId(userId) as unknown as mongoose.Types.ObjectId;
+
         const updatedSession = await Session.findOneAndUpdate(
             {
-                _id: sessionId,
+                _id: sessionObjectId,
                 status: { $ne: 'COMPLETED' },
-                pendingInvitations: userId,
-                'participants.userId': { $ne: userId }
+                pendingInvitations: userObjectId,
+                'participants.userId': { $ne: userObjectId }
             },
             {
-                $pull: { pendingInvitations: userId }
+                $pull: { pendingInvitations: userObjectId }
             },
             { new: true, runValidators: true }
         );
@@ -272,13 +305,13 @@ export class SessionManager {
         // Handle failure cases
         if (!updatedSession) {
             // Find the session to determine the specific error
-            const session = await Session.findById(sessionId);
+            const session = await Session.findById(sessionObjectId);
             
             if (!session) {
                 throw new Error('Session not found');
             } else if (session.status === 'COMPLETED') {
                 throw new Error('Cannot reject invitation for a completed session');
-            } else if (session.participants.some(p => p.userId.equals(userId))) {
+            } else if (session.participants.some(p => p.userId.equals(userObjectId))) {
                 throw new Error('User is already a participant');
             } else {
                 throw new Error('User has not been invited to this session');
@@ -288,17 +321,23 @@ export class SessionManager {
         return updatedSession;
     }
 
-    async leaveSession(sessionId: Types.ObjectId, userId: Types.ObjectId): Promise<ISession> {
+    async leaveSession(sessionId: string, userId: string): Promise<ISession> {
+        if (!Types.ObjectId.isValid(sessionId) || !Types.ObjectId.isValid(userId)) {
+            throw new Error('Invalid ID format');
+        }
+        const sessionObjectId = new Types.ObjectId(sessionId) as unknown as mongoose.Types.ObjectId;
+        const userObjectId = new Types.ObjectId(userId) as unknown as mongoose.Types.ObjectId;
+
         // Use findOneAndUpdate to perform an atomic operation
         const updatedSession = await Session.findOneAndUpdate(
             {
-                _id: sessionId,
+                _id: sessionObjectId,
                 status: { $ne: 'COMPLETED' },
-                creator: { $ne: userId },
-                'participants.userId': userId
+                creator: { $ne: userObjectId },
+                'participants.userId': userObjectId
             },
             {
-                $pull: { participants: { userId: userId } }
+                $pull: { participants: { userId: userObjectId } }
             },
             { new: true, runValidators: true }
         );
@@ -306,13 +345,13 @@ export class SessionManager {
         // Handle failure cases
         if (!updatedSession) {
             // Find the session to determine the specific error
-            const session = await Session.findById(sessionId);
+            const session = await Session.findById(sessionObjectId);
             
             if (!session) {
                 throw new Error('Session not found');
             } else if (session.status === 'COMPLETED') {
                 throw new Error('Cannot leave a completed session');
-            } else if (session.creator.equals(userId)) {
+            } else if (session.creator.equals(userObjectId)) {
                 throw new Error('Session creator cannot leave the session');
             } else {
                 throw new Error('User is not a participant in this session');
@@ -322,26 +361,41 @@ export class SessionManager {
         return updatedSession;
     }
 
-    async getRestaurantsInSession(sessionId: Types.ObjectId) {
-        
-        const session = await Session.findOne({
-            _id: sessionId
-        });
+    async getRestaurantsInSession(sessionId: string) {
+        try {
+            if (!Types.ObjectId.isValid(sessionId)) {
+                throw new Error('Invalid session ID format');
+            }
+            const sessionObjId = new Types.ObjectId(sessionId) as unknown as mongoose.Types.ObjectId;
+            
+            const session = await Session.findOne({
+                _id: sessionObjId
+            });
 
-        if (!session) {
-            throw new Error('Session not found or user is not in session');
-        } else {
+            if (!session) {
+                const error = new Error('Session not found') as CustomError;
+                error.code = 'SESSION_NOT_FOUND';
+                throw error;
+            }
+
             const restaurantsIds = session.restaurants.map(r => r.restaurantId);
-            return this.restaurantService.getRestaurants(restaurantsIds);
+            return await this.restaurantService.getRestaurants(restaurantsIds);
+        } catch (error) {
+            console.error('Error getting restaurants in session:', error);
+            throw error;
         }
     }
 
-    async startSession(sessionId: Types.ObjectId, userId: string, time: number) {
-        const userObjId = new mongoose.Types.ObjectId(userId);
+    async startSession(sessionId: string, userId: string, time: number) {
+        if (!Types.ObjectId.isValid(sessionId) || !Types.ObjectId.isValid(userId)) {
+            throw new Error('Invalid ID format');
+        }
+        const sessionObjId = new Types.ObjectId(sessionId) as unknown as mongoose.Types.ObjectId;
+        const userObjId = new Types.ObjectId(userId) as unknown as mongoose.Types.ObjectId;
 
         const session = await Session.findOneAndUpdate(
             {
-                _id: sessionId,
+                _id: sessionObjId,
                 creator: userObjId,
                 status: 'CREATED'
             },
@@ -372,12 +426,16 @@ export class SessionManager {
         return session;
     }
 
-    async userDoneSwiping(sessionId: Types.ObjectId, userId: string) {
-        const userObjId = new mongoose.Types.ObjectId(userId);
+    async userDoneSwiping(sessionId: string, userId: string) {
+        if (!Types.ObjectId.isValid(sessionId) || !Types.ObjectId.isValid(userId)) {
+            throw new Error('Invalid ID format');
+        }
+        const sessionObjId = new Types.ObjectId(sessionId) as unknown as mongoose.Types.ObjectId;
+        const userObjId = new Types.ObjectId(userId) as unknown as mongoose.Types.ObjectId;
 
         const session = await Session.findOneAndUpdate(
             {
-                _id: sessionId,
+                _id: sessionObjId,
                 status: 'MATCHING',
                 'participants.userId': userObjId,
             },
@@ -399,8 +457,13 @@ export class SessionManager {
         return session;
     }
 
-    async getResultForSession(sessionId: Types.ObjectId) {
-        const session = await Session.findById(sessionId);
+    async getResultForSession(sessionId: string) {
+        if (!Types.ObjectId.isValid(sessionId)) {
+            throw new Error('Invalid session ID format');
+        }
+        const sessionObjId = new Types.ObjectId(sessionId) as unknown as mongoose.Types.ObjectId;
+        
+        const session = await Session.findById(sessionObjId);
         if (!session) {
             throw new Error('Session not found');
         }

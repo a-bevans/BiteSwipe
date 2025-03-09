@@ -48,7 +48,7 @@ GET /users/{userId}
 - `500 Internal Server Error`: Server error occurred
 ```json
 {
-  "error": "Internal server error"
+  "error": "Internal Server Error"
 }
 ```
 
@@ -78,10 +78,16 @@ POST /users/
   "sessionHistory": []
 }
 ```
-- `400 Bad Request`: Unable to create user
+- `409 Conflict`: User already exists
 ```json
 {
-  "error": "Unable to create user"
+  "error": "User with this email already exists"
+}
+```
+- `500 Internal Server Error`: Server error occurred
+```json
+{
+  "error": "Internal Server Error"
 }
 ```
 
@@ -551,6 +557,54 @@ DELETE /sessions/:sessionId/invitations/:userId
 ```json
 {
   "error": "Session not found"
+}
+```
+
+#### Get Restaurants in Session
+Retrieves all restaurants associated with a session.
+
+```http
+GET /sessions/:sessionId/restaurants
+```
+
+**Parameters**
+- `sessionId`: Session ID (path parameter)
+
+**Response**
+- `200 OK`: Successfully retrieved restaurants
+```json
+[
+  {
+    "restaurantId": "string",
+    "name": "string",
+    "address": "string",
+    "latitude": number,
+    "longitude": number,
+    "photoUrl": "string",
+    "rating": number,
+    "priceLevel": number,
+    "score": number,
+    "totalVotes": number,
+    "positiveVotes": number
+  }
+]
+```
+- `400 Bad Request`: Invalid session ID format
+```json
+{
+  "error": "Invalid session ID format"
+}
+```
+- `404 Not Found`: Session not found
+```json
+{
+  "error": "Session not found"
+}
+```
+- `500 Internal Server Error`: Server error occurred
+```json
+{
+  "error": "Internal server error"
 }
 ```
 

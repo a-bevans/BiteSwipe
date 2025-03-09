@@ -37,9 +37,14 @@ export class UserService {
         }
     }
 
-    async getUserById(userId: Types.ObjectId) {
+    async getUserById(userId: string | Types.ObjectId) {
         try {
-            return await UserModel.findById(userId);
+            if (!Types.ObjectId.isValid(userId)) {
+                throw new Error('Invalid user ID format');
+            }
+            return await UserModel.findById(new Types.ObjectId(userId))
+                .select('-__v') // Exclude version field
+                .lean(); // Convert to plain JavaScript object
         } catch (error) {
             console.error('Error getting user:', error);
             throw error;
@@ -51,6 +56,24 @@ export class UserService {
             return await UserModel.findOne({ email });
         } catch (error) {
             console.error('Error getting user by email:', error);
+            throw error;
+        }
+    }
+
+    async updateFCMToken(userId: string | Types.ObjectId, fcmToken: string) {
+        try {
+            if (!Types.ObjectId.isValid(userId)) {
+                throw new Error('Invalid user ID format');
+            }
+            const result = await UserModel.findByIdAndUpdate(new Types.ObjectId(userId), { fcmToken }, { new: true })
+                .select('-__v')
+                .lean();
+            if (!result) {
+                throw new Error('User not found');
+            }
+            return result;
+        } catch (error) {
+            console.error('Error updating FCM token:', error);
             throw error;
         }
     }

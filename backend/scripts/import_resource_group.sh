@@ -7,10 +7,13 @@ if [ "$1" != "" ]; then
     OWNER_TAG="$1"
     echo "Using custom owner tag: $OWNER_TAG"
 elif [ "$GITHUB_ACTOR" != "" ]; then
-    # Check if we're on main branch, use 'master' tag
+    # Check if we're on main or develop branch, use special tags
     if [ "$GITHUB_REF" = "refs/heads/main" ]; then
         OWNER_TAG="master"
         echo "Using master owner tag for main branch"
+    elif [ "$GITHUB_REF" = "refs/heads/develop" ]; then
+        OWNER_TAG="dev"
+        echo "Using dev owner tag for develop branch"
     else
         OWNER_TAG="$GITHUB_ACTOR"
         echo "Using GitHub actor: $OWNER_TAG"
