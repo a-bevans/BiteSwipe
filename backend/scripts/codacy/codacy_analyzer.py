@@ -555,10 +555,14 @@ def main():
     fixed_issues_path = output_dir / f"{base_name}_fixed.json"
     added_issues_path = output_dir / f"{base_name}_added.json"
     
-    # Prepare the complete output data
+    # Prepare the complete output data - simplified to match other output files
     output_data = {
-        "raw_results": results,
-        "analysis": analysis,
+        "analysis": {
+            "total_issues": analysis.get("total_issues", 0),
+            "by_severity": analysis.get("by_severity", {}),
+            "by_category": analysis.get("by_category", {}),
+            "by_file": analysis.get("by_file", {})
+        },
         "suggestions": suggestions
     }
     
