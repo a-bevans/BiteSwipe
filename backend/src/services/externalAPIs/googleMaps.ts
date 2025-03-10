@@ -1,5 +1,46 @@
 import axios from 'axios';
 
+// Type definitions for Google Places API responses
+export interface GooglePlaceDetails {
+  place_id: string;
+  name: string;
+  formatted_address: string;
+  geometry: {
+    location: {
+      lat: number;
+      lng: number;
+    };
+  };
+  formatted_phone_number?: string;
+  website?: string;
+  price_level?: number;
+  rating?: number;
+  user_ratings_total?: number;
+  opening_hours?: {
+    open_now: boolean;
+    weekday_text?: string[];
+  };
+  photos?: {
+    photo_reference: string;
+    height: number;
+    width: number;
+  }[];
+  photos_url?: string[];
+  types?: string[];
+}
+
+export interface GooglePlaceSearchResult {
+  place_id: string;
+  name: string;
+  geometry: {
+    location: {
+      lat: number;
+      lng: number;
+    };
+  };
+  types?: string[];
+}
+
 export class GooglePlacesService {
     private apiKey: string;
     private baseUrl: string = 'https://maps.googleapis.com/maps/api/place';
@@ -19,7 +60,7 @@ export class GooglePlacesService {
         this.getPlaceDetails = this.getPlaceDetails.bind(this);
     }
 
-    async searchNearby(latitude: number, longitude: number, radius: number, keyword?: string) {
+    async searchNearby(latitude: number, longitude: number, radius: number, keyword?: string): Promise<GooglePlaceSearchResult[]> {
         try {
             const response = await axios.get(`${this.baseUrl}/nearbysearch/json`,{
                 params: {
@@ -36,9 +77,10 @@ export class GooglePlacesService {
                 throw new Error('Failed to fetch nearby places');
             }
 
-            const restaurantsOnly = response.data.results.filter((place: any) => {
-                // Check if the place has restaurant-related types
-                const types = (place.types || []) as string[];
+            const responseData = response.data as { status: string; results: GooglePlaceSearchResult[] };
+            const results = responseData.results;
+            const restaurantsOnly = results.filter((place) => {
+                const types = (place.types ?? []);
                 const restaurantTypes = [
                     'restaurant', 
                     'food', 
@@ -48,8 +90,6 @@ export class GooglePlacesService {
                     'meal_delivery'
                 ];
                 
-                // Make sure at least one restaurant-related type is present
-                // AND ensure 'lodging' is not the primary type (to exclude hotels)
                 return restaurantTypes.some(type => types.includes(type)) && 
                        (!types.includes('lodging') || types.indexOf('restaurant') < types.indexOf('lodging'));
             });
@@ -63,7 +103,7 @@ export class GooglePlacesService {
     }
 
 
-    async getPlaceDetails(placeId: string) {
+    async getPlaceDetails(placeId: string): Promise<GooglePlaceDetails | null> {
         try {
             const response = await axios.get(`${this.baseUrl}/details/json`, {
                 params: {
@@ -78,13 +118,15 @@ export class GooglePlacesService {
                 throw new Error('Failed to fetch place details');
             }
 
-            if(response.data.result.photos) {
-                response.data.result.photos_url = response.data.result.photos.map((photo: any) => 
+            const responseData = response.data as { status: string; result: GooglePlaceDetails };
+            const result = responseData.result;
+            if(result.photos) {
+                result.photos_url = result.photos.map((photo: { photo_reference: string }) => 
                     this.getPhotoUrl(photo.photo_reference, 400)
                 );
             }
 
-            return response.data.result;
+            return result;
         } catch (error) {
             console.error(error);
             throw new Error('Failed to fetch place details');
