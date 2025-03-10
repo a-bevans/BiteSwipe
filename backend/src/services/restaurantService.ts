@@ -1,6 +1,6 @@
 import { Restaurant } from '../models/restaurant';
 import { Types } from 'mongoose';
-import { GooglePlacesService } from './externalAPIs/googleMaps';
+import { GooglePlacesService, GooglePlaceDetails } from './externalAPIs/googleMaps';
 
 export class RestaurantService {
 
@@ -17,8 +17,11 @@ export class RestaurantService {
                 const restaurant_exist = await Restaurant.findOne({ 'sourceData.googlePlaceId': place.place_id });
 
                 if(!restaurant_exist) {
-                    const details = await this.googlePlacesService.getPlaceDetails(place.place_id);
-                
+                    const details: GooglePlaceDetails | null = await this.googlePlacesService.getPlaceDetails(place.place_id);
+                    if(!details) {
+                        console.error(`Failed to get details for place ID: ${place.place_id}`);
+                        continue;
+                    }
                     const primaryImage = details.photos_url && details.photos_url.length > 0 ? details.photos_url[0] : '';
                     const galleryImages = details.photos_url && details.photos_url.length > 1 ? details.photos_url.slice(1) : [];
 

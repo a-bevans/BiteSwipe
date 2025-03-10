@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import mongoose from 'mongoose';
+import mongoose, { Mongoose } from 'mongoose';
 import { createApp } from './app';
 
 // ---------------------------------------------------------
@@ -21,7 +21,11 @@ console.log(`HTTP Port: ${port}`);
 console.log('=========================\n');
 
 // Configure mongoose connection with all recommended options
-mongoose.connect(dbUrl, {
+// Type assertion to ensure mongoose is properly typed
+const typedMongoose: Mongoose = mongoose as Mongoose;
+
+// Now we can safely call connect with proper typing
+typedMongoose.connect(dbUrl, {
     autoIndex: true, // Build indexes
     maxPoolSize: 10, // Maintain up to 10 socket connections
     serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
@@ -42,9 +46,9 @@ mongoose.connect(dbUrl, {
         console.log('====================\n');
     });
 })
-.catch(error => {
+.catch((error : unknown)=> {
     console.error('\n=== MongoDB Connection Error ===');
     console.error('Failed to connect to MongoDB');
-    console.error('Error:', error.message);
+    console.error('Error:', (error as Error).message);
     console.error('=============================\n');
 });
