@@ -56,6 +56,8 @@ jobs:
           echo "DB_URI=mongodb://mongo:27017/biteswipe" >> backend/.env
           echo "NODE_ENV=test" >> backend/.env
           echo "GOOGLE_MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY }}" >> backend/.env
+          echo "GOOGLE_WEB_CLIENT_ID=${{ secrets.GOOGLE_WEB_CLIENT_ID }}" >> backend/.env
+          echo "GOOGLE_TEST_EMAIL=${{ secrets.GOOGLE_TEST_EMAIL }}" >> backend/.env
           echo "FIREBASE_CREDENTIALS_JSON_PATHNAME=/app/backend/biteswipe-452501-firebase-adminsdk-fbsvc-f7b58ac1e2.json" >> backend/.env
 
       - name: Deploy New Infrastructure
@@ -99,38 +101,6 @@ jobs:
           ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-
-      - name: Download Test Results
-        run: |
-          # Get VM IP from Terraform output
-          cd backend/terraform
-          VM_IP=$(terraform output -raw vm_public_ip)
-          echo "VM IP: $VM_IP"
-
-          # Create directory for test results
-          mkdir -p test-results
-
-          # Download coverage reports from VM
-          echo "Downloading test results from VM..."
-          scp -o StrictHostKeyChecking=no -i ~/.ssh/to_azure/CPEN321.pem -r adminuser@${VM_IP}:/app/backend/coverage/* test-results/
-
-          # Check if download was successful
-          if [ $? -eq 0 ]; then
-            echo "Test results downloaded successfully"
-            ls -la test-results/
-          else
-            echo "Failed to download test results"
-            exit 1
-          fi
-        continue-on-error: true
-
-      - name: Upload Test Results
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-coverage-report
-          path: test-results
-          retention-days: 14
-        continue-on-error: true
 
       - name: Destroy Infrastructure
         if: always()

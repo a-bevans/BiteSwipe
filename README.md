@@ -25,6 +25,7 @@ openssl pkcs12 -in cert.pfx -clcerts -nokeys -out server.crt
 
 ## Azure VM Deployment
 
+
 ### Prerequisites
 - SSH key setup:
   1. Download the private and public key pair from the shared Google drive.

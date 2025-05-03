@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - abdul/*
       - develop
 
 concurrency:
@@ -54,6 +53,8 @@ jobs:
           echo "PORT=3000" > backend/.env
           echo "DB_URI=mongodb://mongo:27017/biteswipe" >> backend/.env
           echo "GOOGLE_MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY }}" >> backend/.env
+          echo "GOOGLE_WEB_CLIENT_ID=${{ secrets.GOOGLE_WEB_CLIENT_ID }}" >> backend/.env
+          echo "GOOGLE_TEST_EMAIL=${{ secrets.GOOGLE_TEST_EMAIL }}" >> backend/.env
           echo "FIREBASE_CREDENTIALS_JSON_PATHNAME=/app/backend/biteswipe-452501-firebase-adminsdk-fbsvc-f7b58ac1e2.json" >> backend/.env
 
       - name: Deploy New Infrastructure
@@ -64,9 +65,11 @@ jobs:
           chmod +x import_resource_group.sh
           echo "::group::Deploying infrastructure"
           python3 deploy_infra.py
+          
           DEPLOY_EXIT_CODE=$?
           echo "::endgroup::"
           echo "deploy_status=$DEPLOY_EXIT_CODE" >> $GITHUB_OUTPUT
+          
           if [ $DEPLOY_EXIT_CODE -ne 0 ]; then
             echo "::error::Infrastructure deployment failed with exit code $DEPLOY_EXIT_CODE"
             echo "::group::Terraform logs (last 50 lines)"

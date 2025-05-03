@@ -31,6 +31,41 @@ import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
 
 interface ApiHelper {
+    /**
+     * TokenManager handles storage and retrieval of the Google token
+     */
+    object TokenManager {
+        private const val PREF_FILE_NAME = "biteswipe_prefs"
+        private const val KEY_GOOGLE_TOKEN = "google_token"
+
+        /**
+         * Stores the Google token using SharedPreferences
+         */
+        fun storeToken(context: Context, token: String) {
+            try {
+                context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE)
+                    .edit()
+                    .putString(KEY_GOOGLE_TOKEN, token)
+                    .apply()
+                Log.d("TokenManager", "Token stored")
+            } catch (e: Exception) {
+                Log.e("TokenManager", "Error storing token: ${e.message}")
+            }
+        }
+
+        /**
+         * Retrieves the Google token from storage
+         */
+        fun getToken(context: Context): String? {
+            return try {
+                context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE)
+                    .getString(KEY_GOOGLE_TOKEN, null)
+            } catch (e: Exception) {
+                Log.e("TokenManager", "Error retrieving token: ${e.message}")
+                null
+            }
+        }
+    }
 
     /**
      * Retrieves the base API URL dynamically from `strings.xml`
@@ -78,6 +113,12 @@ interface ApiHelper {
 //        val client = OkHttpClient()
         val client = createTrustedClient(context)
 
+        // Create a mutable map of headers that includes the Google token if available
+        val updatedHeaders = headers.toMutableMap()
+        TokenManager.getToken(context)?.let { token ->
+            updatedHeaders["Authorization"] = "Bearer $token"
+        }
+
         val url = if (isFullUrl) endpoint else getBaseUrl(context) + endpoint
 
         val requestBody = jsonBody?.let {
@@ -87,7 +128,7 @@ interface ApiHelper {
         val requestBuilder = Request.Builder().url(url)
 
         // Apply headers if provided
-        headers.forEach { (key, value) ->
+        updatedHeaders.forEach { (key, value) ->
             requestBuilder.addHeader(key, value)
         }
 

@@ -6,6 +6,7 @@ import { UserService } from './services/userService';
 import { SessionManager } from './services/sessionManager';
 import { RestaurantService } from './services/restaurantService';
 import { validateRequest } from './middleware/validateRequest';
+import { verifyGoogleToken } from './middleware/authMiddleware';
 
 // Wrapper for async handlers to properly catch errors
 const asyncHandler = (fn: (req: Request, res: Response, next: NextFunction) => Promise<unknown> | Promise<void>) =>
@@ -24,6 +25,9 @@ export function createApp(): Express {
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+
+  // Apply Google token verification middleware to all routes
+  app.use(asyncHandler(verifyGoogleToken));
 
   // Initialize services
   const restaurantService = new RestaurantService();

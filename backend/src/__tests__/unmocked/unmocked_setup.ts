@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 import { config } from "dotenv";
 import path from "path";
 import { beforeAll, afterAll } from "@jest/globals";
+import { setupGoogleAuth, createAuthenticatedAgent } from "./test_setup_auth";
+import { createApp } from "../../app";
+
+// Export the authenticated agent for use in tests
+export let authenticatedAgent: unknown;
 
 // Load test environment variables
 config({ path: path.join(__dirname, "../../../.env") });
@@ -9,6 +14,25 @@ config({ path: path.join(__dirname, "../../../.env") });
 // Set environment variables for test mode
 process.env.NODE_ENV = 'test';
 process.env.TEST_TYPE = 'unmocked';
+
+// No auth middleware mock for unmocked tests - using real auth
+// Setup Google authentication and create authenticated agent for unmocked tests
+beforeAll(async () => {
+    try {
+        // Setup Google authentication
+        await setupGoogleAuth();
+        console.log('Google authentication setup complete');
+        
+        // Create and export the authenticated agent
+        const app = createApp();
+        authenticatedAgent = createAuthenticatedAgent(app);
+        console.log('Authenticated agent created successfully');
+    } catch (error) {
+        console.error('Failed to setup Google authentication:', error);
+        // Throw error since Google auth is a prerequisite for most endpoints
+        throw error;
+    }
+}, 10000); // 10 second timeout for auth setup
 
 // Configure mongoose
 mongoose.set('strictQuery', false);

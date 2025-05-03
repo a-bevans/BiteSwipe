@@ -128,6 +128,9 @@ class LoginPage : AppCompatActivity(), ApiHelper, ToastHelper {
                         Log.d(TAG, "Google Response: ${credential}")
                         Log.d(TAG, "ID Token: ${googleIdTokenCredential.idToken}")
                         Log.d(TAG, "User Email: $email")
+                        
+                        // Store the Google token for use in all API requests
+                        ApiHelper.TokenManager.storeToken(this@LoginPage, idToken)
                         val endpoint = "/users/"
                         val body = JSONObject().apply {
                             put("email", email)

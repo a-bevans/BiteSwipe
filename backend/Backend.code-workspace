@@ -8,7 +8,8 @@
     }
   ],
   "settings": {
-    "python.languageServer": "None"
+    "python.languageServer": "None",
+    "postman.settings.dotenv-detection-notification-visibility": false
   },
   "extensions": {
     "recommendations": ["esbenp.prettier-vscode"]

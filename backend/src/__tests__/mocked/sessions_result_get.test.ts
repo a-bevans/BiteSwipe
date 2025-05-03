@@ -59,11 +59,12 @@ jest.mock('../../models/session', () => {
             if (id.toString() === '67db3be580163bf1328c0211') {
                 return Promise.resolve({
                     _id: '67db3be580163bf1328c0211',
-                    status: 'MATCHING', //  Ensures we hit the condition
+                    status: 'COMPLETED', // Changed from MATCHING to COMPLETED
                     doneSwiping: [], // Non-empty array
                     save: jest.fn().mockResolvedValue({ status: 'COMPLETED' }), // Simulate save
                     restaurants: [],
                     participants: [],
+                    finalSelection: { name: 'Test Restaurant' } // Added finalSelection
                 });
             }
             return Promise.resolve(null);

@@ -195,11 +195,27 @@ resource "azurerm_linux_virtual_machine" "vm" {
 
 # Add locals block for environment variables
 locals {
-  # Read and extract Google Maps API key from .env
+  # Read and extract environment variables from .env
   env_content = file("${path.module}/../.env")
+  
+  # Extract Google Maps API key
   google_maps_api_key = trimspace(replace(
     regexall("GOOGLE_MAPS_API_KEY=[^\n]*", local.env_content)[0],
     "GOOGLE_MAPS_API_KEY=", 
+    ""
+  ))
+  
+  # Extract Google Web Client ID
+  google_web_client_id = trimspace(replace(
+    regexall("GOOGLE_WEB_CLIENT_ID=[^\n]*", local.env_content)[0],
+    "GOOGLE_WEB_CLIENT_ID=", 
+    ""
+  ))
+  
+  # Extract Google Test Email
+  google_test_email = trimspace(replace(
+    regexall("GOOGLE_TEST_EMAIL=[^\n]*", local.env_content)[0],
+    "GOOGLE_TEST_EMAIL=", 
     ""
   ))
 }
@@ -336,6 +352,8 @@ EOF
 PORT=3000
 DB_URI=mongodb://mongo:27017/biteswipe
 GOOGLE_MAPS_API_KEY=${local.google_maps_api_key}
+GOOGLE_WEB_CLIENT_ID=${local.google_web_client_id}
+GOOGLE_TEST_EMAIL=${local.google_test_email}
 FIREBASE_CREDENTIALS_JSON_PATHNAME=$BACKEND_REMOTE_PATH/biteswipe-452501-firebase-adminsdk-fbsvc-f7b58ac1e2.json
 ENVFILE
       

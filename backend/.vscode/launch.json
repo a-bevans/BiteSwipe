@@ -12,6 +12,15 @@
       "port": 9229
     },
     {
+      "name": "Run",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
       "name": "Attach to Remote Backend",
       "type": "node",
       "request": "attach",

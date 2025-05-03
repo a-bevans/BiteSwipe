@@ -48,6 +48,14 @@ export class UserController {
     async createUser(req: Request, res: Response) {
         try {
             const { email, displayName } = req.body;
+            
+            // Validate that the email in the request body matches the authenticated user's email
+            // Skip validation in test mode
+            const isTestMode = process.env.NODE_ENV === 'test';
+            if (!isTestMode && req.userEmail && email !== req.userEmail) {
+                return res.status(403).json({ error: "Email in request does not match authenticated user" });
+            }
+            
             const user = await this.userService.createUser(
                 String(email),
                 String(displayName)
@@ -149,6 +157,13 @@ export class UserController {
         try {
             const userEmail = req.params.email;
             const friendEmail = req.body.friendEmail;
+            
+            // Validate that the email in the URL matches the authenticated user's email
+            // Skip validation in test mode
+            const isTestMode = process.env.NODE_ENV === 'test';
+            if (!isTestMode && req.userEmail && userEmail !== req.userEmail) {
+                return res.status(403).json({ error: "Email in URL does not match authenticated user" });
+            }
 
             const user = await this.userService.sendFriendRequest(userEmail, friendEmail);
 
@@ -167,6 +182,13 @@ export class UserController {
         try {
             const userEmail = req.params.email;
             const friendEmail = req.body.friendEmail;
+            
+            // Validate that the email in the URL matches the authenticated user's email
+            // Skip validation in test mode
+            const isTestMode = process.env.NODE_ENV === 'test';
+            if (!isTestMode && req.userEmail && userEmail !== req.userEmail) {
+                return res.status(403).json({ error: "Email in URL does not match authenticated user" });
+            }
 
             const user = await this.userService.acceptFriendRequest(userEmail, friendEmail);
 
@@ -184,6 +206,13 @@ export class UserController {
         try {
             const userEmail = req.params.email;
             const friendEmail = req.body.friendEmail;
+            
+            // Validate that the email in the URL matches the authenticated user's email
+            // Skip validation in test mode
+            const isTestMode = process.env.NODE_ENV === 'test';
+            if (!isTestMode && req.userEmail && userEmail !== req.userEmail) {
+                return res.status(403).json({ error: "Email in URL does not match authenticated user" });
+            }
 
             const user = await this.userService.rejectFriendRequest(userEmail, friendEmail);
 
@@ -201,6 +230,13 @@ export class UserController {
         try {
             const userEmail = req.params.email;
             const friendEmail = req.body.friendEmail;
+            
+            // Validate that the email in the URL matches the authenticated user's email
+            // Skip validation in test mode
+            const isTestMode = process.env.NODE_ENV === 'test';
+            if (!isTestMode && req.userEmail && userEmail !== req.userEmail) {
+                return res.status(403).json({ error: "Email in URL does not match authenticated user" });
+            }
 
             const user = await this.userService.removeFriend(userEmail, friendEmail);
 

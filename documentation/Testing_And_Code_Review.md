@@ -33,10 +33,6 @@
 | **POST /users/:userId/fcm-token**                    | [`/backend/src/__tests__/unmocked/users_userid_fcmtoken_post.test.ts#L49`](#)                   | [`/backend/src/__tests__/mocked/users_userid_fcmtoken_post.test.ts#L75`](#)                                                               | User DB                            |
 | **GET /users/:userId/sessions**                      | [`/backend/src/__tests__/unmocked/users_userid_sessions_get.test.ts#L52`](#)                    |                                                                                                                                           |                                    |
 | **GET /users/emails/:email**                         | [`/backend/src/__tests__/unmocked/users_emails_email_get.test.ts#L56`](#)                       | [`/backend/src/__tests__/mocked/create_get_user.test.ts#L252`](#) [`/backend/src/__tests__/mocked/users_emails_email_get.test.ts#L66`](#) | User DB                            |
-| **GET /users/:email/friendRequest**                         | [`/backend/src/__tests__/unmocked/user_post_sendReq.test.ts#L4`](#)                       |  |                             |
-| **GET /users/:email/acceptRequest**                         | [`/backend/src/__tests__/unmocked/user_post_accptReq.test.ts#L4`](#)                       |  |                             |
-| **GET /users/:email/rejectRequest**                         | [`/backend/src/__tests__/unmocked/user_post_rejectReq.test.ts#L4`](#)                       |  |                             |
-| **GET /users/:email/removeFriend**                         | [`/backend/src/__tests__/unmocked/user_post_rmvFrnd.test.ts#L4`](#)                       |  |                             |
 
 #### 2.1.2. Commit Hash Where Tests Run
 
